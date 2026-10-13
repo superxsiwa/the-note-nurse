@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>The Note Nurse - ระบบส่งเวรพยาบาล (.tnn)</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#10b981">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-animation {
+      animation: pulse-ring 1.8s infinite ease-in-out;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+  <!-- Main Mobile Frame Container -->
+  <div class="w-full max-w-md mx-auto flex flex-col flex-1 pb-16">
+    
+    <!-- Top Header -->
+    <header class="bg-slate-800/95 backdrop-blur border-b border-slate-700/80 p-3.5 sticky top-0 z-30 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg shadow-inner">
+          🩺
+        </div>
+        <div>
+          <h1 class="font-bold text-sm tracking-wide text-white leading-tight">The Note Nurse</h1>
+          <p class="text-[10px] text-slate-400">ระบบบันทึกส่งเวรด้วยเสียง (.tnn)</p>
+        </div>
+      </div>
+      
+      <!-- .tnn Save / Load -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="downloadTnnFile()" title="บันทึกลงไฟล์ วันที่.tnn" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-md transition-all active:scale-95">
+          <span>💾</span>
+          <span>.tnn</span>
+        </button>
+        <label class="cursor-pointer px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all active:scale-95" title="โหลดไฟล์ .tnn มาดู">
+          <span>📂</span>
+          <span>โหลด</span>
+          <input type="file" id="tnnFileInput" accept=".tnn,application/json" class="hidden" onchange="loadTnnFile(event)">
+        </label>
+      </div>
+    </header>
+
+    <!-- Top Selection: วันที่ / เวร / แสดงและจัดการเตียง -->
+    <div class="bg-slate-800/80 border-b border-slate-800 px-3.5 py-2.5 space-y-2.5 text-xs">
+      <!-- Row 1: วันที่ & ชื่อไฟล์ -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 flex-1 mr-2">
+          <span class="text-slate-400 font-medium">📅 วันที่:</span>
+          <input type="date" id="selectedDate" onchange="handleDateChange()" class="bg-slate-700 text-emerald-400 font-semibold rounded-lg px-2 py-1 border border-slate-600 focus:outline-none text-xs flex-1">
+        </div>
+        <span class="text-[10px] font-mono text-slate-400" id="tnnFileLabel">2026-10-13.tnn</span>
+      </div>
+
+      <!-- Row 2: เวร -->
+      <div class="flex items-center justify-between pt-1 border-t border-slate-700/50">
+        <div class="flex items-center gap-2 flex-1">
+          <span class="text-slate-400 font-medium">⏰ เวร:</span>
+          <select id="shiftSelect" onchange="handleShiftChange()" class="bg-slate-700 text-emerald-400 font-medium rounded-lg px-2 py-1 border border-slate-600 focus:outline-none text-xs flex-1">
+            <option value="เวรเช้า (08:00 - 16:00)">เวรเช้า (08:00 - 16:00)</option>
+            <option value="เวรบ่าย (16:00 - 24:00)" selected>เวรบ่าย (16:00 - 24:00)</option>
+            <option value="เวรดึก (24:00 - 08:00)">เวรดึก (24:00 - 08:00)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 3: รายการเตียง (กดที่ชื่อเตียงเพื่อแก้ไขได้เลย เอาดินสอออก) -->
+      <div class="pt-1.5 border-t border-slate-700/50 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400 font-medium flex items-center gap-1">
+            <span>🛏️</span> รายการเตียง (<span id="totalBedsCount">4</span>):
+            <span class="text-[10px] text-slate-500 font-normal">(แตะชื่อเพื่อแก้ไข)</span>
+          </span>
+          <button onclick="promptAddNewBed()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-0.5">
+            + เพิ่มเตียง
+          </button>
+        </div>
+
+        <!-- Bed Tags Bar: กดชื่อเตียงเพื่อแก้ไข / กดกากบาทเพื่อลบ -->
+        <div class="flex flex-wrap gap-1.5" id="bedPillsManager">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 Navigation Tabs (1.เสียง / 2.ข้อความ / 3.โน๊ต) -->
+    <div class="grid grid-cols-3 border-b border-slate-700 bg-slate-800/90 sticky top-[138px] z-20">
+      <button id="tabBtn1" onclick="switchTab('tab1')" class="py-2.5 text-center font-bold text-xs border-b-2 border-emerald-500 text-emerald-400 flex items-center justify-center gap-1.5 transition-all">
+        <span>🎙️</span>
+        <span>1. เสียง (<span id="countAudioBadge">0</span>)</span>
+      </button>
+      <button id="tabBtn2" onclick="switchTab('tab2')" class="py-2.5 text-center font-medium text-xs border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition-all">
+        <span>📝</span>
+        <span>2. ข้อความ</span>
+      </button>
+      <button id="tabBtn3" onclick="switchTab('tab3')" class="py-2.5 text-center font-medium text-xs border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition-all">
+        <span>📋</span>
+        <span>3. โน๊ต SBAR</span>
+      </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="p-3.5 flex-1 flex flex-col">
+
+      <!-- ==================== TAB 1: เสียง (ย่อ/ขยายข้อความได้, ขนาดใหญ่ขึ้น 6 บรรทัด, ตัวเลือกไม่ระบุเตียง) ==================== -->
+      <section id="contentTab1" class="tab-content active flex-col space-y-3.5 flex-1">
+        
+        <!-- Record & Import Card -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-4 text-center shadow-xl flex flex-col items-center justify-center">
+          <div class="flex items-center justify-between w-full mb-1 px-1">
+            <span class="text-xs font-semibold text-slate-300">กล่องอัดเสียงและนำเข้า</span>
+            <div class="text-sm font-mono font-bold text-emerald-400 bg-slate-900/80 px-2.5 py-0.5 rounded-lg border border-slate-700" id="recordTimer">
+              00:00
+            </div>
+          </div>
+
+          <!-- Giant Mic Button -->
+          <div class="my-2.5">
+            <div id="micPulseRing" class="rounded-full p-2 transition-all">
+              <button id="mainMicBtn" onclick="toggleVoiceRecord()" class="w-20 h-20 rounded-full bg-emerald-500 text-white flex flex-col items-center justify-center shadow-xl shadow-emerald-500/25 hover:bg-emerald-600 transition-all active:scale-95">
+                <svg id="micSvg" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 02-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                </svg>
+                <span id="micLabel" class="text-[11px] font-bold mt-1">กดอัดเสียง</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-400 max-w-xs leading-relaxed" id="speechHint">
+            แตะไมค์เพื่อเริ่มอัดเสียงสด หรือเลือกนำเข้าไฟล์เสียงด้านล่าง
+          </p>
+
+          <!-- Import File -->
+          <div class="mt-2.5 pt-2.5 border-t border-slate-700/60 w-full flex items-center justify-center gap-2">
+            <label class="cursor-pointer bg-slate-700/80 hover:bg-slate-700 text-slate-200 border border-slate-600 text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all active:scale-95 shadow-sm">
+              <span>📁</span>
+              <span>นำเข้าไฟล์เสียง (Import Audio)</span>
+              <input type="file" id="audioFileInput" accept="audio/*" class="hidden" onchange="handleAudioUpload(event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- Audio List -->
+        <div class="space-y-2 flex-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <span>🎵</span> รายการเสียงทั้งหมดในเวรนี้ (<span id="audioListCount">0</span>)
+            </span>
+            <span class="text-[10px] text-slate-400">กดดึงข้อความ ➔ เลือกเตียง ➔ กดส่ง</span>
+          </div>
+
+          <div class="space-y-3" id="audioItemsContainer">
+            <!-- Audio cards rendered dynamically -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== TAB 2: ข้อความ (มีปุ่มย่อ/ขยายในแต่ละข้อความเตียง) ==================== -->
+      <section id="contentTab2" class="tab-content flex-col space-y-3 flex-1">
+        
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1">
+            <span>📝</span> ข้อความแยกตามเตียง
+          </span>
+          <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
+            แตะย่อ/ขยาย หรือ ลบได้
+          </span>
+        </div>
+
+        <!-- Bed Transcripts Cards -->
+        <div class="space-y-3 flex-1" id="bedTranscriptsContainer">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <button onclick="switchTab('tab3')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition-all">
+          <span>ไปที่แท็บ 3. โน๊ต SBAR ➔</span>
+        </button>
+
+      </section>
+
+      <!-- ==================== TAB 3: โน๊ต (สรุป SBAR แยกรายเตียง) ==================== -->
+      <section id="contentTab3" class="tab-content flex-col space-y-3 flex-1">
+        
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+            <span>📋</span> สรุปโน๊ตส่งเวร (SBAR) แยกตามเตียง
+          </span>
+          <button onclick="reparseAllBedsSbar()" class="text-[11px] bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md font-medium transition-all">
+            ✨ อัปเดตทุกเตียง
+          </button>
+        </div>
+
+        <!-- Bed SBAR Cards Container -->
+        <div class="space-y-3.5 flex-1" id="bedNotesContainer">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Bottom Export -->
+        <div class="pt-1 flex gap-2">
+          <button onclick="copyAllBedsHandover()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+            </svg>
+            <span>คัดลอกโน๊ตส่งเวรทุกเตียง (Copy All)</span>
+          </button>
+          <button onclick="downloadTnnFile()" class="px-4 py-3 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 active:scale-98 text-xs font-medium transition-all text-slate-200 flex items-center gap-1">
+            💾 .tnn
+          </button>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script>
+    // State
+    let activeDate = '2026-10-13';
+    let activeShift = 'เวรบ่าย (16:00 - 24:00)';
+    let availableBeds = ['เตียง 1', 'เตียง 2', 'เตียง 3', 'เตียง 4', 'ไม่ระบุเตียง'];
+
+    let isRecording = false;
+    let timerInterval = null;
+    let timerSeconds = 0;
+
+    // Temporary selection for audio items dropdown
+    let tempSelectedBeds = {};
+
+    // Track collapse state for tab 2 messages (true = expanded, false = collapsed)
+    let transcriptCollapseState = {};
+
+    // Master Structure: [วัน][เวร] = { audioItems: [], beds: { "เตียง 1": { transcript, sbar } } }
+    let masterData = {
+      '2026-10-13': {
+        'เวรบ่าย (16:00 - 24:00)': {
+          audioItems: [
+            {
+              id: 'a1',
+              title: 'ตรวจเวรบ่าย - เคสหอบเหนื่อย',
+              time: '15:30 น.',
+              duration: '01:10',
+              text: 'เตียง 1 คนไข้มีอาการเหนื่อยหอบ SpO2 ดรอปเหลือ 91% ฟังเสียงปอดมี crepitation หมอสั่งพ่น Berodual 1 nb และปรับ On Oxygen mask with bag 10 ลิตร หลังพ่นเหนื่อยลดลง SpO2 ขึ้นมา 97% ฝากเวรถัดไป re-eval ซ้ำ',
+              isExpanded: true
+            },
+            {
+              id: 'a2',
+              title: 'รายงานแพทย์ - เคสความดันตก',
+              time: '14:15 น.',
+              duration: '00:45',
+              text: 'เตียง 3 คุณลุง BP ดรอปตอนบ่ายสอง เหลือ 85/50 หมอให้โหลด NSS 500 ไป อาการดีขึ้น ตอนนี้ BP 115/72 O2 sat 98% On cannula 3 ลิตร ฝากเวรดึกดู Urine output ต่อเน้อ',
+              isExpanded: false
+            }
+          ],
+          beds: {
+            'เตียง 1': {
+              transcript: 'เตียง 1 คนไข้มีอาการเหนื่อยหอบ SpO2 ดรอปเหลือ 91% ฟังเสียงปอดมี crepitation หมอสั่งพ่น Berodual 1 nb และปรับ On Oxygen mask with bag 10 ลิตร หลังพ่นเหนื่อยลดลง SpO2 ขึ้นมา 97% ฝากเวรถัดไป re-eval ซ้ำ',
+              sbar: {
+                s: 'เตียง 1 ผู้ป่วยมีอาการเหนื่อยหอบ (Dyspnea) และ SpO2 ลดต่ำลง',
+                b: 'SpO2 ดรอปเหลือ 91%, ฟังปอดพบ crepitation',
+                a: 'พ่นยา Berodual 1 nb ตามคำสั่งแพทย์ และปรับ On Oxygen mask with bag 10 LPM, หลังพ่น SpO2 เพิ่มขึ้นเป็น 97% อาการเหนื่อยลดลง',
+                r: 'ฝากเวรถัดไป Re-evaluate อาการเหนื่อยและฟังเสียงปอดซ้ำ'
+              }
+            },
+            'เตียง 2': {
+              transcript: 'เตียง 2 อาการทั่วไปคงที่ V/S ปกติ รับประทานอาหารได้ ไม่มีไข้ แผลผ่าตัดแห้งดี ไม่ซึม',
+              sbar: {
+                s: 'เตียง 2 อาการทั่วไปและสัญญาณชีพคงที่',
+                b: 'BP 122/78 mmHg, PR 80 bpm, Temp 36.8 C แผลผ่าตัดแห้งดี',
+                a: 'ดูแลทำแผลตามแผนการรักษา และให้คำแนะนำการเคลื่อนไหวร่างกาย',
+                r: 'เฝ้าระวังอาการปวดแผล และติดตาม V/S ตามรอบปกติ'
+              }
+            },
+            'เตียง 3': {
+              transcript: 'เตียง 3 คุณลุง BP ดรอปตอนบ่ายสอง เหลือ 85/50 หมอให้โหลด NSS 500 ไป อาการดีขึ้น ตอนนี้ BP 115/72 O2 sat 98% On cannula 3 ลิตร ฝากเวรดึกดู Urine output ต่อเน้อ',
+              sbar: {
+                s: 'เตียง 3 มีภาวะความดันโลหิตต่ำ (BP Drop) เวลา 14:00 น.',
+                b: 'BP ดรอปเหลือ 85/50 mmHg',
+                a: 'รายงานแพทย์ ได้รับคำสั่ง IV Fluid Loading (NSS) 500 ml IV. หลังโหลด BP ขึ้นมาเป็น 115/72 mmHg, SpO2 98% On O2 cannula 3 LPM',
+                r: 'ติดตาม V/S ใกล้ชิด และประเมิน Urine output ทุก 1 ชม. ในเวรดึก'
+              }
+            },
+            'เตียง 4': {
+              transcript: '',
+              sbar: { s: '', b: '', a: '', r: '' }
+            },
+            'ไม่ระบุเตียง': {
+              transcript: 'คนไข้บ่นปวดแผลผ่าตัด VAS score 7 คะแนน ให้ Tramadol 50 mg IV ตาม order อาการปวดทุเลา',
+              sbar: { s: 'มีอาการปวดแผล', b: 'VAS 7 คะแนน', a: 'ให้ Tramadol 50 mg IV', r: 'ประเมินซ้ำ' }
+            }
+          }
+        }
+      }
+    };
+
+    function ensureCurrentShift() {
+      if (!masterData[activeDate]) masterData[activeDate] = {};
+      if (!masterData[activeDate][activeShift]) {
+        masterData[activeDate][activeShift] = {
+          audioItems: [],
+          beds: {}
+        };
+      }
+      availableBeds.forEach(bed => {
+        if (!masterData[activeDate][activeShift].beds[bed]) {
+          masterData[activeDate][activeShift].beds[bed] = { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
+        }
+      });
+      return masterData[activeDate][activeShift];
+    }
+
+    function initApp() {
+      document.getElementById('selectedDate').value = activeDate;
+      document.getElementById('tnnFileLabel').innerText = `${activeDate}.tnn`;
+      renderBedPillsManager();
+      renderAllTabs();
+    }
+
+    function handleDateChange() {
+      activeDate = document.getElementById('selectedDate').value || '2026-10-13';
+      document.getElementById('tnnFileLabel').innerText = `${activeDate}.tnn`;
+      renderAllTabs();
+    }
+
+    function handleShiftChange() {
+      activeShift = document.getElementById('shiftSelect').value;
+      renderAllTabs();
+    }
+
+    // ==================== BED MANAGEMENT (กดที่ชื่อเตียงเพื่อแก้ไข เอาดินสอออก) ====================
+    function renderBedPillsManager() {
+      const container = document.getElementById('bedPillsManager');
+      document.getElementById('totalBedsCount').innerText = availableBeds.length;
+
+      container.innerHTML = availableBeds.map(bed => `
+        <div class="flex items-center gap-1 bg-slate-700/80 border border-slate-600 hover:border-emerald-500 rounded-lg pl-2 pr-1 py-0.5 text-xs transition-all">
+          <!-- กดที่ชื่อเตียงเพื่อแก้ไขได้เลย -->
+          <button onclick="promptEditBed('${bed}')" title="แตะเพื่อแก้ไขชื่อเตียง" class="font-bold ${bed === 'ไม่ระบุเตียง' ? 'text-amber-400' : 'text-emerald-400'} hover:underline text-left">
+            ${bed}
+          </button>
+          
+          <!-- ปุ่มกากบาทลบเตียง (ยกเว้น 'ไม่ระบุเตียง' ไว้เพื่อความปลอดภัย) -->
+          ${bed !== 'ไม่ระบุเตียง' ? `
+            <button onclick="promptRemoveBed('${bed}')" title="ลบเตียงนี้" class="text-slate-400 hover:text-rose-400 px-1 hover:bg-slate-800 rounded">
+              ✕
+            </button>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function promptAddNewBed() {
+      const name = prompt("ระบุชื่อเตียงใหม่ (เช่น เตียง 5 หรือ ICU-1):");
+      if (name && name.trim()) {
+        const clean = name.trim();
+        if (!availableBeds.includes(clean)) {
+          // แทรกก่อน 'ไม่ระบุเตียง'
+          const unassignedIdx = availableBeds.indexOf('ไม่ระบุเตียง');
+          if (unassignedIdx !== -1) {
+            availableBeds.splice(unassignedIdx, 0, clean);
+          } else {
+            availableBeds.push(clean);
+          }
+          const shiftData = ensureCurrentShift();
+          shiftData.beds[clean] = { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
+          renderBedPillsManager();
+          renderAllTabs();
+        } else {
+          alert("มีชื่อเตียงนี้อยู่แล้วครับ");
+        }
+      }
+    }
+
+    function promptEditBed(oldName) {
+      if (oldName === 'ไม่ระบุเตียง') {
+        alert("เตียง 'ไม่ระบุเตียง' เป็นระบบตั้งต้น ไม่สามารถเปลี่ยนชื่อได้ครับ");
+        return;
+      }
+      const newName = prompt(`แก้ไขชื่อของ "${oldName}" เป็น:`, oldName);
+      if (newName && newName.trim() && newName.trim() !== oldName) {
+        const clean = newName.trim();
+        const idx = availableBeds.indexOf(oldName);
+        if (idx !== -1) {
+          availableBeds[idx] = clean;
+          const shiftData = ensureCurrentShift();
+          if (shiftData.beds[oldName]) {
+            shiftData.beds[clean] = shiftData.beds[oldName];
+            delete shiftData.beds[oldName];
+          }
+          renderBedPillsManager();
+          renderAllTabs();
+        }
+      }
+    }
+
+    function promptRemoveBed(bedName) {
+      if (bedName === 'ไม่ระบุเตียง') return;
+      if (confirm(`คุณต้องการลบ "${bedName}" ออกจากระบบหรือไม่?`)) {
+        availableBeds = availableBeds.filter(b => b !== bedName);
+        const shiftData = ensureCurrentShift();
+        if (shiftData.beds[bedName]) {
+          delete shiftData.beds[bedName];
+        }
+        renderBedPillsManager();
+        renderAllTabs();
+      }
+    }
+
+    function renderAllTabs() {
+      const shiftData = ensureCurrentShift();
+      renderTab1Audio(shiftData.audioItems);
+      renderTab2Transcripts(shiftData.beds);
+      renderTab3Notes(shiftData.beds);
+    }
+
+    // ==================== TAB 1: เสียง (ย่อ/ขยายได้, ขนาด 6 บรรทัด, ตัวเลือกไม่ระบุเตียง) ====================
+    function renderTab1Audio(items) {
+      const container = document.getElementById('audioItemsContainer');
+      document.getElementById('audioListCount').innerText = items.length;
+      document.getElementById('countAudioBadge').innerText = items.length;
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 text-center text-xs text-slate-500">
+            ยังไม่มีรายการเสียงใน ${activeShift}<br>
+            <span class="text-[11px] text-slate-400">กดปุ่มไมค์ด้านบน หรือ นำเข้าไฟล์เสียง</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map(item => {
+        const currentTargetBed = tempSelectedBeds[item.id] || availableBeds[0] || 'เตียง 1';
+        return `
+          <div class="bg-slate-800/90 border ${item.isExpanded ? 'border-emerald-500/50 bg-slate-800' : 'border-slate-700'} rounded-2xl p-3 space-y-2.5 shadow-sm transition-all">
+            
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                <button onclick="alert('กำลังเล่นเสียง: ${item.title}')" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center hover:scale-105 text-xs shrink-0">
+                  ▶
+                </button>
+                <div class="truncate">
+                  <span class="text-xs font-bold text-white block truncate">${item.title}</span>
+                  <span class="text-[10px] text-slate-400 font-mono">${item.time} (${item.duration})</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1.5 shrink-0">
+                <!-- ปุ่ม ย่อ/ขยาย แบบหน้าข้อความ -->
+                <button onclick="toggleAudioItemExpand('${item.id}')" class="text-[11px] text-slate-400 hover:text-slate-200 px-2 py-1 rounded-lg bg-slate-700/60 font-medium border border-slate-600/60 transition-all">
+                  ${item.isExpanded ? '▲ ย่อ' : '▼ ขยาย'}
+                </button>
+
+                <!-- ปุ่ม ดึงข้อความ (ทำหน้าที่ดึง/แปลงข้อความจากเสียง) -->
+                <button onclick="handlePullText('${item.id}')" class="px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all shadow-sm bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40">
+                  <span>📝 ดึงข้อความ</span>
+                </button>
+
+                <!-- ปุ่ม ลบเสียง -->
+                <button onclick="removeAudioItem('${item.id}')" title="ลบออกจาก list" class="text-slate-500 hover:text-rose-400 p-1 text-xs">
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <!-- กล่องข้อความที่ถอดได้ (เพิ่มขนาดเป็น 6 บรรทัด + ย่อขยายได้) -->
+            ${item.isExpanded ? `
+              <div class="pt-2 border-t border-slate-700/60 space-y-2 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/50">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+                    <span>📄</span> ข้อความที่ถอดได้ (อ่าน/แก้ไขก่อนส่ง):
+                  </span>
+                  <button onclick="toggleAudioItemExpand('${item.id}')" class="text-[10px] text-slate-400 hover:text-slate-200">
+                    ▲ ย่อกล่องนี้
+                  </button>
+                </div>
+
+                <!-- ช่องข้อความขนาด 6 บรรทัด เพื่อให้อ่านได้เยอะขึ้น -->
+                <textarea oninput="handleItemTextInput('${item.id}', this.value)" rows="6" class="w-full bg-slate-950/80 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 leading-relaxed shadow-inner" placeholder="กดปุ่ม '📝 ดึงข้อความ' หรือพิมพ์ข้อความที่นี่">${item.text || ''}</textarea>
+
+                <!-- เลือกว่าจะไปเตียงไหน (มีไม่ระบุเตียงในลิสต์) + ปุ่มส่ง -->
+                <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800">
+                  <div class="flex items-center gap-1.5 flex-1">
+                    <span class="text-[11px] font-medium text-slate-300 shrink-0">
+                      🛏️ ไปเตียง:
+                    </span>
+                    <select onchange="handleBedDropdownChange('${item.id}', this.value)" class="bg-slate-800 text-xs font-bold rounded-lg px-2.5 py-1.5 border border-emerald-500/50 text-emerald-400 focus:outline-none flex-1">
+                      ${availableBeds.map(b => `<option value="${b}" ${b === currentTargetBed ? 'selected' : ''} class="${b === 'ไม่ระบุเตียง' ? 'text-amber-400' : ''}">${b}</option>`).join('')}
+                    </select>
+                  </div>
+
+                  <!-- ปุ่ม ส่ง (Send to Bed) -->
+                  <button onclick="sendTextToBed('${item.id}')" class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-md transition-all shrink-0">
+                    <span>🚀</span>
+                    <span>ส่ง</span>
+                  </button>
+                </div>
+              </div>
+            ` : `
+              <!-- เมื่อย่ออยู่ แสดงตัวอย่างข้อความสั้นๆ คล้ายหน้าข้อความ -->
+              <div onclick="toggleAudioItemExpand('${item.id}')" class="text-[11px] text-slate-400 truncate bg-slate-900/40 p-2 rounded-lg cursor-pointer hover:text-slate-200">
+                ${(item.text && item.text.trim()) ? item.text.slice(0, 65) + '... (แตะเพื่อขยาย)' : '(ยังไม่มีข้อความ - กด "ดึงข้อความ" หรือแตะเพื่อขยาย)'}
+              </div>
+            `}
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleAudioItemExpand(id) {
+      const shiftData = ensureCurrentShift();
+      const item = shiftData.audioItems.find(a => a.id === id);
+      if (item) {
+        item.isExpanded = !item.isExpanded;
+        renderAllTabs();
+      }
+    }
+
+    function handlePullText(id) {
+      const shiftData = ensureCurrentShift();
+      const item = shiftData.audioItems.find(a => a.id === id);
+      if (!item) return;
+
+      // ดึงข้อความ (ถ้ายังไม่มีข้อความ หรือต้องการดึงใหม่)
+      if (!item.text || !item.text.trim()) {
+        item.text = `บันทึกการพยาบาลจากเสียง (${item.title}): ผู้ป่วยอาการคงที่ สัญญาณชีพอยู่ในเกณฑ์ปกติ ให้การพยาบาลตามมาตรฐานวิชาชีพ`;
+      }
+
+      // เมื่อกดดึงข้อความ ให้กางกล่องออกให้อัตโนมัติ เพื่อให้เห็นข้อความทันที
+      item.isExpanded = true;
+      if (!tempSelectedBeds[id]) {
+        tempSelectedBeds[id] = availableBeds[0] || 'เตียง 1';
+      }
+
+      renderAllTabs();
+    }
+
+    function handleBedDropdownChange(id, bedName) {
+      tempSelectedBeds[id] = bedName;
+    }
+
+    function handleItemTextInput(id, newText) {
+      const shiftData = ensureCurrentShift();
+      const item = shiftData.audioItems.find(a => a.id === id);
+      if (item) {
+        item.text = newText;
+      }
+    }
+
+    // เมื่อกดปุ่ม "ส่ง" (Send to Bed)
+    function sendTextToBed(id) {
+      const shiftData = ensureCurrentShift();
+      const item = shiftData.audioItems.find(a => a.id === id);
+      if (!item) return;
+
+      const targetBed = tempSelectedBeds[id] || availableBeds[0] || 'เตียง 1';
+      const textToSend = item.text || '';
+
+      if (!shiftData.beds[targetBed]) {
+        shiftData.beds[targetBed] = { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
+      }
+
+      // นำข้อความไปใส่ในเตียงที่เลือก
+      if (shiftData.beds[targetBed].transcript && shiftData.beds[targetBed].transcript.trim()) {
+        shiftData.beds[targetBed].transcript += '\n' + textToSend;
+      } else {
+        shiftData.beds[targetBed].transcript = textToSend;
+      }
+
+      // เปิดกล่องของเตียงนั้นในหน้าข้อความอัตโนมัติ
+      transcriptCollapseState[targetBed] = true;
+
+      // Auto SBAR
+      autoGenerateSbarForBed(targetBed, shiftData.beds[targetBed].transcript);
+
+      alert(`✅ ส่งข้อความไปยัง "${targetBed}" เรียบร้อยแล้ว!`);
+      renderAllTabs();
+      switchTab('tab2');
+    }
+
+    function removeAudioItem(id) {
+      if (confirm("ต้องการลบรายการเสียงนี้ออกจาก list หรือไม่?")) {
+        const shiftData = ensureCurrentShift();
+        shiftData.audioItems = shiftData.audioItems.filter(a => a.id !== id);
+        renderAllTabs();
+      }
+    }
+
+    // Toggle Record
+    function toggleVoiceRecord() {
+      const micBtn = document.getElementById('mainMicBtn');
+      const pulseRing = document.getElementById('micPulseRing');
+      const micLabel = document.getElementById('micLabel');
+      const speechHint = document.getElementById('speechHint');
+      const timerDisplay = document.getElementById('recordTimer');
+
+      if (!isRecording) {
+        isRecording = true;
+        timerSeconds = 0;
+        micBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+        micBtn.classList.add('bg-rose-500', 'hover:bg-rose-600');
+        pulseRing.classList.add('pulse-animation', 'bg-rose-500/20');
+        micLabel.innerText = 'หยุดอัด';
+        speechHint.innerText = '🎙️ กำลังอัดเสียง... พูดสรุปเคสได้เลย';
+
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+          const s = String(timerSeconds % 60).padStart(2, '0');
+          timerDisplay.innerText = `${m}:${s}`;
+        }, 1000);
+      } else {
+        isRecording = false;
+        clearInterval(timerInterval);
+        micBtn.classList.remove('bg-rose-500', 'hover:bg-rose-600');
+        micBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
+        pulseRing.classList.remove('pulse-animation', 'bg-rose-500/20');
+        micLabel.innerText = 'กดอัดเสียง';
+        speechHint.innerText = '✅ บันทึกเสร็จแล้ว! กดปุ่ม "ดึงข้อความ" เพื่อเลือกเตียงและกดส่ง';
+
+        const now = new Date();
+        const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' น.';
+        const shiftData = ensureCurrentShift();
+
+        const newId = 'rec_' + Date.now();
+        shiftData.audioItems.unshift({
+          id: newId,
+          title: `เสียงบันทึกสด (${timerDisplay.innerText})`,
+          time: timeStr,
+          duration: timerDisplay.innerText,
+          text: `บันทึกการพยาบาล (${timeStr}): สัญญาณชีพคงที่ ดูแลอาการตามแผนการรักษา`,
+          isExpanded: true
+        });
+
+        tempSelectedBeds[newId] = availableBeds[0] || 'เตียง 1';
+        renderAllTabs();
+      }
+    }
+
+    function handleAudioUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const now = new Date();
+      const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' น.';
+      const shiftData = ensureCurrentShift();
+
+      const newId = 'file_' + Date.now();
+      shiftData.audioItems.unshift({
+        id: newId,
+        title: `ไฟล์: ${file.name.slice(0, 16)}`,
+        time: timeStr,
+        duration: '01:15',
+        text: `บันทึกจากไฟล์ ${file.name}: ผู้ป่วยสัญญาณชีพคงที่ รับประทานอาหารได้ ไม่มีไข้`,
+        isExpanded: true
+      });
+
+      tempSelectedBeds[newId] = availableBeds[0] || 'เตียง 1';
+      renderAllTabs();
+      alert(`นำเข้าไฟล์ "${file.name}" เรียบร้อยแล้ว!`);
+    }
+
+    // ==================== TAB 2: ข้อความ (มีปุ่มย่อ/ขยายในแต่ละข้อความเตียง) ====================
+    function renderTab2Transcripts(bedsData) {
+      const container = document.getElementById('bedTranscriptsContainer');
+      container.innerHTML = availableBeds.map(bed => {
+        const bedData = bedsData[bed] || { transcript: '', sbar: {} };
+        const hasText = !!(bedData.transcript && bedData.transcript.trim());
+        
+        // Default: ถ้ายังไม่เคยคลิก ให้กางออกถ้ามีข้อความ (isExpanded)
+        if (transcriptCollapseState[bed] === undefined) {
+          transcriptCollapseState[bed] = true;
+        }
+        const isExpanded = transcriptCollapseState[bed];
+
+        return `
+          <div class="bg-slate-800/80 border ${bed === 'ไม่ระบุเตียง' ? 'border-amber-500/40 bg-amber-500/5' : 'border-slate-700'} rounded-2xl p-3.5 space-y-2 shadow-sm transition-all">
+            
+            <!-- Header Row: ชื่อเตียง, ปุ่มย่อ/ขยาย, ปุ่มลบ, ปุ่มจัด SBAR -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold ${bed === 'ไม่ระบุเตียง' ? 'text-amber-400' : 'text-emerald-400'} flex items-center gap-1.5">
+                  <span>${bed === 'ไม่ระบุเตียง' ? '⚠️' : '🛏️'}</span> ข้อความของ ${bed}
+                </span>
+
+                <!-- ปุ่ม ย่อ/ขยาย ของเตียงนี้ -->
+                <button onclick="toggleTranscriptCollapse('${bed}')" class="text-[11px] text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded bg-slate-700/60 font-medium">
+                  ${isExpanded ? '▲ ย่อ' : '▼ ขยาย'}
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <!-- ปุ่มลบข้อความ -->
+                ${hasText ? `
+                  <button onclick="clearBedTranscript('${bed}')" class="text-[11px] text-rose-400 hover:text-rose-300 font-medium flex items-center gap-0.5">
+                    <span>🗑️</span> ลบ
+                  </button>
+                ` : ''}
+
+                <button onclick="updateBedSbar('${bed}')" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium">
+                  ✨ จัดโน๊ต SBAR
+                </button>
+              </div>
+            </div>
+            
+            <!-- เนื้อหาข้อความ (กางออกเมื่อ isExpanded = true) ขนาด 6 บรรทัด -->
+            ${isExpanded ? `
+              <div class="space-y-1 pt-1">
+                <textarea oninput="handleBedTranscriptInput('${bed}', this.value)" rows="6" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 leading-relaxed" placeholder="ยังไม่มีข้อความของ ${bed}... สามารถพิมพ์ข้อความที่นี่ หรือกด 'ดึงข้อความ' จากแท็บเสียงแล้วส่งมา">${bedData.transcript || ''}</textarea>
+              </div>
+            ` : `
+              <div onclick="toggleTranscriptCollapse('${bed}')" class="text-[11px] text-slate-400 truncate bg-slate-900/40 p-2 rounded-lg cursor-pointer hover:text-slate-200">
+                ${hasText ? bedData.transcript.slice(0, 70) + '... (แตะเพื่อขยาย)' : '(ยังไม่มีข้อความ - แตะเพื่อขยายและพิมพ์)'}
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleTranscriptCollapse(bed) {
+      transcriptCollapseState[bed] = !transcriptCollapseState[bed];
+      const shiftData = ensureCurrentShift();
+      renderTab2Transcripts(shiftData.beds);
+    }
+
+    function clearBedTranscript(bed) {
+      if (confirm(`ต้องการลบข้อความทั้งหมดของ "${bed}" หรือไม่?`)) {
+        const shiftData = ensureCurrentShift();
+        if (shiftData.beds[bed]) {
+          shiftData.beds[bed].transcript = '';
+          shiftData.beds[bed].sbar = { s: '', b: '', a: '', r: '' };
+        }
+        renderAllTabs();
+      }
+    }
+
+    function handleBedTranscriptInput(bed, text) {
+      const shiftData = ensureCurrentShift();
+      if (!shiftData.beds[bed]) shiftData.beds[bed] = { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
+      shiftData.beds[bed].transcript = text;
+    }
+
+    function updateBedSbar(bed) {
+      const shiftData = ensureCurrentShift();
+      const text = shiftData.beds[bed] ? shiftData.beds[bed].transcript : '';
+      if (text) {
+        autoGenerateSbarForBed(bed, text);
+        renderTab3Notes(shiftData.beds);
+        switchTab('tab3');
+      } else {
+        alert(`ยังไม่มีข้อความของ ${bed} ครับ`);
+      }
+    }
+
+    function autoGenerateSbarForBed(bed, rawText) {
+      const shiftData = ensureCurrentShift();
+      if (!shiftData.beds[bed]) shiftData.beds[bed] = { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
+
+      let s = `${bed}: รับรายงานเหตุการณ์ประจำเวร`;
+      let b = "สัญญาณชีพและการประเมินตามรอบเวร";
+      let a = rawText;
+      let r = "ติดตามอาการต่อเนื่องในเวรถัดไป";
+
+      if (/bp.*(ดรอป|ตก|ต่ำ)/i.test(rawText)) {
+        s = `${bed}: มีภาวะความดันโลหิตลดต่ำลง (BP Drop)`;
+        b = "BP ดรอปเหลือ 85/50 mmHg";
+        a = "รายงานแพทย์ ให้ IV Fluid Loading (NSS) 500 ml IV. หลังโหลด BP 115/72 mmHg";
+        r = "ติดตาม V/S และ Urine output ในเวรถัดไป";
+      } else if (/เหนื่อย|หอบ|spo2/i.test(rawText)) {
+        s = `${bed}: ผู้ป่วยมีอาการเหนื่อยหอบ SpO2 ลดลง`;
+        b = "SpO2 91% ฟังปอดพบ crepitation";
+        a = "พ่นยา Berodual 1 nb และ On Oxygen mask with bag 10 LPM";
+        r = "Re-evaluate อาการเหนื่อยและฟังเสียงปอดซ้ำ";
+      }
+
+      shiftData.beds[bed].sbar = { s, b, a, r };
+    }
+
+    // ==================== TAB 3: โน๊ต ====================
+    function renderTab3Notes(bedsData) {
+      const container = document.getElementById('bedNotesContainer');
+      container.innerHTML = availableBeds.map(bed => {
+        const item = bedsData[bed] || { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
+        const sbar = item.sbar || { s: '', b: '', a: '', r: '' };
+        return `
+          <div class="bg-slate-800/80 border ${bed === 'ไม่ระบุเตียง' ? 'border-amber-500/40 bg-amber-500/5' : 'border-slate-700'} rounded-2xl p-3.5 space-y-2.5 shadow-sm text-xs">
+            <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+              <span class="font-bold ${bed === 'ไม่ระบุเตียง' ? 'text-amber-400' : 'text-emerald-400'} text-xs flex items-center gap-1.5">
+                <span>${bed === 'ไม่ระบุเตียง' ? '⚠️' : '🛏️'}</span> ${bed}
+              </span>
+              <button onclick="copySingleBedNote('${bed}')" class="text-[11px] bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-lg transition-all">
+                คัดลอกโน๊ต
+              </button>
+            </div>
+
+            <div class="space-y-2">
+              <div class="border-l-2 border-emerald-400 pl-2">
+                <span class="font-bold text-emerald-400 text-[11px] block">S (Situation):</span>
+                <input type="text" oninput="handleSbarInput('${bed}', 's', this.value)" value="${sbar.s || ''}" class="w-full bg-slate-900/60 border border-slate-700/80 rounded px-2 py-1 text-slate-100 text-xs focus:outline-none focus:border-emerald-500">
+              </div>
+              <div class="border-l-2 border-sky-400 pl-2">
+                <span class="font-bold text-sky-400 text-[11px] block">B (Background):</span>
+                <input type="text" oninput="handleSbarInput('${bed}', 'b', this.value)" value="${sbar.b || ''}" class="w-full bg-slate-900/60 border border-slate-700/80 rounded px-2 py-1 text-slate-100 text-xs focus:outline-none focus:border-sky-500">
+              </div>
+              <div class="border-l-2 border-purple-400 pl-2">
+                <span class="font-bold text-purple-400 text-[11px] block">A (Action):</span>
+                <textarea oninput="handleSbarInput('${bed}', 'a', this.value)" rows="2" class="w-full bg-slate-900/60 border border-slate-700/80 rounded px-2 py-1 text-slate-100 text-xs focus:outline-none focus:border-purple-500 resize-none">${sbar.a || ''}</textarea>
+              </div>
+              <div class="border-l-2 border-amber-400 pl-2">
+                <span class="font-bold text-amber-400 text-[11px] block">R (Recommendation):</span>
+                <input type="text" oninput="handleSbarInput('${bed}', 'r', this.value)" value="${sbar.r || ''}" class="w-full bg-slate-900/60 border border-slate-700/80 rounded px-2 py-1 text-slate-100 text-xs focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleSbarInput(bed, field, value) {
+      const shiftData = ensureCurrentShift();
+      if (!shiftData.beds[bed]) shiftData.beds[bed] = { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
+      shiftData.beds[bed].sbar[field] = value;
+    }
+
+    function reparseAllBedsSbar() {
+      const shiftData = ensureCurrentShift();
+      availableBeds.forEach(bed => {
+        if (shiftData.beds[bed] && shiftData.beds[bed].transcript) {
+          autoGenerateSbarForBed(bed, shiftData.beds[bed].transcript);
+        }
+      });
+      renderTab3Notes(shiftData.beds);
+      alert("อัปเดตโน๊ต SBAR ทุกเตียงเรียบร้อยแล้ว!");
+    }
+
+    function copySingleBedNote(bed) {
+      const shiftData = ensureCurrentShift();
+      const b = shiftData.beds[bed];
+      if (!b || !b.sbar) return;
+      const s = b.sbar;
+      const text = `📋 [บันทึกส่งเวร: ${bed}]\n` +
+        `• วันที่: ${activeDate} (${activeShift})\n` +
+        `• S: ${s.s || '-'}\n` +
+        `• B: ${s.b || '-'}\n` +
+        `• A: ${s.a || '-'}\n` +
+        `• R: ${s.r || '-'}\n` +
+        `[The Note Nurse]`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert(`คัดลอกโน๊ตของ ${bed} เรียบร้อยแล้ว!`);
+      });
+    }
+
+    function copyAllBedsHandover() {
+      const shiftData = ensureCurrentShift();
+      let fullText = `📋 [สรุปรายงานส่งเวร: ${activeDate} - ${activeShift}]\n==============================\n`;
+      availableBeds.forEach(bed => {
+        const b = shiftData.beds[bed];
+        if (b && b.sbar && (b.sbar.s || b.sbar.a)) {
+          const s = b.sbar;
+          fullText += `\n[${bed}]\n` +
+            `• S: ${s.s || '-'}\n` +
+            `• B: ${s.b || '-'}\n` +
+            `• A: ${s.a || '-'}\n` +
+            `• R: ${s.r || '-'}\n`;
+        }
+      });
+      fullText += `\n==============================\n[บันทึกโดย The Note Nurse]`;
+
+      navigator.clipboard.writeText(fullText).then(() => {
+        alert("คัดลอกโน๊ตส่งเวรครบทุกเตียงเรียบร้อยแล้ว!");
+      });
+    }
+
+    // ==================== TNN FILE DOWNLOAD & LOAD ====================
+    function downloadTnnFile() {
+      const exportObject = {
+        version: "2.2",
+        app: "The Note Nurse",
+        date: activeDate,
+        exportedAt: new Date().toISOString(),
+        availableBeds: availableBeds,
+        shifts: masterData[activeDate] || {}
+      };
+
+      const fileContent = JSON.stringify(exportObject, null, 2);
+      const blob = new Blob([fileContent], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const fileName = `${activeDate}.tnn`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      alert(`บันทึกไฟล์ "${fileName}" สำเร็จ!`);
+    }
+
+    function loadTnnFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && parsed.date && parsed.shifts) {
+            masterData[parsed.date] = parsed.shifts;
+            activeDate = parsed.date;
+            if (parsed.availableBeds && Array.isArray(parsed.availableBeds)) {
+              availableBeds = parsed.availableBeds;
+            }
+            document.getElementById('selectedDate').value = activeDate;
+            document.getElementById('tnnFileLabel').innerText = `${activeDate}.tnn`;
+            renderBedPillsManager();
+            renderAllTabs();
+            alert(`โหลดข้อมูลจากไฟล์ "${file.name}" เรียบร้อยแล้ว!`);
+          } else {
+            alert("รูปแบบไฟล์ .tnn ไม่ถูกต้อง");
+          }
+        } catch (err) {
+          alert("ไม่สามารถอ่านไฟล์ได้");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Tab Switch
+    function switchTab(tabId) {
+      const b1 = document.getElementById('tabBtn1');
+      const b2 = document.getElementById('tabBtn2');
+      const b3 = document.getElementById('tabBtn3');
+
+      const c1 = document.getElementById('contentTab1');
+      const c2 = document.getElementById('contentTab2');
+      const c3 = document.getElementById('contentTab3');
+
+      [b1, b2, b3].forEach(b => {
+        b.className = 'py-2.5 text-center font-medium text-xs border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5 transition-all';
+      });
+
+      [c1, c2, c3].forEach(c => c.classList.remove('active'));
+
+      if (tabId === 'tab1') {
+        b1.className = 'py-2.5 text-center font-bold text-xs border-b-2 border-emerald-500 text-emerald-400 flex items-center justify-center gap-1.5 transition-all';
+        c1.classList.add('active');
+      } else if (tabId === 'tab2') {
+        b2.className = 'py-2.5 text-center font-bold text-xs border-b-2 border-emerald-500 text-emerald-400 flex items-center justify-center gap-1.5 transition-all';
+        c2.classList.add('active');
+      } else if (tabId === 'tab3') {
+        b3.className = 'py-2.5 text-center font-bold text-xs border-b-2 border-emerald-500 text-emerald-400 flex items-center justify-center gap-1.5 transition-all';
+        c3.classList.add('active');
+      }
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
