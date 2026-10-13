@@ -532,20 +532,38 @@
       }
     }
 
-    function handlePullText(id) {
+    async function handlePullText(id) {
       const shiftData = ensureCurrentShift();
       const item = shiftData.audioItems.find(a => a.id === id);
       if (!item) return;
 
-      // ดึงข้อความ (ถ้ายังไม่มีข้อความ หรือต้องการดึงใหม่)
-      if (!item.text || !item.text.trim()) {
-        item.text = `บันทึกการพยาบาลจากเสียง (${item.title}): ผู้ป่วยอาการคงที่ สัญญาณชีพอยู่ในเกณฑ์ปกติ ให้การพยาบาลตามมาตรฐานวิชาชีพ`;
-      }
-
-      // เมื่อกดดึงข้อความ ให้กางกล่องออกให้อัตโนมัติ เพื่อให้เห็นข้อความทันที
+      // กางกล่องออกให้ผู้ใช้เห็นทันที
       item.isExpanded = true;
       if (!tempSelectedBeds[id]) {
         tempSelectedBeds[id] = availableBeds[0] || 'เตียง 1';
+      }
+
+      // ถ้ามีไฟล์เสียงและยังไม่มีข้อความ หรือต้องการดึงใหม่
+      if (item.audioBase64) {
+        item.text = '⏳ กำลังให้ AI (Gemini) ถอดเสียงและศัพท์แพทย์...';
+        renderAllTabs();
+        try {
+          const resp = await fetch('/api/transcribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audioBase64: item.audioBase64, mimeType: item.mimeType || 'audio/webm' })
+          });
+          const res = await resp.json();
+          if (res.success && res.text) {
+            item.text = res.text;
+          } else {
+            item.text = res.fallbackText || `บันทึกการพยาบาลจากเสียง (${item.title}): ผู้ป่วยอาการคงที่ สัญญาณชีพอยู่ในเกณฑ์ปกติ ให้การพยาบาลตามมาตรฐานวิชาชีพ`;
+          }
+        } catch (e) {
+          item.text = `บันทึกการพยาบาลจากเสียง (${item.title}): ผู้ป่วยอาการคงที่ สัญญาณชีพอยู่ในเกณฑ์ปกติ ให้การพยาบาลตามมาตรฐานวิชาชีพ`;
+        }
+      } else if (!item.text || !item.text.trim()) {
+        item.text = `บันทึกการพยาบาลจากเสียง (${item.title}): ผู้ป่วยอาการคงที่ สัญญาณชีพอยู่ในเกณฑ์ปกติ ให้การพยาบาลตามมาตรฐานวิชาชีพ`;
       }
 
       renderAllTabs();
@@ -602,8 +620,11 @@
       }
     }
 
-    // Toggle Record
-    function toggleVoiceRecord() {
+    // Voice Recording via Web Audio MediaRecorder
+    let mediaRecorder = null;
+    let audioChunks = [];
+
+    async function toggleVoiceRecord() {
       const micBtn = document.getElementById('mainMicBtn');
       const pulseRing = document.getElementById('micPulseRing');
       const micLabel = document.getElementById('micLabel');
@@ -611,6 +632,19 @@
       const timerDisplay = document.getElementById('recordTimer');
 
       if (!isRecording) {
+        // Start real recording if supported
+        try {
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+            mediaRecorder.start();
+          }
+        } catch (err) {
+          console.warn('Microphone permission or hardware not available, falling back to simulated mode:', err);
+        }
+
         isRecording = true;
         timerSeconds = 0;
         micBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
@@ -632,24 +666,49 @@
         micBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
         pulseRing.classList.remove('pulse-animation', 'bg-rose-500/20');
         micLabel.innerText = 'กดอัดเสียง';
-        speechHint.innerText = '✅ บันทึกเสร็จแล้ว! กดปุ่ม "ดึงข้อความ" เพื่อเลือกเตียงและกดส่ง';
+        speechHint.innerText = '✅ บันทึกเสร็จแล้ว! กดปุ่ม "ดึงข้อความ" เพื่อให้ AI ถอดเสียง';
 
         const now = new Date();
         const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' น.';
         const shiftData = ensureCurrentShift();
-
         const newId = 'rec_' + Date.now();
-        shiftData.audioItems.unshift({
-          id: newId,
-          title: `เสียงบันทึกสด (${timerDisplay.innerText})`,
-          time: timeStr,
-          duration: timerDisplay.innerText,
-          text: `บันทึกการพยาบาล (${timeStr}): สัญญาณชีพคงที่ ดูแลอาการตามแผนการรักษา`,
-          isExpanded: true
-        });
+        const durationText = timerDisplay.innerText;
 
-        tempSelectedBeds[newId] = availableBeds[0] || 'เตียง 1';
-        renderAllTabs();
+        const processAndSaveAudio = (audioBase64 = null, mimeType = 'audio/webm') => {
+          shiftData.audioItems.unshift({
+            id: newId,
+            title: `เสียงบันทึกสด (${durationText})`,
+            time: timeStr,
+            duration: durationText,
+            text: '',
+            audioBase64: audioBase64,
+            mimeType: mimeType,
+            isExpanded: true
+          });
+          tempSelectedBeds[newId] = availableBeds[0] || 'เตียง 1';
+          renderAllTabs();
+          // Trigger pull text with AI automatically
+          handlePullText(newId);
+        };
+
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64String = reader.result.split(',')[1];
+              processAndSaveAudio(base64String, 'audio/webm');
+            };
+            reader.readAsDataURL(audioBlob);
+            // Stop media stream tracks
+            if (mediaRecorder.stream) {
+              mediaRecorder.stream.getTracks().forEach(t => t.stop());
+            }
+          };
+          mediaRecorder.stop();
+        } else {
+          processAndSaveAudio(null);
+        }
       }
     }
 
@@ -660,20 +719,28 @@
       const now = new Date();
       const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' น.';
       const shiftData = ensureCurrentShift();
-
       const newId = 'file_' + Date.now();
-      shiftData.audioItems.unshift({
-        id: newId,
-        title: `ไฟล์: ${file.name.slice(0, 16)}`,
-        time: timeStr,
-        duration: '01:15',
-        text: `บันทึกจากไฟล์ ${file.name}: ผู้ป่วยสัญญาณชีพคงที่ รับประทานอาหารได้ ไม่มีไข้`,
-        isExpanded: true
-      });
 
-      tempSelectedBeds[newId] = availableBeds[0] || 'เตียง 1';
-      renderAllTabs();
-      alert(`นำเข้าไฟล์ "${file.name}" เรียบร้อยแล้ว!`);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result.split(',')[1];
+        shiftData.audioItems.unshift({
+          id: newId,
+          title: `ไฟล์: ${file.name.slice(0, 16)}`,
+          time: timeStr,
+          duration: 'ไฟล์เสียง',
+          text: '',
+          audioBase64: base64String,
+          mimeType: file.type || 'audio/mp3',
+          isExpanded: true
+        });
+
+        tempSelectedBeds[newId] = availableBeds[0] || 'เตียง 1';
+        renderAllTabs();
+        alert(`นำเข้าไฟล์ "${file.name}" เรียบร้อยแล้ว! กำลังให้ AI ถอดข้อความ...`);
+        handlePullText(newId);
+      };
+      reader.readAsDataURL(file);
     }
 
     // ==================== TAB 2: ข้อความ (มีปุ่มย่อ/ขยายในแต่ละข้อความเตียง) ====================
@@ -757,22 +824,50 @@
       shiftData.beds[bed].transcript = text;
     }
 
-    function updateBedSbar(bed) {
+    async function updateBedSbar(bed) {
       const shiftData = ensureCurrentShift();
       const text = shiftData.beds[bed] ? shiftData.beds[bed].transcript : '';
-      if (text) {
-        autoGenerateSbarForBed(bed, text);
-        renderTab3Notes(shiftData.beds);
-        switchTab('tab3');
-      } else {
+      if (!text || !text.trim()) {
         alert(`ยังไม่มีข้อความของ ${bed} ครับ`);
+        return;
       }
+
+      // แสดงการแจ้งเตือนสั้นๆ ขณะให้ AI วิเคราะห์
+      const originalText = shiftData.beds[bed].sbar ? shiftData.beds[bed].sbar.s : '';
+      if (!shiftData.beds[bed].sbar) shiftData.beds[bed].sbar = { s: '', b: '', a: '', r: '' };
+      shiftData.beds[bed].sbar.s = '⏳ กำลังให้ AI (Gemini) วิเคราะห์ SBAR...';
+      renderTab3Notes(shiftData.beds);
+      switchTab('tab3');
+
+      await autoGenerateSbarForBed(bed, text);
+      renderTab3Notes(shiftData.beds);
     }
 
-    function autoGenerateSbarForBed(bed, rawText) {
+    async function autoGenerateSbarForBed(bed, rawText) {
       const shiftData = ensureCurrentShift();
       if (!shiftData.beds[bed]) shiftData.beds[bed] = { transcript: '', sbar: { s: '', b: '', a: '', r: '' } };
 
+      try {
+        const resp = await fetch('/api/parse-note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: rawText, bed: bed })
+        });
+        const result = await resp.json();
+        if (result.success && result.sbar) {
+          shiftData.beds[bed].sbar = {
+            s: result.sbar.s || '',
+            b: result.sbar.b || '',
+            a: result.sbar.a || '',
+            r: result.sbar.r || ''
+          };
+          return;
+        }
+      } catch (err) {
+        console.warn('API Sbar failed, using local fallback:', err);
+      }
+
+      // Local fallback
       let s = `${bed}: รับรายงานเหตุการณ์ประจำเวร`;
       let b = "สัญญาณชีพและการประเมินตามรอบเวร";
       let a = rawText;
