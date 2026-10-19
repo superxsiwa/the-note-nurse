@@ -193,8 +193,37 @@ flowchart LR
     <!-- 2. SEQUENCE -->
     <div id="sequence" class="tab-content">
       <h2>🔄 แผนภาพลำดับขั้นตอน (Sequence Diagram)</h2>
-      <p>ขั้นตอนการอัดเสียงส่งเวร ➡️ กรองข้อมูลตาม PDPA ➡️ แปลงเป็น SBAR + ดักคำถามรุ่นพี่</p>
+      <p>ขั้นตอนการทำงานหลักของระบบ The Note Nurse</p>
 
+      <h3>กระบวนการเข้าสู่ระบบเครื่องส่วนตัว (BYOD) & ปลดล็อก Quick PIN:</h3>
+      <div class="diagram-container">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Nurse as 👩‍⚕️ พยาบาลผู้ใช้งาน
+    participant UI as 📱 Auth & Login UI (เครื่องส่วนตัว)
+    participant Gateway as 🌐 API Gateway & RBAC
+    participant AuthSvc as 🔑 Identity & Device Service
+    participant DB as 💾 User DB
+
+    Nurse->>UI: 1. ป้อน Email / Staff ID + Password
+    UI->>Gateway: 2. ส่งรหัสผ่าน + Device Fingerprint เฉพาะเครื่อง
+    Gateway->>AuthSvc: 3. ตรวจสอบรหัสผ่าน & ตรวจสอบการผูกเครื่อง (Device Binding)
+    AuthSvc->>DB: 4. ดึงข้อมูลผู้ใช้ + boundDeviceId
+    DB-->>AuthSvc: 5. ข้อมูลผู้ใช้และรหัส Hash
+    alt เครื่องตรงกับที่ลงทะเบียนไว้ (Personal Device Match)
+        AuthSvc-->>Gateway: 6. สิทธิ์ถูกต้อง ออก Bound JWT Token
+        Gateway-->>UI: 7. ล็อกอินสำเร็จ เข้าสู่หน้าเตียง & จัดเวร
+    else อุปกรณ์อื่นพยายามล็อกอิน
+        AuthSvc-->>Gateway: 8. แจ้งเตือนย้ายเครื่อง (Single Active Device Policy)
+    end
+    Note over Nurse, UI: เมื่อสลับหน้าจอหรือวางเครื่องระหว่างเวร
+    Nurse->>UI: 9. ปลดล็อกด่วนด้วย Quick PIN 4 หลักเฉพาะเครื่องตนเอง
+    UI-->>Nurse: 10. ปลดล็อกทันที ทำงานหน้าเตียงต่อเนื่อง
+        </pre>
+      </div>
+
+      <h3>ขั้นตอนการอัดเสียงส่งเวร ➡️ กรองข้อมูลตาม PDPA ➡️ แปลงเป็น SBAR + ดักคำถามรุ่นพี่:</h3>
       <div class="diagram-container">
         <pre class="mermaid">
 sequenceDiagram
@@ -248,10 +277,13 @@ classDiagram
     class User {
         +String userId
         +String staffId
+        +String email
         +String fullName
         +String nickname
         +Role role
+        +String boundDeviceId
         +String pinHash
+        +String passwordHash
         +Int expPoints
         +Int level
     }

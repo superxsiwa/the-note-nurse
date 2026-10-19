@@ -1,10 +1,69 @@
 # แผนภาพลำดับขั้นตอนการทำงาน (Sequence Diagram)
 ## โครงการ: The Note Nurse (เพื่อนคู่คิดและพี่เลี้ยงพยาบาลอัจฉริยะ)
 
-เอกสารนี้แสดงลำดับการส่งข้อมูลระหว่างวัตถุ (Sequence of Interactions) ใน 3 กระบวนการหลักของระบบ:
-1. **Flow 1: การบันทึกเสียง ➡️ กรอง PDPA ➡️ สร้างรายงาน SBAR + Cheat Sheet ดักคำถาม**
-2. **Flow 2: การแชร์สรุปข้อมูลเตียงคนไข้ให้เพื่อน (Handover Sharing via LINE / Clipboard)**
-3. **Flow 3: การเผยแพร่เกร็ดความรู้จากรุ่นพี่ ➡️ แปลงเป็นโจทย์ควิซ ➡️ รุ่นน้องฝึกทำข้อสอบ**
+เอกสารนี้แสดงลำดับการส่งข้อมูลระหว่างวัตถุ (Sequence of Interactions) ใน 4 กระบวนการหลักของระบบ:
+1. **Flow 0: การเข้าสู่ระบบด้วย Email & Password ➡️ ปลดล็อกด่วนด้วย Quick PIN (Authentication Flow)**
+2. **Flow 1: การบันทึกเสียง ➡️ กรอง PDPA ➡️ สร้างรายงาน SBAR + Cheat Sheet ดักคำถาม**
+3. **Flow 2: การแชร์สรุปข้อมูลเตียงคนไข้ให้เพื่อน (Handover Sharing via LINE / Clipboard)**
+4. **Flow 3: การเผยแพร่เกร็ดความรู้จากรุ่นพี่ ➡️ แปลงเป็นโจทย์ควิซ ➡️ รุ่นน้องฝึกทำข้อสอบ**
+
+---
+
+### Flow 0: การลงทะเบียน, เข้าสู่ระบบ (Email/Social) ➡️ ปลดล็อกด่วนด้วย Quick PIN (Auth & Registration Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Nurse as 👩‍⚕️ พยาบาลผู้ใช้งาน (Nurse)
+    participant UI as 📱 Auth, Register & PIN UI
+    participant Gateway as 🌐 API Gateway & RBAC Guard
+    participant AuthSvc as 🔑 Identity & Auth Service
+    participant UserDB as 💾 User Database
+    participant Audit as 🔒 Audit Logger
+
+    %% Part 1: Registration with Confirm Quick PIN
+    opt การลงทะเบียนพยาบาลใหม่ (New Nurse Registration)
+        Nurse->>UI: 1. ป้อนชื่อ-นามสกุล, รหัสพนักงาน, อีเมล, เลือกวอร์ด, รหัสผ่าน
+        Nurse->>UI: 2. ตั้งรหัส Quick PIN (4 หลัก) + ยืนยันรหัส Confirm PIN (4 หลัก)
+        Nurse->>UI: 3. ติ๊กยินยอมรับข้อกำหนด PDPA และกด "ยืนยันการลงทะเบียน"
+        UI->>UI: 4. ตรวจสอบ Quick PIN == Confirm PIN (ทั้งสองช่องตรงกัน)
+        UI->>Gateway: 5. POST /api/auth/register { fullName, staffId, email, ward, password, pin, deviceId }
+        Gateway->>AuthSvc: 6. Hash รหัสผ่าน (Argon2) + Hash PIN + ผูก DeviceId
+        AuthSvc->>UserDB: 7. บันทึกข้อมูลพยาบาลใหม่
+        UserDB-->>AuthSvc: 8. บันทึกสำเร็จ
+        AuthSvc-->>Gateway: 9. ส่งผลลงทะเบียนสำเร็จ + Auto-issue Session
+        Gateway-->>UI: 10. แจ้งเตือนสำเร็จและเข้าสู่ระบบทันที
+    end
+
+    %% Part 2: Standard Login or Social Login
+    alt เข้าสู่ระบบด้วย Email & Password หรือ Social Login
+        Nurse->>UI: 11. ป้อน Email + Password (หรือกดปุ่ม Google / LINE / Facebook)
+        UI->>Gateway: 12. POST /api/auth/login หรือ POST /api/auth/social-callback
+        Gateway->>Audit: 13. บันทึก Attempt Log (IP, User, DeviceId, Timestamp)
+        Gateway->>AuthSvc: 14. ตรวจสอบข้อมูลประจำตัว + DeviceId
+        AuthSvc->>UserDB: 15. ดึงข้อมูล User และ Device Binding
+        alt ข้อมูลถูกต้อง & เครื่องตรงตามเงื่อนไข BYOD
+            AuthSvc-->>Gateway: 16. สร้าง JWT Session Token + User Role
+            Gateway->>Audit: 17. Log Success: Personal Device Login Succeeded
+            Gateway-->>UI: 18. ส่ง Session Token + ข้อมูลพยาบาล
+            UI-->>Nurse: 19. แสดงหน้าต่างจัดเวรและเตียงที่ดูแล (Shift & Bed Roster)
+        else ข้อมูลไม่ถูกต้อง
+            AuthSvc-->>Gateway: Login Failed
+            Gateway-->>UI: แจ้งเตือนข้อผิดพลาด
+        end
+    end
+
+    %% Part 3: 5-Minute Inactivity Auto-Lock & Quick PIN Unlock
+    Note over Nurse, UI: วางเครื่องทิ้งไว้เกิน 5 นาที (Inactivity Timeout) หรือกดทดสอบจำลอง
+    UI->>UI: 20. ตรวจพบ Inactivity ครบ 5 นาที ➔ เด้ง Quick PIN Keypad Modal ล็อกหน้าจอทันที
+    Nurse->>UI: 21. กดรหัส Quick PIN 4 หลักบน Keypad
+    UI->>UI: 22. ตรวจสอบรหัส PIN ตรงกับที่ลงทะเบียนไว้
+    alt PIN ถูกต้อง
+        UI-->>Nurse: 23. ปลดล็อกทันที กลับสู่หน้าจอการทำงานเดิมโดยไม่ต้องกรอกรหัสผ่านยาว
+    else PIN ไม่ถูกต้อง
+        UI-->>Nurse: 24. แจ้งเตือนรหัส PIN ไม่ถูกต้อง และสั่นเตือน
+    end
+```
 
 ---
 

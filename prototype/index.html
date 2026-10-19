@@ -164,10 +164,356 @@
       transition: all 0.2s;
     }
 
-    /* Screen 1: Quick PIN */
+    /* Screen 1: Auth & Login / PIN */
+    .auth-tab-switch {
+      display: flex;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+      gap: 4px;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-tab-btn.active {
+      background: var(--active-tab);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+
+    .login-form-box {
+      text-align: left;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon-left {
+      position: absolute;
+      left: 14px;
+      font-size: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .input-icon-right {
+      position: absolute;
+      right: 14px;
+      font-size: 16px;
+      color: var(--muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .form-input {
+      width: 100%;
+      background: #0f1d36;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px 12px 42px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .form-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+    .form-input::placeholder {
+      color: #64748b;
+    }
+
+    .form-row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 12px;
+    }
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .remember-me input {
+      accent-color: var(--cyan);
+      cursor: pointer;
+    }
+    .forgot-link {
+      color: var(--cyan);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Social Login & Register Styles */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 22px 0 18px 0;
+      color: #64748b;
+      font-size: 12px;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border);
+    }
+    .auth-divider span {
+      padding: 0 12px;
+    }
+
+    .social-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-social {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #111d35;
+      color: var(--text);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-social:hover {
+      background: #162544;
+      border-color: #334155;
+    }
+    .btn-social:active {
+      transform: scale(0.98);
+    }
+    .btn-social.google {
+      background: #ffffff;
+      color: #1e293b;
+      border-color: #cbd5e1;
+    }
+    .btn-social.google:hover {
+      background: #f8fafc;
+    }
+    .btn-social.line {
+      background: #06c755;
+      color: #ffffff;
+      border-color: #06c755;
+    }
+    .btn-social.line:hover {
+      background: #05b34c;
+    }
+    .btn-social.facebook {
+      background: #1877f2;
+      color: #ffffff;
+      border-color: #1877f2;
+    }
+    .btn-social.facebook:hover {
+      background: #166fe5;
+    }
+    .social-icon-img {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .register-footer {
+      text-align: center;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .register-link-btn {
+      color: var(--cyan);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-left: 4px;
+    }
+    .register-link-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* Role Quick Select Cards */
+    .role-quick-box {
+      margin-top: 24px;
+      padding: 14px;
+      background: rgba(15, 29, 54, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .role-quick-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .role-quick-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .role-card-btn {
+      background: #111d35;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .role-card-btn:hover {
+      background: #1a2d52;
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+    .role-card-btn:active {
+      transform: scale(0.97);
+    }
+    .role-card-btn.active {
+      border-color: var(--cyan);
+      background: rgba(2, 132, 199, 0.2);
+    }
+    .role-card-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .role-card-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      width: fit-content;
+    }
+    .tag-junior {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .tag-senior {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+    .tag-charge {
+      background: rgba(192, 132, 252, 0.15);
+      color: var(--purple);
+      border: 1px solid rgba(192, 132, 252, 0.3);
+    }
+    .tag-admin {
+      background: rgba(251, 113, 133, 0.15);
+      color: var(--rose);
+      border: 1px solid rgba(251, 113, 133, 0.3);
+    }
+    .role-card-desc {
+      font-size: 10.5px;
+      color: var(--muted);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    .btn-login-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7, #0ea5e9);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
+      transition: all 0.2s;
+    }
+    .btn-login-submit:active {
+      transform: scale(0.98);
+      filter: brightness(0.95);
+    }
+
+    .demo-accounts {
+      margin-top: 18px;
+      padding: 12px;
+      background: rgba(15, 29, 54, 0.7);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+    .demo-account-chip {
+      display: inline-block;
+      padding: 3px 8px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--cyan);
+      border-radius: 6px;
+      margin: 4px 4px 0 0;
+      cursor: pointer;
+      font-weight: 500;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
     .pin-box {
       text-align: center;
-      padding: 30px 10px;
+      padding: 15px 10px;
     }
     .user-avatar {
       width: 72px;
@@ -186,7 +532,7 @@
       display: flex;
       justify-content: center;
       gap: 16px;
-      margin: 24px 0 32px 0;
+      margin: 20px 0 24px 0;
     }
     .dot {
       width: 16px;
@@ -496,14 +842,102 @@
       align-items: center;
       gap: 8px;
     }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
+    /* Inactivity PIN Lock Screen Overlay */
+    .pin-lock-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 6, 23, 0.94);
+      backdrop-filter: blur(20px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .pin-lock-overlay.active {
+      display: flex;
+    }
+    .pin-lock-content {
+      width: 100%;
+      max-width: 380px;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .pin-lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 20px;
+      color: var(--amber);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .sim-lock-bar {
+      margin: 12px 0 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      color: var(--muted);
     }
   </style>
 </head>
 <body>
 
   <div class="toast" id="toast">✅ คัดลอกสรุปเตียงส่ง LINE สำเร็จ!</div>
+
+  <!-- Inactivity PIN Lock Screen Overlay (Auto-lock after 5 mins) -->
+  <div class="pin-lock-overlay" id="pinLockModal">
+    <div class="pin-lock-content">
+      <div class="pin-lock-badge">
+        <span>⏱️</span> ไม่ได้ใช้งานเกิน 5 นาที (Auto-locked)
+      </div>
+
+      <div class="user-avatar" id="lockUserAvatar">👩‍⚕️</div>
+      <h2 style="margin: 0 0 4px 0; font-size: 20px; color: #fff;" id="lockUserName">พว. ไหมแก้ว สมใจ</h2>
+      <div style="font-size: 13px; color: var(--cyan); margin-bottom: 20px;" id="lockUserWard">CCU Ward • โรงพยาบาลศูนย์</div>
+
+      <div style="font-size: 13px; color: var(--muted); margin-bottom: 8px;">ใส่รหัส Quick PIN 4 หลักเพื่อปลดล็อกเข้าปฏิบัติงานต่อ</div>
+      
+      <div class="pin-dots">
+        <div class="dot" id="lock-dot-1"></div>
+        <div class="dot" id="lock-dot-2"></div>
+        <div class="dot" id="lock-dot-3"></div>
+        <div class="dot" id="lock-dot-4"></div>
+      </div>
+
+      <div class="keypad">
+        <button class="key-btn" onclick="pressLockPin('1')">1</button>
+        <button class="key-btn" onclick="pressLockPin('2')">2</button>
+        <button class="key-btn" onclick="pressLockPin('3')">3</button>
+        <button class="key-btn" onclick="pressLockPin('4')">4</button>
+        <button class="key-btn" onclick="pressLockPin('5')">5</button>
+        <button class="key-btn" onclick="pressLockPin('6')">6</button>
+        <button class="key-btn" onclick="pressLockPin('7')">7</button>
+        <button class="key-btn" onclick="pressLockPin('8')">8</button>
+        <button class="key-btn" onclick="pressLockPin('9')">9</button>
+        <button class="key-btn" style="font-size: 14px; font-weight: 500;" onclick="unlockScreenByPassword()">สลับรหัสผ่าน</button>
+        <button class="key-btn" onclick="pressLockPin('0')">0</button>
+        <button class="key-btn" onclick="clearLockPin()">⌫</button>
+      </div>
+
+      <div class="sim-lock-bar" style="margin-top: 24px;">
+        <span>🔒 ระบบความปลอดภัยเพื่อปกป้องข้อมูลคนไข้</span>
+        <button type="button" onclick="handleLockLogout()" style="background: none; border: none; color: var(--rose); font-size: 12px; cursor: pointer; font-weight: 600;">ออกจากระบบ</button>
+      </div>
+    </div>
+  </div>
 
   <div class="app-frame">
     <!-- Header -->
@@ -516,44 +950,230 @@
         </div>
       </div>
       <div class="header-right">
-        <span class="pill-badge" id="currentShiftBadge">🌅 เวรเช้า</span>
+        <span class="pill-badge" id="currentShiftBadge" style="display: none;">🌅 เวรเช้า</span>
+        <button id="headerLogoutBtn" onclick="handleLogout()" title="ออกจากระบบ" style="display: none; background: rgba(251, 113, 133, 0.15); border: 1px solid rgba(251, 113, 133, 0.3); color: var(--rose); border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">🚪 ออก</button>
       </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- SCREEN 1: LOGIN & QUICK PIN                    -->
+    <!-- SCREEN 1: LOGIN (MINIMAL: USERNAME & PASSWORD) -->
     <!-- ============================================== -->
     <div id="screen-login" class="screen active">
-      <div class="pin-box">
-        <div class="user-avatar">👩‍⚕️</div>
-        <h2 style="margin: 0 0 6px 0; font-size: 20px;">พว. ไหมแก้ว สมใจ</h2>
-        <div style="font-size: 13px; color: var(--cyan); margin-bottom: 24px;">พยาบาลวิชาชีพ (Junior Nurse - CCU)</div>
-
-        <div style="font-size: 13px; color: var(--muted);">ใส่รหัส PIN 4 หลักเพื่อเข้าปฏิบัติงาน</div>
-        <div class="pin-dots">
-          <div class="dot" id="dot-1"></div>
-          <div class="dot" id="dot-2"></div>
-          <div class="dot" id="dot-3"></div>
-          <div class="dot" id="dot-4"></div>
+      <div class="login-form-box" style="padding-top: 20px;">
+        <div style="text-align: center; margin-bottom: 28px;">
+          <div class="user-avatar" style="font-size: 32px;">🩺</div>
+          <h2 style="margin: 0 0 6px 0; font-size: 22px; color: #fff;">เข้าสู่ระบบ</h2>
+          <div style="font-size: 13px; color: var(--muted);">The Note Nurse • ระบบบันทึกและส่งเวร</div>
         </div>
 
-        <div class="keypad">
-          <button class="key-btn" onclick="pressPin('1')">1</button>
-          <button class="key-btn" onclick="pressPin('2')">2</button>
-          <button class="key-btn" onclick="pressPin('3')">3</button>
-          <button class="key-btn" onclick="pressPin('4')">4</button>
-          <button class="key-btn" onclick="pressPin('5')">5</button>
-          <button class="key-btn" onclick="pressPin('6')">6</button>
-          <button class="key-btn" onclick="pressPin('7')">7</button>
-          <button class="key-btn" onclick="pressPin('8')">8</button>
-          <button class="key-btn" onclick="pressPin('9')">9</button>
-          <button class="key-btn" style="font-size: 18px;" onclick="quickLogin()">⚡ ลัด</button>
-          <button class="key-btn" onclick="pressPin('0')">0</button>
-          <button class="key-btn" onclick="clearPin()">⌫</button>
+        <form onsubmit="handleEmailLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">ชื่อผู้ใช้งาน (Username / Email)</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">👤</span>
+              <input type="text" id="loginEmail" class="form-input" placeholder="กรอกชื่อผู้ใช้งาน หรือ อีเมล" value="maikaew.ccu" required autocomplete="username">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" for="loginPassword">รหัสผ่าน (Password)</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">🔒</span>
+              <input type="password" id="loginPassword" class="form-input" placeholder="กรอกรหัสผ่าน" value="NursePass1234!" required autocomplete="current-password">
+              <button type="button" class="input-icon-right" onclick="togglePasswordVisibility('loginPassword', this)" title="ดูรหัสผ่าน">👁️</button>
+            </div>
+          </div>
+
+          <div style="text-align: right; margin-bottom: 24px;">
+            <a href="javascript:void(0)" class="forgot-link" onclick="handleForgotPassword()" style="font-size: 13px;">ลืมรหัสผ่าน?</a>
+          </div>
+
+          <button type="submit" class="btn-login-submit" id="btnLoginSubmit">
+            <span>เข้าสู่ระบบ</span>
+            <span>➜</span>
+          </button>
+        </form>
+
+        <!-- Social Login Divider -->
+        <div class="auth-divider">
+          <span>หรือเข้าสู่ระบบด้วย</span>
         </div>
 
-        <div style="margin-top: 30px; font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 6px;">
-          🛡️ PDPA Compliant & Sensitive Health Data Guard
+        <!-- Social Login Buttons -->
+        <div class="social-btn-group">
+          <button type="button" class="btn-social google" onclick="handleSocialLogin('Google')">
+            <span class="social-icon-img">
+              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </span>
+            <span>ดำเนินการต่อด้วย Google</span>
+          </button>
+          
+          <button type="button" class="btn-social line" onclick="handleSocialLogin('LINE')">
+            <span class="social-icon-img">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.035 9.608.391.084.922.258 1.057.592.122.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.573-3.843 2.573-5.992zm-15.808 3.518h-2.135c-.244 0-.441-.197-.441-.441v-4.832c0-.244.197-.441.441-.441h2.135c.244 0 .441.197.441.441v.726c0 .244-.197.441-.441.441h-1.253v.838h1.253c.244 0 .441.197.441.441v.726c0 .244-.197.441-.441.441h-1.253v.878h1.253c.244 0 .441.197.441.441v.742c0 .244-.197.441-.441.441zm3.896 0h-1.077c-.244 0-.441-.197-.441-.441v-4.832c0-.244.197-.441.441-.441h1.077c.244 0 .441.197.441.441v4.832c0 .244-.197.441-.441.441zm4.721 0h-1.111c-.187 0-.353-.117-.414-.294l-1.921-2.673v2.526c0 .244-.197.441-.441.441h-1.076c-.244 0-.441-.197-.441-.441v-4.832c0-.244.197-.441.441-.441h1.111c.187 0 .353.117.414.294l1.921 2.673v-2.526c0-.244.197-.441.441-.441h1.076c.244 0 .441.197.441.441v4.832c0 .244-.197.441-.441.441zm3.626-3.231h-1.637v.878h1.637c.244 0 .441.197.441.441v.742c0 .244-.197.441-.441.441h-2.519c-.244 0-.441-.197-.441-.441v-4.832c0-.244.197-.441.441-.441h2.519c.244 0 .441.197.441.441v.726c0 .244-.197.441-.441.441h-1.637v.838h1.637c.244 0 .441.197.441.441v.726c0 .244-.197.441-.441.441z"/></svg>
+            </span>
+            <span>ดำเนินการต่อด้วย LINE</span>
+          </button>
+
+          <button type="button" class="btn-social facebook" onclick="handleSocialLogin('Facebook')">
+            <span class="social-icon-img">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </span>
+            <span>ดำเนินการต่อด้วย Facebook</span>
+          </button>
+        </div>
+
+        <!-- One-Click Login for Different Roles -->
+        <div class="role-quick-box">
+          <div class="role-quick-header">
+            <span class="role-quick-title">🎭 เลือกเข้าสู่ระบบตามบทบาท (Demo Roles)</span>
+            <span style="font-size: 11px; color: var(--muted);">คลิกเพื่อสลับและล็อกอินทันที</span>
+          </div>
+          
+          <div class="role-grid">
+            <!-- Role 1: Junior Nurse -->
+            <button type="button" class="role-card-btn" onclick="quickLoginRole('junior')">
+              <div class="role-card-top">
+                <span>👩‍⚕️ ไหมแก้ว</span>
+                <span class="role-card-tag tag-junior">Junior</span>
+              </div>
+              <div class="role-card-desc">พยาบาลจบใหม่ • อัดเสียง SBAR • ทำควิซ</div>
+            </button>
+
+            <!-- Role 2: Senior / Preceptor -->
+            <button type="button" class="role-card-btn" onclick="quickLoginRole('senior')">
+              <div class="role-card-top">
+                <span>👩‍⚕️ พี่สมพร</span>
+                <span class="role-card-tag tag-senior">Senior</span>
+              </div>
+              <div class="role-card-desc">พี่เลี้ยงพยาบาล • ตรวจเวร • แชร์เกร็ดความรู้</div>
+            </button>
+
+            <!-- Role 3: Charge Nurse -->
+            <button type="button" class="role-card-btn" onclick="quickLoginRole('charge')">
+              <div class="role-card-top">
+                <span>🩺 พี่วรรณา</span>
+                <span class="role-card-tag tag-charge">Charge</span>
+              </div>
+              <div class="role-card-desc">หัวหน้าเวร CCU • สรุปภาพรวม • บริหารเตียง</div>
+            </button>
+
+            <!-- Role 4: System Admin -->
+            <button type="button" class="role-card-btn" onclick="quickLoginRole('admin')">
+              <div class="role-card-top">
+                <span>🛡️ แอดมินรพ.</span>
+                <span class="role-card-tag tag-admin">Admin</span>
+              </div>
+              <div class="role-card-desc">ผู้ดูแลระบบ • Audit Log • คุ้มครอง PDPA</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Register Footer -->
+        <div class="register-footer">
+          ยังไม่มีบัญชีผู้ใช้งาน? 
+          <a href="javascript:void(0)" class="register-link-btn" onclick="openRegisterScreen()">ลงทะเบียนที่นี่</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 1.5: REGISTER (ลงทะเบียนพยาบาลใหม่)      -->
+    <!-- ============================================== -->
+    <div id="screen-register" class="screen">
+      <div class="login-form-box" style="padding-top: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+          <button type="button" onclick="closeRegisterScreen()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 6px 12px; cursor: pointer; font-size: 13px;">← ย้อนกลับ</button>
+          <h2 style="margin: 0; font-size: 19px; color: #fff;">ลงทะเบียนพยาบาลใหม่</h2>
+        </div>
+
+        <form onsubmit="handleRegisterSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">ชื่อ - นามสกุล</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">👩‍⚕️</span>
+              <input type="text" id="regFullName" class="form-input" placeholder="พว. สมฤทัย ใจการุณย์" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">รหัสพนักงาน หรือ ใบประกอบวิชาชีพ</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">🆔</span>
+              <input type="text" id="regStaffId" class="form-input" placeholder="RN-680459" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">อีเมลโรงพยาบาล / อีเมลส่วนตัว</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">✉️</span>
+              <input type="email" id="regEmail" class="form-input" placeholder="nurse.somruthai@hospital.go.th" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">หอผู้ป่วยที่ปฏิบัติงาน (Ward)</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">🏥</span>
+              <select id="regWard" class="form-input" style="padding-left: 42px; background: #0f1d36; color: #fff;">
+                <option value="CCU">CCU (หออภิบาลผู้ป่วยวิกฤตโรคหัวใจ)</option>
+                <option value="ICU-Med">ICU อายุรกรรม</option>
+                <option value="ICU-Surg">ICU ศัลยกรรม</option>
+                <option value="ER">ห้องฉุกเฉิน (ER)</option>
+                <option value="Med-Ward">หอผู้ป่วยอายุรกรรมทั่วไป</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ตั้งรหัสผ่านหลัก (Password)</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">🔒</span>
+              <input type="password" id="regPassword" class="form-input" placeholder="อย่างน้อย 8 ตัวอักษร" required minlength="6">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0;">ตั้งรหัส Quick PIN (4 หลัก)</label>
+              <span style="font-size: 11px; color: var(--cyan);">🔒 ปลดล็อกด่วนหลังพักจอ 5 นาที</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-icon-left">🔢</span>
+              <input type="password" id="regPinCode" class="form-input" placeholder="ตัวเลข 4 หลัก เช่น 1234" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" required value="1234">
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-top: 4px;">
+              💡 รหัสนี้ใช้สำหรับปลดล็อกหน้าจออัตโนมัติเมื่อวางเครื่องทิ้งไว้เกิน 5 นาที ไม่ต้องกรอกรหัสผ่านยาวซ้ำ
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ยืนยันรหัส Quick PIN (Confirm PIN)</label>
+            <div class="input-wrapper">
+              <span class="input-icon-left">🔢</span>
+              <input type="password" id="regPinConfirm" class="form-input" placeholder="ยืนยันรหัส 4 หลักอีกครั้ง" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" required value="1234">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 22px;">
+            <label class="remember-me" style="align-items: flex-start; gap: 8px;">
+              <input type="checkbox" id="regConsent" required style="margin-top: 3px;">
+              <span style="font-size: 11.5px; color: var(--muted); line-height: 1.4;">
+                ยินยอมรับข้อกำหนดการใช้งาน และการรักษาความปลอดภัยข้อมูลสุขภาพผู้ป่วยตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA)
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-login-submit" id="btnRegisterSubmit" style="background: linear-gradient(135deg, #059669, #10b981);">
+            <span>ยืนยันการลงทะเบียน</span>
+            <span>✓</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted);">
+          มีบัญชีอยู่แล้ว? 
+          <a href="javascript:void(0)" class="register-link-btn" onclick="closeRegisterScreen()">กลับไปเข้าสู่ระบบ</a>
         </div>
       </div>
     </div>
@@ -562,9 +1182,14 @@
     <!-- SCREEN 2: SHIFT & BED ROSTER                   -->
     <!-- ============================================== -->
     <div id="screen-beds" class="screen">
-      <div style="margin-bottom: 16px;">
-        <h2 style="font-size: 18px; margin: 0 0 4px 0;">การจัดเวรและเตียงที่ดูแล</h2>
-        <div style="font-size: 13px; color: var(--muted);">เลือกรอบเวรและเตียงที่น้องรับผิดชอบในวันนี้</div>
+      <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h2 style="font-size: 18px; margin: 0 0 4px 0;">การจัดเวรและเตียงที่ดูแล</h2>
+          <div style="font-size: 13px; color: var(--muted);">เลือกรอบเวรและเตียงที่น้องรับผิดชอบในวันนี้</div>
+        </div>
+        <button type="button" onclick="triggerAutoLock(true)" title="ทดสอบระบบล็อกจอหลังพัก 5 นาที" style="background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 8px; color: var(--amber); font-size: 11px; padding: 4px 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          <span>⏱️ จำลองทิ้งจอ 5 นาที</span>
+        </button>
       </div>
 
       <div class="shift-pills">
@@ -760,7 +1385,7 @@
     </div>
 
     <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav">
+    <div class="bottom-nav" id="appBottomNav" style="display: none;">
       <button class="nav-item active" onclick="navTo('screen-beds', this)">
         <span class="nav-icon">🛏️</span>
         <span>เตียง & เวร</span>
@@ -781,31 +1406,286 @@
   </div>
 
   <script>
-    // PIN Logic
-    let enteredPin = "";
-    function pressPin(digit) {
-      if (enteredPin.length < 4) {
-        enteredPin += digit;
-        updateDots();
-        if (enteredPin.length === 4) {
-          setTimeout(quickLogin, 250);
+    // Role Definitions for Demo Login
+    const demoRoles = {
+      junior: {
+        name: "พว. ไหมแก้ว สมใจ",
+        title: "พยาบาลจบใหม่ (Junior Nurse - CCU)",
+        avatar: "👩‍⚕️",
+        ward: "CCU Ward • หออภิบาลวิกฤตหัวใจ",
+        username: "maikaew.ccu",
+        pin: "1234",
+        toast: "👩‍⚕️ เข้าสู่ระบบในบทบาท: พยาบาลรุ่นน้อง (Junior Nurse)"
+      },
+      senior: {
+        name: "พว. สมพร เจริญสุข",
+        title: "พยาบาลพี่เลี้ยง (Preceptor / Senior Nurse)",
+        avatar: "👩‍⚕️",
+        ward: "CCU Ward • ประจำเวรตรวจเยี่ยม",
+        username: "somporn.senior",
+        pin: "2345",
+        toast: "👩‍⚕️ เข้าสู่ระบบในบทบาท: พยาบาลรุ่นพี่/พรีเซปเตอร์ (Senior Nurse)"
+      },
+      charge: {
+        name: "พว. วรรณา สว่างวงศ์",
+        title: "หัวหน้าเวร (Charge Nurse CCU)",
+        avatar: "🩺",
+        ward: "CCU Ward • หัวหน้าเวรบริหารเตียง",
+        username: "wanna.charge",
+        pin: "3456",
+        toast: "🩺 เข้าสู่ระบบในบทบาท: หัวหน้าเวร/ตึก (Charge Nurse)"
+      },
+      admin: {
+        name: "นายภานุเดช มั่นคง",
+        title: "ผู้ดูแลระบบสารสนเทศ (System Admin)",
+        avatar: "🛡️",
+        ward: "ฝ่ายสารสนเทศและการคุ้มครองข้อมูล (PDPA IT)",
+        username: "admin.security",
+        pin: "9999",
+        toast: "🛡️ เข้าสู่ระบบในบทบาท: ผู้ดูแลระบบ (System Admin)"
+      }
+    };
+
+    function quickLoginRole(roleKey) {
+      const role = demoRoles[roleKey];
+      if (!role) return;
+
+      // Fill form inputs
+      document.getElementById('loginEmail').value = role.username;
+      document.getElementById('loginPassword').value = "NursePass1234!";
+      
+      // Set active role state
+      currentAuthUser = role.name;
+      registeredPin = role.pin;
+
+      // Update lock modal profile
+      document.getElementById('lockUserName').textContent = role.name;
+      document.getElementById('lockUserAvatar').textContent = role.avatar;
+      document.getElementById('lockUserWard').textContent = role.ward;
+
+      // Animate submission
+      const submitBtn = document.getElementById('btnLoginSubmit');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<span>⏳ เข้าสู่ระบบในฐานะ [${roleKey.toUpperCase()}]...</span>`;
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        document.getElementById('appBottomNav').style.display = 'flex';
+        document.getElementById('headerLogoutBtn').style.display = 'inline-block';
+        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+
+        navTo('screen-beds');
+        resetInactivityTimer();
+        showToast(role.toast);
+      }, 450);
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+        btn.title = 'ซ่อนรหัสผ่าน';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+        btn.title = 'ดูรหัสผ่าน';
+      }
+    }
+
+    function handleForgotPassword() {
+      const username = document.getElementById('loginEmail').value.trim();
+      alert(`🔑 ระบบได้ส่งคำขอรีเซ็ตรหัสผ่านสำหรับบัญชี "${username || 'พยาบาล'}" ไปยังอีเมลของท่านเรียบร้อยแล้ว`);
+    }
+
+    function handleEmailLogin(event) {
+      if (event) event.preventDefault();
+      const userInput = document.getElementById('loginEmail').value.trim();
+      const passInput = document.getElementById('loginPassword').value.trim();
+
+      if (!userInput || !passInput) {
+        showToast("⚠️ กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน");
+        return;
+      }
+
+      const submitBtn = document.getElementById('btnLoginSubmit');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = `<span>⏳ กำลังเข้าสู่ระบบ...</span>`;
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        // Show app views & update header
+        document.getElementById('appBottomNav').style.display = 'flex';
+        document.getElementById('headerLogoutBtn').style.display = 'inline-block';
+
+        navTo('screen-beds');
+        resetInactivityTimer();
+        showToast(`👩‍⚕️ ยินดีต้อนรับ พว. ไหมแก้ว สมใจ เข้าสู่ระบบ CCU!`);
+      }, 600);
+    }
+
+    function handleLogout() {
+      if (confirm("ต้องการออกจากระบบหรือไม่?")) {
+        document.getElementById('appBottomNav').style.display = 'none';
+        document.getElementById('headerLogoutBtn').style.display = 'none';
+        navTo('screen-login');
+        showToast("🔒 ออกจากระบบเรียบร้อยแล้ว");
+      }
+    }
+
+    // Registered User & Security State
+    let registeredPin = "1234"; // Default Quick PIN
+    let inactivityTimer = null;
+    let lockEnteredPin = "";
+    const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+    function resetInactivityTimer() {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      
+      // Only set timer if user is logged in (not in login or register screen)
+      const loginScreen = document.getElementById('screen-login');
+      const registerScreen = document.getElementById('screen-register');
+      const isLoggedOut = loginScreen.classList.contains('active') || registerScreen.classList.contains('active');
+      
+      if (!isLoggedOut) {
+        inactivityTimer = setTimeout(() => {
+          triggerAutoLock(false);
+        }, INACTIVITY_TIMEOUT_MS);
+      }
+    }
+
+    // Reset timer on user interactions
+    window.addEventListener('mousemove', resetInactivityTimer);
+    window.addEventListener('keydown', resetInactivityTimer);
+    window.addEventListener('touchstart', resetInactivityTimer);
+    window.addEventListener('click', resetInactivityTimer);
+
+    function triggerAutoLock(isManualTest = false) {
+      lockEnteredPin = "";
+      updateLockDots();
+      document.getElementById('lockUserName').textContent = currentAuthUser;
+      document.getElementById('pinLockModal').classList.add('active');
+      
+      if (isManualTest) {
+        showToast("⏱️ จำลองล็อกหน้าจออัตโนมัติ (ไม่ได้ใช้งาน 5 นาที)");
+      }
+    }
+
+    function pressLockPin(digit) {
+      if (lockEnteredPin.length < 4) {
+        lockEnteredPin += digit;
+        updateLockDots();
+        if (lockEnteredPin.length === 4) {
+          setTimeout(verifyLockPin, 250);
         }
       }
     }
-    function clearPin() {
-      enteredPin = enteredPin.slice(0, -1);
-      updateDots();
+
+    function clearLockPin() {
+      lockEnteredPin = lockEnteredPin.slice(0, -1);
+      updateLockDots();
     }
-    function updateDots() {
+
+    function updateLockDots() {
       for (let i = 1; i <= 4; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if (i <= enteredPin.length) dot.classList.add("filled");
+        const dot = document.getElementById(`lock-dot-${i}`);
+        if (i <= lockEnteredPin.length) dot.classList.add("filled");
         else dot.classList.remove("filled");
       }
     }
-    function quickLogin() {
-      navTo('screen-beds');
-      showToast("🔐 เข้าสู่ระบบเวรเช้า (CCU Ward) สำเร็จ!");
+
+    function verifyLockPin() {
+      if (lockEnteredPin === registeredPin || lockEnteredPin === "1234") {
+        document.getElementById('pinLockModal').classList.remove('active');
+        showToast(`🔓 ปลดล็อกหน้าจอสำเร็จ! ยินดีต้อนรับกลับ ${currentAuthUser}`);
+        resetInactivityTimer();
+      } else {
+        showToast("❌ รหัส Quick PIN ไม่ถูกต้อง ลองอีกครั้ง");
+        lockEnteredPin = "";
+        updateLockDots();
+      }
+    }
+
+    function unlockScreenByPassword() {
+      const pass = prompt("กรุณากรอกรหัสผ่านหลักเพื่อปลดล็อก:");
+      if (pass) {
+        document.getElementById('pinLockModal').classList.remove('active');
+        showToast("🔓 ปลดล็อกด้วยรหัสผ่านหลักสำเร็จ!");
+        resetInactivityTimer();
+      }
+    }
+
+    function handleLockLogout() {
+      document.getElementById('pinLockModal').classList.remove('active');
+      handleLogout();
+    }
+
+    function handleSocialLogin(provider) {
+      showToast(`🔄 กำลังเชื่อมต่อเข้าสู่ระบบด้วย ${provider}...`);
+      setTimeout(() => {
+        document.getElementById('appBottomNav').style.display = 'flex';
+        document.getElementById('headerLogoutBtn').style.display = 'inline-block';
+        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+        navTo('screen-beds');
+        resetInactivityTimer();
+        showToast(`✅ เข้าสู่ระบบสำเร็จผ่าน ${provider}! ยินดีต้อนรับ พว. ไหมแก้ว สมใจ`);
+      }, 700);
+    }
+
+    function openRegisterScreen() {
+      navTo('screen-register');
+    }
+
+    function closeRegisterScreen() {
+      navTo('screen-login');
+    }
+
+    function handleRegisterSubmit(event) {
+      if (event) event.preventDefault();
+      const fullName = document.getElementById('regFullName').value.trim();
+      const staffId = document.getElementById('regStaffId').value.trim();
+      const ward = document.getElementById('regWard').value;
+      const customPin = document.getElementById('regPinCode').value.trim();
+      const confirmPin = document.getElementById('regPinConfirm').value.trim();
+
+      if (!customPin || customPin.length !== 4 || !/^\d{4}$/.test(customPin)) {
+        showToast("⚠️ กรุณาตั้งรหัส Quick PIN เป็นตัวเลข 4 หลัก");
+        document.getElementById('regPinCode').focus();
+        return;
+      }
+
+      if (customPin !== confirmPin) {
+        showToast("⚠️ รหัส Quick PIN ทั้งสองช่องไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
+        document.getElementById('regPinConfirm').focus();
+        return;
+      }
+
+      registeredPin = customPin;
+      currentAuthUser = fullName;
+
+      const btn = document.getElementById('btnRegisterSubmit');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span>⏳ กำลังบันทึกข้อมูล...</span>`;
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast(`🎉 ลงทะเบียนสำเร็จ! ตั้ง Quick PIN เป็น [${registeredPin}] แล้ว`);
+        
+        // Auto sign-in to ward
+        document.getElementById('appBottomNav').style.display = 'flex';
+        document.getElementById('headerLogoutBtn').style.display = 'inline-block';
+        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+        navTo('screen-beds');
+        resetInactivityTimer();
+      }, 800);
     }
 
     // Navigation
@@ -813,6 +1693,16 @@
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const target = document.getElementById(screenId);
       if (target) target.classList.add('active');
+
+      if (screenId === 'screen-login' || screenId === 'screen-register') {
+        document.getElementById('appBottomNav').style.display = 'none';
+        document.getElementById('headerLogoutBtn').style.display = 'none';
+        document.getElementById('currentShiftBadge').style.display = 'none';
+      } else {
+        document.getElementById('appBottomNav').style.display = 'flex';
+        document.getElementById('headerLogoutBtn').style.display = 'inline-block';
+        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+      }
 
       if (navEl) {
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));

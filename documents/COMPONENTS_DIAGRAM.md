@@ -68,6 +68,7 @@ graph TD
     UI_Pearls --> APIGateway
     UI_Knowledge --> APIGateway
     UI_Quiz --> APIGateway
+    UI_Auth --> APIGateway
 
     %% Gateway Pipeline
     APIGateway --> AuthMiddleware
@@ -112,15 +113,16 @@ graph TD
 - **👩‍⚕️ Senior Pearls Component:** กระดานอ่านเกร็ดความรู้ประจำวัน และฟอร์มสำหรับรุ่นพี่แชร์ทริค พร้อมปุ่มกดแสดงความขอบคุณ (Heart Reaction)
 - **📚 Knowledge Hub & Tutor Component:** ระบบค้นหาคู่มือ CCU พกพา (ยาเสี่ยงสูง, แถบ EKG, แปลผลแล็บ) และช่องสนทนาถาม-ตอบกับ AI ติวเตอร์
 - **🎮 Clinical Quiz Component:** หน้าต่างทำควิซสั้นๆ ประจำวัน, บันทึกสถิติ, แสดงคะแนนและแต้ม EXP
+- **🔐 Auth & Access Component:** หน้าจอยืนยันตัวตนและการลงทะเบียนมาตรฐาน รองรับ Email/Staff ID + Password, เข้าสู่ระบบด้วย Social Login (Google, LINE, Facebook), ระบบ Show/Hide รหัสผ่าน, ลืมรหัสผ่าน, จดจำการเข้าสู่ระบบ (Remember Me), แผงสลับบทบาทจำลอง (Role Quick Access สำหรับ Prototype), ฟอร์มลงทะเบียนพร้อมตั้งและยืนยันรหัส Quick PIN 4 หลัก, ระบบล็อกหน้าจออัตโนมัติเมื่อพักเครื่อง 5 นาที (Inactivity Lock) พร้อม Keypad ปลดล็อกด่วนด้วย Quick PIN และปุ่มออกจากระบบ (Logout)
 
 #### 2.2 Security & Gateway Layer
 - **🌐 API Gateway / Reverse Proxy:** รับ Request จาก Client, จัดการเส้นทาง URL, จัดการ CORS และ Static Files
-- **🛡️ Auth & RBAC Guard:** ตรวจสอบ Token (JWT) และสิทธิ์การเข้าถึงตามบทบาท (Junior, Senior, Charge Nurse, Admin)
+- **🛡️ Auth & RBAC Guard:** ตรวจสอบ Token (JWT), สิทธิ์การเข้าถึงตามบทบาท (Junior, Senior, Charge Nurse, Admin) และตรวจสอบ OAuth Identity จาก Social Providers
 - **🛡️ PDPA Data Sanitizer:** ตัดและปิดบังข้อมูลที่ระบุตัวตน (เช่น ชื่อ-นามสกุล, เลขประจำตัวประชาชน, เลข HN) ก่อนส่งต่อให้ AI ภายนอก
 - **📝 Audit & Access Logger:** บันทึกการเข้าใช้งาน การส่งต่อข้อมูล และเหตุการณ์สำคัญลงใน Log ตามข้อกำหนดกฎหมาย PDPA
 
 #### 2.3 Business Logic & Service Layer
-- **🔑 Identity & Access Service:** ดูแลการลงทะเบียน, เข้าสู่ระบบ, ถอดรหัสผ่านแบบ Salted Hash, และตรวจสอบ PIN รวดเร็ว
+- **🔑 Identity & Access Service:** ดูแลการลงทะเบียนสมาชิกพยาบาล, ตรวจสอบความถูกต้องของ Quick PIN และ Confirm PIN, การเข้าสู่ระบบด้วยรหัสผ่านหรือ Social Login, จัดเก็บรหัสผ่านแบบ Salted Hash, และตรวจสอบ PIN รวดเร็วกรณี Inactivity Unlock
 - **📋 Shift & Bed Management Service:** ประมวลผลสถานะเตียงในวอร์ด, จัดกลุ่มเตียงตามที่พยาบาลแต่ละคนรับผิดชอบ
 - **📤 Handover Sharing Service:** จัดรูปแบบข้อความส่งต่อเตียงสำหรับแชร์ลง LINE, สร้างใบสรุปส่งเวรประจำรอบ (Shift Summary Sheet)
 - **🧠 SBAR Structuring Service:** ประสานงานกับ AI เพื่อแปลงข้อความ/เสียงเป็นโครงสร้าง SBAR พร้อมวิเคราะห์จุดที่ต้องระวัง

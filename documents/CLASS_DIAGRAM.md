@@ -14,16 +14,34 @@ classDiagram
     class User {
         +String userId
         +String staffId
+        +String email
         +String fullName
         +String nickname
         +Role role
         +String wardId
+        +String boundDeviceId
+        +String deviceToken
         +String pinHash
         +String passwordHash
+        +AuthProvider authProvider
+        +Boolean pdpaConsentAccepted
         +Int expPoints
         +Int level
+        +register(data: RegisterRequest) Boolean
+        +verifyPassword(password: String) Boolean
         +verifyPin(pin: String) Boolean
+        +bindDevice(deviceId: String, deviceName: String) Boolean
+        +validateDevice(deviceId: String) Boolean
+        +resetPassword(token: String) Boolean
         +addExp(points: Int) void
+    }
+
+    class AuthProvider {
+        <<enumeration>>
+        LOCAL_PASSWORD
+        GOOGLE
+        LINE
+        FACEBOOK
     }
 
     class Role {
