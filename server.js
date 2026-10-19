@@ -120,7 +120,15 @@ const server = http.createServer((req, res) => {
   }
 
   // Static File Serving
-  let filePath = path.join(PUBLIC_DIR, req.url === '/' ? 'index.html' : req.url.split('?')[0]);
+  let reqUrl = req.url.split('?')[0];
+  let filePath;
+  if (reqUrl.startsWith('/prototype')) {
+    let subPath = reqUrl.replace('/prototype', '');
+    if (subPath === '' || subPath === '/') subPath = '/index.html';
+    filePath = path.join(__dirname, 'prototype', subPath);
+  } else {
+    filePath = path.join(PUBLIC_DIR, reqUrl === '/' ? 'index.html' : reqUrl);
+  }
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 

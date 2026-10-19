@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>The Note Nurse - Interactive Prototype</title>
+  <style>
+    :root {
+      --bg: #0b1329;
+      --card: #152238;
+      --card-hover: #1c2e4a;
+      --cyan: #38bdf8;
+      --cyan-glow: rgba(56, 189, 248, 0.25);
+      --green: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --purple: #c084fc;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: #1e3a5f;
+      --active-tab: #0284c7;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #020617;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Sarabun", sans-serif;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Mobile Container Frame */
+    .app-frame {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      box-shadow: 0 0 50px rgba(0,0,0,0.8);
+      overflow-x: hidden;
+    }
+
+    /* Header Bar */
+    .header-bar {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(11, 19, 41, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--cyan-glow);
+    }
+    .brand-title {
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill-badge {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-weight: 600;
+    }
+
+    /* Screen Views */
+    .screen {
+      display: none;
+      flex: 1;
+      padding: 20px;
+      padding-bottom: 95px;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .screen.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 440px;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0 14px 0;
+      z-index: 100;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      transition: all 0.2s;
+      flex: 1;
+    }
+    .nav-item.active {
+      color: var(--cyan);
+    }
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    /* Cards & UI Elements */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+
+    /* Screen 1: Quick PIN */
+    .pin-box {
+      text-align: center;
+      padding: 30px 10px;
+    }
+    .user-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a5f, #0284c7);
+      margin: 0 auto 16px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      box-shadow: 0 0 25px var(--cyan-glow);
+      border: 2px solid var(--cyan);
+    }
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 24px 0 32px 0;
+    }
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      transition: all 0.2s;
+    }
+    .dot.filled {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    .key-btn {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #111d35;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .key-btn:active {
+      background: var(--active-tab);
+      transform: scale(0.92);
+    }
+
+    /* Shift Selector Pills */
+    .shift-pills {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .shift-pill {
+      flex: 1;
+      padding: 10px 4px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .shift-pill.active {
+      background: #0284c7;
+      color: #fff;
+      border-color: var(--cyan);
+      box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);
+    }
+
+    /* Bed Cards */
+    .bed-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bed-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .bed-card:hover {
+      border-color: var(--cyan);
+      background: var(--card-hover);
+    }
+    .bed-card.selected {
+      border-color: var(--cyan);
+      box-shadow: 0 0 15px var(--cyan-glow);
+    }
+    .bed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .bed-number {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .tag-acuity {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .tag-red { background: rgba(251, 113, 133, 0.2); color: var(--rose); border: 1px solid rgba(251, 113, 133, 0.4); }
+    .tag-yellow { background: rgba(251, 191, 36, 0.2); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.4); }
+    .tag-green { background: rgba(52, 211, 153, 0.2); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.4); }
+
+    /* Screen 3: Voice & SBAR */
+    .mic-section {
+      text-align: center;
+      padding: 24px 0 16px 0;
+    }
+    .mic-button {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      border: none;
+      color: white;
+      font-size: 34px;
+      cursor: pointer;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px var(--cyan-glow);
+      transition: all 0.2s;
+    }
+    .mic-button.recording {
+      background: linear-gradient(135deg, #e11d48, #fb7185);
+      animation: pulse 1.2s infinite;
+      box-shadow: 0 0 35px rgba(251, 113, 133, 0.6);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    /* SBAR Blocks */
+    .sbar-card {
+      background: #0d182e;
+      border-radius: 12px;
+      border-left: 4px solid var(--cyan);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .sbar-title {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .sbar-desc {
+      font-size: 13.5px;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    /* Cheat Sheet Box */
+    .cheat-box {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 14px;
+      padding: 14px;
+      margin: 16px 0;
+    }
+    .cheat-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--amber);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    /* Pearls / Knowledge */
+    .pearl-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .pearl-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .author-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--cyan);
+    }
+    .btn-heart {
+      background: rgba(251, 113, 133, 0.15);
+      color: var(--rose);
+      border: 1px solid rgba(251, 113, 133, 0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-heart:active {
+      transform: scale(1.15);
+    }
+
+    /* Quiz Screen */
+    .exp-bar-box {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .progress-track {
+      background: #0f172a;
+      height: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0 6px 0;
+      border: 1px solid var(--border);
+    }
+    .progress-fill {
+      width: 65%;
+      height: 100%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+      border-radius: 10px;
+    }
+
+    .btn-choice {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #111d35;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-choice:hover {
+      background: var(--card-hover);
+      border-color: var(--cyan);
+    }
+    .btn-choice.correct {
+      background: rgba(52, 211, 153, 0.2);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* Common Buttons */
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 0 20px var(--cyan-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-line {
+      background: #06c755;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #0284c7;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast" id="toast">✅ คัดลอกสรุปเตียงส่ง LINE สำเร็จ!</div>
+
+  <div class="app-frame">
+    <!-- Header -->
+    <div class="header-bar">
+      <div class="brand-logo">
+        <div class="logo-icon">🩺</div>
+        <div>
+          <div class="brand-title">The Note Nurse</div>
+          <div class="brand-sub">CCU Ward • โรงพยาบาลศูนย์</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="pill-badge" id="currentShiftBadge">🌅 เวรเช้า</span>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 1: LOGIN & QUICK PIN                    -->
+    <!-- ============================================== -->
+    <div id="screen-login" class="screen active">
+      <div class="pin-box">
+        <div class="user-avatar">👩‍⚕️</div>
+        <h2 style="margin: 0 0 6px 0; font-size: 20px;">พว. ไหมแก้ว สมใจ</h2>
+        <div style="font-size: 13px; color: var(--cyan); margin-bottom: 24px;">พยาบาลวิชาชีพ (Junior Nurse - CCU)</div>
+
+        <div style="font-size: 13px; color: var(--muted);">ใส่รหัส PIN 4 หลักเพื่อเข้าปฏิบัติงาน</div>
+        <div class="pin-dots">
+          <div class="dot" id="dot-1"></div>
+          <div class="dot" id="dot-2"></div>
+          <div class="dot" id="dot-3"></div>
+          <div class="dot" id="dot-4"></div>
+        </div>
+
+        <div class="keypad">
+          <button class="key-btn" onclick="pressPin('1')">1</button>
+          <button class="key-btn" onclick="pressPin('2')">2</button>
+          <button class="key-btn" onclick="pressPin('3')">3</button>
+          <button class="key-btn" onclick="pressPin('4')">4</button>
+          <button class="key-btn" onclick="pressPin('5')">5</button>
+          <button class="key-btn" onclick="pressPin('6')">6</button>
+          <button class="key-btn" onclick="pressPin('7')">7</button>
+          <button class="key-btn" onclick="pressPin('8')">8</button>
+          <button class="key-btn" onclick="pressPin('9')">9</button>
+          <button class="key-btn" style="font-size: 18px;" onclick="quickLogin()">⚡ ลัด</button>
+          <button class="key-btn" onclick="pressPin('0')">0</button>
+          <button class="key-btn" onclick="clearPin()">⌫</button>
+        </div>
+
+        <div style="margin-top: 30px; font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 6px;">
+          🛡️ PDPA Compliant & Sensitive Health Data Guard
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 2: SHIFT & BED ROSTER                   -->
+    <!-- ============================================== -->
+    <div id="screen-beds" class="screen">
+      <div style="margin-bottom: 16px;">
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;">การจัดเวรและเตียงที่ดูแล</h2>
+        <div style="font-size: 13px; color: var(--muted);">เลือกรอบเวรและเตียงที่น้องรับผิดชอบในวันนี้</div>
+      </div>
+
+      <div class="shift-pills">
+        <div class="shift-pill active" onclick="setShift('เช้า', this)">🌅 เวรเช้า</div>
+        <div class="shift-pill" onclick="setShift('บ่าย', this)">🌇 เวรบ่าย</div>
+        <div class="shift-pill" onclick="setShift('ดึก', this)">🌙 เวรดึก</div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 13px; font-weight: 600; color: var(--cyan);">เตียงใน CCU (เลือกแตะเพื่อส่งเวร)</span>
+        <button class="btn-line" onclick="shareAllBeds()">📲 สรุปส่งเวรทั้งรอบ</button>
+      </div>
+
+      <div class="bed-grid">
+        <!-- Bed 1 -->
+        <div class="bed-card" onclick="openHandover('เตียง 1', 'ชาย 68 ปี', 'Acute STEMI Anterior post PCI d1', '🔴 วิกฤตใกล้ชิด', ['A-line', 'Foley cath'], ['Levophed 8 mcg/min', 'Heparin 800u/hr'])">
+          <div class="bed-header">
+            <span class="bed-number">🛏️ เตียง 1 (ชาย 68 ปี)</span>
+            <span class="tag-acuity tag-red">🔴 วิกฤตใกล้ชิด</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Dx: Acute STEMI Anterior wall post PCI (LAD stent) Day 1</div>
+          <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">💉 ยาเสี่ยงสูง: <span style="color: var(--amber);">Levophed 8 mcg/min, Heparin drip</span></div>
+          <div style="font-size: 12px; color: var(--muted);">🩺 สายยาง: A-line ข้อมือขวา, Foley's cath urine ออกดี</div>
+        </div>
+
+        <!-- Bed 2 -->
+        <div class="bed-card" onclick="openHandover('เตียง 2', 'หญิง 62 ปี', 'Acute Decompensated Heart Failure', '🟡 เฝ้าระวัง', ['Nasal cannula 3L', 'IV NSS KVO'], ['Lasix 40 mg IV q 12h'])">
+          <div class="bed-header">
+            <span class="bed-number">🛏️ เตียง 2 (หญิง 62 ปี)</span>
+            <span class="tag-acuity tag-yellow">🟡 เฝ้าระวัง</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Dx: Acute Decompensated Heart Failure (EF 28%)</div>
+          <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">💉 การรักษา: Lasix IV, On Oxygen cannula 3 LPM</div>
+          <div style="font-size: 12px; color: var(--muted);">🩺 ข้อควรระวัง: Record Urine output ทุก 2 ชม., Keep I/O negative</div>
+        </div>
+
+        <!-- Bed 3 -->
+        <div class="bed-card" onclick="openHandover('เตียง 3', 'ชาย 55 ปี', 'Post Elective CAG with Stent Day 2', '🟢 ทรงตัว', ['แผล Femoral ขวา'], ['Aspirin', 'Brilinta'])">
+          <div class="bed-header">
+            <span class="bed-number">🛏️ เตียง 3 (ชาย 55 ปี)</span>
+            <span class="tag-acuity tag-green">🟢 ทรงตัว</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Dx: Post Elective CAG with Stent Day 2 (เตรียมย้ายออกวอร์ด)</div>
+          <div style="font-size: 12px; color: var(--muted);">🩺 สถานะ: แผล femoral ขวาแห้งดี ไม่มี hematoma ชีพจรหลังเท้าชัดเจน</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 3: HANDOVER STUDIO (SBAR & SHIELD)      -->
+    <!-- ============================================== -->
+    <div id="screen-handover" class="screen">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <button onclick="navTo('screen-beds')" style="background: none; border: none; color: var(--cyan); font-size: 14px; font-weight: 600; cursor: pointer; padding: 0;">← กลับหน้ารวมเตียง</button>
+        <span class="pill-badge" id="handoverTargetBed">🛏️ เตียง 1</span>
+      </div>
+
+      <div class="card" style="padding: 14px; margin-bottom: 14px; background: #0c182d;">
+        <div style="font-size: 12px; color: var(--muted);">ข้อมูลผู้ป่วยประจำเตียง:</div>
+        <div id="handoverPatientDx" style="font-size: 13.5px; font-weight: 600; color: #fff; margin-top: 2px;">Acute STEMI Anterior post PCI Day 1</div>
+      </div>
+
+      <!-- Mic Recording Action -->
+      <div class="mic-section">
+        <button class="mic-button" id="micBtn" onclick="toggleRecord()">🎙️</button>
+        <div id="micStatusText" style="font-size: 13px; color: var(--cyan); margin-top: 10px; font-weight: 600;">แตะไมค์เพื่อพูดเล่าอาการภาษาธรรมชาติ</div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">(AI จะช่วยเรียบเรียงเป็น SBAR และกรองชื่อ/HN อัตโนมัติ)</div>
+      </div>
+
+      <!-- Preceptor Cheat Sheet (ดักคำถามรุ่นพี่) -->
+      <div class="cheat-box" id="cheatBox">
+        <div class="cheat-header">
+          <span>💡</span> สิ่งที่รุ่นพี่/แพทย์มักจะถามจี้ในเคสนี้ (เตรียมคำตอบล่วงหน้า):
+        </div>
+        <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #fde68a; line-height: 1.6;" id="cheatQuestionsList">
+          <li>"ค่า aPTT ล่าสุดกี่วิ? เจาะซ้ำรอบกี่โมง?"</li>
+          <li>"Levophed เรทล่าสุดเท่าไหร่? ได้ titrate ลงบ้างไหม?"</li>
+          <li>"แผลที่ขาหนีบคลำแล้วมี hematoma หรือแน่นไหม? ชีพจรหลังเท้าเต้นเท่ากันสองข้างไหม?"</li>
+        </ul>
+      </div>
+
+      <!-- SBAR Output Container -->
+      <div id="sbarContainer">
+        <div class="sbar-card" style="border-left-color: #38bdf8;">
+          <div class="sbar-title" style="color: #38bdf8;">📌 S - Situation (สถานการณ์สำคัญในเวรนี้)</div>
+          <div class="sbar-desc" id="sbarS">เตียง 1 ผู้ป่วยชาย 68 ปี Post-PCI Day 1 สัญญาณชีพโดยรวมคงตัว ไม่มีอาการแน่นหน้าอกซ้ำระหว่างเวร</div>
+        </div>
+        <div class="sbar-card" style="border-left-color: #818cf8;">
+          <div class="sbar-title" style="color: #818cf8;">📋 B - Background (ประวัติสำคัญ & สัญญาณชีพ)</div>
+          <div class="sbar-desc" id="sbarB">BP 115/68 mmHg, PR 78/min regular, SpO2 99% on room air, EKG monitor เป็น Sinus rhythm ไม่มี ST elevation ซ้ำ</div>
+        </div>
+        <div class="sbar-card" style="border-left-color: #34d399;">
+          <div class="sbar-title" style="color: #34d399;">💉 A - Assessment (การประเมินและการรักษาที่ให้ไป)</div>
+          <div class="sbar-desc" id="sbarA">ยังคงดริป Levophed 4 mcg/min, Heparin drip 800 u/hr ต่อเนื่อง แผล Femoral site ขวาแห้งดี ไม่มีก้อนบวมคลำได้ ชีพจร Dorsalis pedis สองข้างชัดเจน</div>
+        </div>
+        <div class="sbar-card" style="border-left-color: #c084fc;">
+          <div class="sbar-title" style="color: #c084fc;">⚠️ R - Recommendation (แผนฝากเวรถัดไปติดตาม)</div>
+          <div class="sbar-desc" id="sbarR">ฝากเวรถัดไปเจาะ aPTT ซ้ำเวลา 14.00 น. เพื่อปรับเรท Heparin, ติดตาม Urine output ทุก 2 ชม. และเฝ้าระวังอาการเจ็บหน้าอกซ้ำ</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 18px;">
+        <button class="btn-primary" onclick="copyBedForLine()">📲 คัดลอกสรุป SBAR ส่ง LINE</button>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 4: KNOWLEDGE HUB & SENIOR PEARLS        -->
+    <!-- ============================================== -->
+    <div id="screen-knowledge" class="screen">
+      <div style="margin-bottom: 16px;">
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;">เกร็ดความรู้ & คลังคู่มือ CCU</h2>
+        <div style="font-size: 13px; color: var(--muted);">เรียนรู้ทริคจากรุ่นพี่ และค้นคว้าคู่มือฉุกเฉิน</div>
+      </div>
+
+      <!-- Senior Tip Highlight -->
+      <div class="card" style="background: linear-gradient(135deg, #152238, #182e50); border-color: rgba(56, 189, 248, 0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--amber);">💡 เกร็ดความรู้ประจำวันจากพี่ CCU</span>
+          <span style="font-size: 11px; color: var(--muted);">วันนี้ 10:30 น.</span>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;">"การสังเกต Retroperitoneal Bleed หลังทำ PCI"</div>
+        <div style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
+          ถ้าน้องเจอคนไข้แทงสายสวนที่ขาหนีบ แล้วอยู่ๆ บ่นปวดหลัง/สะโพก หรือความดันดรอปโดยไม่มีเลือดออกที่แผลภายนอก ให้รีบคลำหน้าท้องด้านล่าง และรายงานหมอทันทีนะจ๊ะ เลือดอาจออกในช่องท้องหลังเยื่อบุ!
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; color: var(--cyan);">✍️ พี่ไหม (Charge Nurse CCU)</span>
+          <button class="btn-heart" onclick="addHeart(this)">❤️ ขอบคุณพี่ <span class="heart-num">24</span></button>
+        </div>
+      </div>
+
+      <!-- Quick Manual Categories -->
+      <h3 style="font-size: 15px; color: var(--cyan); margin: 20px 0 10px 0;">📖 คู่มือฉบับพกพา (Quick Ref)</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="card" style="padding: 14px; cursor: pointer;" onclick="alert('💊 ยาเสี่ยงสูง: Levophed ผสม 4mg in D5W 250ml, Cordarone drip ผสมเฉพาะ D5W เท่านั้น!')">
+          <div style="font-size: 22px; margin-bottom: 4px;">💊</div>
+          <div style="font-weight: 600; font-size: 13px;">High Alert Drugs</div>
+          <div style="font-size: 11px; color: var(--muted);">วิธีผสม & ข้อควรระวัง</div>
+        </div>
+        <div class="card" style="padding: 14px; cursor: pointer;" onclick="alert('📈 แถบ EKG: V1-V4 = Anterior (LAD), II,III,aVF = Inferior (RCA)')">
+          <div style="font-size: 22px; margin-bottom: 4px;">📈</div>
+          <div style="font-weight: 600; font-size: 13px;">EKG & Arrhythmia</div>
+          <div style="font-size: 11px; color: var(--muted);">สูตรจำ Lead & Rhythm</div>
+        </div>
+      </div>
+
+      <!-- Pocket Tutor Input -->
+      <div class="card" style="margin-top: 14px;">
+        <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px;">🤖 ถามข้อสงสัยพยาบาล (AI Safe Tutor)</div>
+        <input type="text" id="tutorInput" placeholder="พิมพ์ถามศัพท์/ยา เช่น Cordarone drip ผสมอะไร..." style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: #fff; font-size: 13px; margin-bottom: 8px;">
+        <button class="btn-primary" style="padding: 10px;" onclick="askTutor()">ถามพี่เลี้ยง AI (ไม่ดุ ไม่ด่า)</button>
+        <div id="tutorAnswer" style="display: none; margin-top: 10px; font-size: 13px; background: #0f172a; padding: 10px; border-radius: 8px; border-left: 3px solid var(--green);"></div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SCREEN 5: QUIZ QUEST & GROWTH                  -->
+    <!-- ============================================== -->
+    <div id="screen-quiz" class="screen">
+      <div style="margin-bottom: 16px;">
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;">เกมควิซทบทวนเคส (Quiz Quest)</h2>
+        <div style="font-size: 13px; color: var(--muted);">ฝึกตอบคำถาม เสริมความมั่นใจ ไม่ต้องกลัวตอบผิด</div>
+      </div>
+
+      <div class="exp-bar-box">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 700; color: #fff; font-size: 14px;">🌟 Level 2: CCU Rookie Star</span>
+          <span style="font-size: 12px; color: var(--cyan); font-weight: 600;" id="expText">320 / 500 EXP</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="expFill" style="width: 64%;"></div>
+        </div>
+        <div style="font-size: 11px; color: var(--muted);">ตอบถูกอีก 2 ข้อ เพื่อเลื่อนขั้นเป็น "Staff Nurse"</div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="card" id="quizCard">
+        <div style="font-size: 11px; color: var(--cyan); font-weight: 700; margin-bottom: 6px;">โจทย์จำลองส่งเวรประจำวัน (ข้อ 1/3)</div>
+        <div style="font-size: 14.5px; font-weight: 600; line-height: 1.5; color: #fff; margin-bottom: 16px;">
+          "คนไข้เคส STEMI ได้ยา Heparin Drip ต่อเนื่อง ค่าการตรวจทางห้องปฏิบัติการใดที่น้องต้องติดตามทุก 6 ชั่วโมงเพื่อปรับเรทยายา?"
+        </div>
+
+        <button class="btn-choice" onclick="answerQuiz(0, false)">A. ค่า PT / INR</button>
+        <button class="btn-choice" onclick="answerQuiz(1, true)">B. ค่า aPTT (Activated Partial Thromboplastin Time)</button>
+        <button class="btn-choice" onclick="answerQuiz(2, false)">C. ค่า Troponin-T</button>
+        <button class="btn-choice" onclick="answerQuiz(3, false)">D. ค่า Platelet Count อย่างเดียว</button>
+
+        <div id="quizResult" style="display: none; margin-top: 14px; padding: 12px; border-radius: 10px; background: rgba(52, 211, 153, 0.15); border: 1px solid var(--green); font-size: 13px; color: #a7f3d0; line-height: 1.5;">
+          🎉 <strong>ตอบถูกต้องยอดเยี่ยม! (+50 EXP)</strong><br/>
+          เพราะ Heparin ออกฤทธิ์ยับยั้ง Thrombin ผ่านทาง Intrinsic pathway จึงต้องตรวจติดตามด้วย <strong>aPTT</strong> โดยรักษาค่าให้อยู่ในช่วง 1.5 - 2.5 เท่าของค่าควบคุม เก่งมากจ้า!
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="navTo('screen-beds', this)">
+        <span class="nav-icon">🛏️</span>
+        <span>เตียง & เวร</span>
+      </button>
+      <button class="nav-item" onclick="navTo('screen-handover', this)">
+        <span class="nav-icon">🎙️</span>
+        <span>ส่งเวร SBAR</span>
+      </button>
+      <button class="nav-item" onclick="navTo('screen-knowledge', this)">
+        <span class="nav-icon">📚</span>
+        <span>ความรู้ & ทริค</span>
+      </button>
+      <button class="nav-item" onclick="navTo('screen-quiz', this)">
+        <span class="nav-icon">🎮</span>
+        <span>ควิซ & เลเวล</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // PIN Logic
+    let enteredPin = "";
+    function pressPin(digit) {
+      if (enteredPin.length < 4) {
+        enteredPin += digit;
+        updateDots();
+        if (enteredPin.length === 4) {
+          setTimeout(quickLogin, 250);
+        }
+      }
+    }
+    function clearPin() {
+      enteredPin = enteredPin.slice(0, -1);
+      updateDots();
+    }
+    function updateDots() {
+      for (let i = 1; i <= 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i <= enteredPin.length) dot.classList.add("filled");
+        else dot.classList.remove("filled");
+      }
+    }
+    function quickLogin() {
+      navTo('screen-beds');
+      showToast("🔐 เข้าสู่ระบบเวรเช้า (CCU Ward) สำเร็จ!");
+    }
+
+    // Navigation
+    function navTo(screenId, navEl) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
+
+      if (navEl) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        navEl.classList.add('active');
+      }
+    }
+
+    // Shift Selector
+    function setShift(shiftName, el) {
+      document.querySelectorAll('.shift-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('currentShiftBadge').textContent = `เวร${shiftName}`;
+      showToast(`เปลี่ยนเป็นเวร${shiftName} เรียบร้อยแล้ว`);
+    }
+
+    // Open Handover Studio
+    function openHandover(bedName, patientAge, dx, acuity, lines, drugs) {
+      document.getElementById('handoverTargetBed').textContent = bedName;
+      document.getElementById('handoverPatientDx').textContent = `${patientAge} • ${dx}`;
+      navTo('screen-handover');
+      
+      // Update SBAR sample
+      document.getElementById('sbarS').textContent = `${bedName}: ${patientAge} ${dx} สัญญาณชีพทรงตัว ไม่มีแน่นหน้าอกซ้ำในเวรนี้`;
+      document.getElementById('sbarA').textContent = `ยาที่ได้: ${drugs.join(', ')} | สายระบาย: ${lines.join(', ')}`;
+    }
+
+    // Recording Toggle
+    let isRecording = false;
+    function toggleRecord() {
+      const btn = document.getElementById('micBtn');
+      const text = document.getElementById('micStatusText');
+      isRecording = !isRecording;
+      
+      if (isRecording) {
+        btn.classList.add('recording');
+        text.textContent = "🔴 กำลังฟังบันทึกเสียง... (แตะอีกครั้งเพื่อหยุด)";
+      } else {
+        btn.classList.remove('recording');
+        text.textContent = "✨ AI กำลังเกลาข้อความเป็น SBAR และสร้างโพยคำถาม...";
+        setTimeout(() => {
+          text.textContent = "✅ ถอดเสียงและเรียงเป็น SBAR เรียบร้อยแล้ว!";
+          showToast("✨ AI เรียบเรียง SBAR และดักคำถามให้แล้ว!");
+        }, 1200);
+      }
+    }
+
+    // Sharing to LINE
+    function copyBedForLine() {
+      const bed = document.getElementById('handoverTargetBed').textContent;
+      const s = document.getElementById('sbarS').textContent;
+      const b = document.getElementById('sbarB').textContent;
+      const a = document.getElementById('sbarA').textContent;
+      const r = document.getElementById('sbarR').textContent;
+
+      const text = `🏥 [สรุปส่งเวร CCU - ${bed}]\n` +
+                   `-------------------------\n` +
+                   `📌 [S]: ${s}\n` +
+                   `📋 [B]: ${b}\n` +
+                   `💉 [A]: ${a}\n` +
+                   `⚠️ [R/ฝากเวรถัดไป]: ${r}\n` +
+                   `-------------------------\n` +
+                   `🛡️ ส่งต่อข้อมูลปลอดภัยตามมาตรฐาน PDPA`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("📲 คัดลอกสรุป SBAR ส่ง LINE สำเร็จ!");
+      });
+    }
+
+    function shareAllBeds() {
+      showToast("📋 คัดลอกสรุปทุกเตียงประจำเวรเรียบร้อย!");
+    }
+
+    // Reaction
+    function addHeart(btn) {
+      const numSpan = btn.querySelector('.heart-num');
+      let count = parseInt(numSpan.textContent);
+      numSpan.textContent = count + 1;
+      btn.style.background = "rgba(251, 113, 133, 0.35)";
+      showToast("❤️ ส่งความขอบคุณให้พี่พยาบาลแล้วค่ะ!");
+    }
+
+    // Tutor
+    function askTutor() {
+      const input = document.getElementById('tutorInput');
+      const ans = document.getElementById('tutorAnswer');
+      if (!input.value.trim()) return;
+
+      ans.style.display = "block";
+      ans.innerHTML = `💡 <strong>คำแนะนำจากพี่เลี้ยง AI:</strong><br/>ยา <em>Cordarone (Amiodarone)</em> ต้องผสมในสารน้ำ <strong>D5W เท่านั้น</strong> ห้ามผสมใน NSS เด็ดขาด เพราะจะเกิดการตกตะกอน และต้องต่อเข้ากับ Infusion Pump เสมอนะจ๊ะ!`;
+      input.value = "";
+    }
+
+    // Quiz
+    let answered = false;
+    function answerQuiz(idx, isCorrect) {
+      if (answered) return;
+      answered = true;
+
+      const choices = document.querySelectorAll('.btn-choice');
+      choices[idx].classList.add(isCorrect ? 'correct' : 'wrong');
+      
+      const res = document.getElementById('quizResult');
+      res.style.display = "block";
+
+      if (isCorrect) {
+        document.getElementById('expFill').style.width = "74%";
+        document.getElementById('expText').textContent = "370 / 500 EXP";
+        showToast("🎉 ตอบถูก! ได้รับ +50 EXP");
+      }
+    }
+
+    // Toast Helper
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+  </script>
+</body>
+</html>
+

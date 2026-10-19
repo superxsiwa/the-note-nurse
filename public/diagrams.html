@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Note Nurse - สถาปัตยกรรมระบบและแผนภาพ (System Architecture & Diagrams)</title>
+  <!-- Load Mermaid CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Sarabun", sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 24px;
+      line-height: 1.6;
+    }
+    .header {
+      max-width: 1200px;
+      margin: 0 auto 30px auto;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    .header h1 {
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+    .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: #334155;
+      color: #e2e8f0;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      background: #475569;
+    }
+    .tab-btn.active {
+      background: #0284c7;
+      color: white;
+      box-shadow: 0 0 12px rgba(14, 165, 233, 0.4);
+    }
+    .content-area {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .tab-content {
+      display: none;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 28px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .diagram-container {
+      background: #0b1329;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #1e3a5f;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+    }
+    h2 {
+      color: #7dd3fc;
+      margin-top: 0;
+    }
+    p, li {
+      color: #cbd5e1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th {
+      background: #0f172a;
+      color: #38bdf8;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #0369a1;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🏥 The Note Nurse - System Diagrams Viewer</h1>
+    <p>เพื่อนคู่คิดและพี่เลี้ยงพยาบาลอัจฉริยะ (แผนภาพสถาปัตยกรรมและการทำงานตามมาตรฐาน PDPA)</p>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="showTab('usecase')">👥 1. Use Case Diagram</button>
+      <button class="tab-btn" onclick="showTab('sequence')">🔄 2. Sequence Diagram</button>
+      <button class="tab-btn" onclick="showTab('class')">🧱 3. Class Diagram</button>
+      <button class="tab-btn" onclick="showTab('component')">🏗️ 4. Components Diagram</button>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- 1. USE CASE -->
+    <div id="usecase" class="tab-content active">
+      <h2>👥 แผนภาพยูสเคส (Use Case Diagram)</h2>
+      <p>แสดงปฏิสัมพันธ์ของผู้ใช้งานแต่ละกลุ่ม (พยาบาลรุ่นน้อง, พยาบาลรุ่นพี่, หัวหน้าเวร, ผู้ดูแลระบบ) กับระบบ</p>
+      
+      <div class="diagram-container">
+        <pre class="mermaid">
+flowchart LR
+    JN["👩‍⚕️ พยาบาลรุ่นน้อง"]
+    SN["👩‍⚕️ พยาบาลรุ่นพี่/Preceptor"]
+    CN["🩺 หัวหน้าเวร/ตึก"]
+    AI["🤖 Gemini AI Engine"]
+
+    subgraph Core ["ระบบ The Note Nurse"]
+        UC1(["UC01: เข้าสู่ระบบ / PIN"])
+        UC2(["UC02: เลือกรอบเวร & เตียงที่ดูแล"])
+        UC3(["UC04: อัดเสียงเล่าอาการ / พิมพ์ส่งเวร"])
+        UC4(["UC05: จัดทำรายงาน SBAR อัจฉริยะ"])
+        UC5(["UC06: ดู Cheat Sheet ดักคำถามรุ่นพี่"])
+        UC6(["UC07: สรุปเตียงคนไข้แชร์ลง LINE"])
+        UC7(["UC08: อ่านเกร็ดความรู้ & กดหัวใจ"])
+        UC8(["UC09: โพสต์เกร็ดความรู้/ทริคพยาบาล"])
+        UC9(["UC11: เล่นเกมควิซ & สะสม EXP"])
+        UC10(["UC14: กรองข้อมูล PDPA (Mask ชื่อ/HN)"])
+    end
+
+    JN --> UC1
+    JN --> UC2
+    JN --> UC3
+    JN --> UC5
+    JN --> UC6
+    JN --> UC7
+    JN --> UC9
+
+    SN --> UC1
+    SN --> UC2
+    SN --> UC6
+    SN --> UC8
+
+    CN --> UC1
+    CN --> UC2
+    CN --> UC6
+
+    UC3 -.->|ต้องผ่าน| UC10
+    UC10 -.->|ประมวลผล| UC4
+    UC4 -.->|เชื่อมโยง| UC5
+    UC4 <--> AI
+    UC8 -.->|แปลงเป็นโจทย์| UC9
+        </pre>
+      </div>
+
+      <h3>คำอธิบายหลัก:</h3>
+      <ul>
+        <li><strong>พยาบาลรุ่นน้อง:</strong> ใช้บันทึกเสียงส่งเวร ➡️ ดูการ์ด SBAR ➡️ ดูคำถามดักคอ (Cheat Sheet) ➡️ ส่งข้อมูลให้เพื่อน ➡️ อ่านเกร็ดความรู้และเล่นควิซ</li>
+        <li><strong>พยาบาลรุ่นพี่:</strong> มีพื้นที่โพสต์แบ่งปันเกร็ดความรู้ (Senior Pearls) ให้รุ่นน้อง พร้อมรับกำลังใจ/หัวใจ ❤️</li>
+      </ul>
+    </div>
+
+    <!-- 2. SEQUENCE -->
+    <div id="sequence" class="tab-content">
+      <h2>🔄 แผนภาพลำดับขั้นตอน (Sequence Diagram)</h2>
+      <p>ขั้นตอนการอัดเสียงส่งเวร ➡️ กรองข้อมูลตาม PDPA ➡️ แปลงเป็น SBAR + ดักคำถามรุ่นพี่</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Nurse as 👩‍⚕️ พยาบาลรุ่นน้อง
+    participant UI as 📱 แอป The Note Nurse
+    participant Filter as 🛡️ ตัวกรอง PDPA
+    participant AudioAPI as 🤖 Gemini Audio (STT)
+    participant LLM as 🤖 Gemini SBAR & CheatSheet
+    participant DB as 💾 บันทึกส่งเวร
+
+    Nurse->>UI: 1. แตะไมค์ พูดเล่าอาการคนไข้
+    Nurse->>UI: 2. แตะหยุดบันทึก
+    UI->>AudioAPI: 3. ส่งเสียงแปลงเป็นข้อความ (Speech to Text)
+    AudioAPI-->>UI: 4. ส่งข้อความดิบกลับมา
+    UI->>Filter: 5. ตรวจจับ & ลบชื่อจริง/HN ออก
+    Filter->>LLM: 6. ส่งข้อความ Cleaned Text เข้า AI
+    LLM-->>UI: 7. สรุปเป็น SBAR + คำถามที่รุ่นพี่มักจะถามจี้
+    UI->>DB: 8. บันทึกลงระบบ
+    UI-->>Nurse: 9. แสดงผลบนหน้าจอ น้องอ่านซ้อมส่งเวรได้เลย!
+        </pre>
+      </div>
+
+      <h3>กระบวนการแชร์สรุปเตียงให้เพื่อน (Handover Sharing via LINE):</h3>
+      <div class="diagram-container">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor NurseA as 👩‍⚕️ พยาบาลส่งเวร
+    participant UI as 📱 Bed Management
+    participant Clipboard as 📋 Clipboard / LINE
+    actor NurseB as 👩‍⚕️ เพื่อนร่วมเวร/เวรถัดไป
+
+    NurseA->>UI: กดปุ่ม "แชร์สรุปเตียงนี้ให้เพื่อน"
+    UI->>UI: ดึงประวัติเตียง + สัญญาณชีพ + ยาเสี่ยงสูง + SBAR ล่าสุด
+    UI->>Clipboard: คัดลอกข้อความจัดฟอร์แมตสะอาด (ไม่มีชื่อ/HN ตาม PDPA)
+    NurseA->>NurseB: วางส่งในห้องแชท LINE กลุ่มเวร
+    NurseB-->>NurseB: รับทราบและดูแลต่อได้ทันที
+        </pre>
+      </div>
+    </div>
+
+    <!-- 3. CLASS -->
+    <div id="class" class="tab-content">
+      <h2>🧱 แผนภาพคลาส (Class Diagram)</h2>
+      <p>โครงสร้างข้อมูล Entity ตามมาตรฐานความปลอดภัย PDPA (De-identified Patient Model)</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+classDiagram
+    class User {
+        +String userId
+        +String staffId
+        +String fullName
+        +String nickname
+        +Role role
+        +String pinHash
+        +Int expPoints
+        +Int level
+    }
+
+    class Bed {
+        +String bedId
+        +String bedNumber
+        +String age
+        +String gender
+        +String primaryDiagnosis
+        +AcuityLevel acuityLevel
+        +List activeLines
+        +List highAlertDrugs
+    }
+
+    class HandoverNote {
+        +String noteId
+        +String bedId
+        +DateTime handoverTime
+        +String situation
+        +String background
+        +String assessment
+        +String recommendation
+        +List preceptorQuestions
+    }
+
+    class SeniorPearl {
+        +String pearlId
+        +String authorName
+        +String title
+        +String content
+        +Int heartCount
+    }
+
+    class QuizQuestion {
+        +String questionId
+        +String questionText
+        +List choices
+        +Int correctIndex
+        +String rationale
+        +Int expReward
+    }
+
+    User "1" --> "*" HandoverNote : สร้างโน้ตส่งเวร
+    Bed "1" --> "*" HandoverNote : ประวัติเตียง
+    User "1" --> "*" SeniorPearl : โพสต์ทริค
+    SeniorPearl "1" ..> "*" QuizQuestion : แปลงเป็นโจทย์
+    User "1" ..> "*" QuizQuestion : เล่นควิซ
+        </pre>
+      </div>
+    </div>
+
+    <!-- 4. COMPONENT -->
+    <div id="component" class="tab-content">
+      <h2>🏗️ แผนภาพส่วนประกอบระบบ (Components Diagram)</h2>
+      <p>สถาปัตยกรรมเชิงส่วนประกอบ 5 ระดับชั้น</p>
+
+      <div class="diagram-container">
+        <pre class="mermaid">
+graph TD
+    subgraph UI ["1. Frontend Presentation Layer"]
+        BedsUI["🛏️ เตียง & เวรพยาบาล"]
+        VoiceUI["🎙️ อัดเสียง & SBAR"]
+        CheatUI["💡 ดักคำถามรุ่นพี่"]
+        PearlsUI["👩‍⚕️ เกร็ดความรู้รุ่นพี่"]
+        QuizUI["🎮 ควิซทบทวนความรู้"]
+    end
+
+    subgraph Gateway ["2. Gateway & Security"]
+        Router["🌐 API Route"]
+        PDPAGuard["🛡️ PDPA Masking Filter"]
+        AuditLog["📝 บันทึกประวัติ Log 90 วัน"]
+    end
+
+    subgraph Services ["3. Backend Core Services"]
+        BedSvc["จัดการเตียง & โอนเวร"]
+        SbarSvc["เรียบเรียง SBAR"]
+        QuizSvc["ระบบควิซ & EXP"]
+        FallbackEngine["ระบบทำงานออฟไลน์"]
+    end
+
+    subgraph AI ["4. Gemini AI Cloud"]
+        GeminiAudio["ถอดเสียงศัพท์แพทย์"]
+        GeminiSbar["ประมวลผล SBAR & คำถาม"]
+    end
+
+    UI --> Gateway
+    Gateway --> Services
+    Services --> AI
+    SbarSvc -.-> FallbackEngine
+        </pre>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0b1329',
+        primaryColor: '#0284c7',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#38bdf8',
+        secondaryColor: '#1e293b',
+        tertiaryColor: '#0f172a'
+      }
+    });
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>
+
