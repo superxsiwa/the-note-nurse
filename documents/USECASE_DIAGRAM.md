@@ -22,84 +22,103 @@ graph LR
     subgraph CoreSystem ["ระบบ The Note Nurse (System Boundary)"]
         %% Group 1: Auth, Register & Shift
         UC_Auth(["UC01: ลงทะเบียน, ล็อกอิน (Email/Social) & ปลดล็อก Quick PIN"])
-        UC_Shift(["UC02: เลือกรอบเวร & เตียงที่รับผิดชอบ"])
-        UC_BedStatus(["UC03: อัปเดตประวัติ & สายยาง & ยาเสี่ยงสูง"])
+        UC_Shift(["UC02: จัดการรอบเวร (วันที่/รอบเวร) & กรองเตียงอัตโนมัติ"])
+        UC_BedStatus(["UC03: จัดการเตียงผู้ป่วย (เพิ่ม ลบ แก้ไข ข้อมูลเตียง & ยาเสี่ยงสูง)"])
         
-        %% Group 2: Handover & SBAR
-        UC_RecordVoice(["UC04: อัดเสียงเล่าอาการ / พิมพ์โน้ต"])
-        UC_SbarGen(["UC05: จัดทำรายงานส่งเวร SBAR อัจฉริยะ"])
-        UC_CheatSheet(["UC06: ดูคำถามดักคอของรุ่นพี่ (Cheat Sheet)"])
+        %% Group 2: Work & Handover SBAR
+        UC_RecordWork(["UC04: บันทึกรายการทำงาน (พิมพ์ หรือ บันทึกจากเสียง)"])
+        UC_CheatSheet(["UC05: ดูคำถามดักคอของรุ่นพี่ (Cheat Sheet ก่อนเริ่มงาน)"])
+        UC_SbarGen(["UC06: สร้างข้อมูลส่งเวร SBAR อัจฉริยะ"])
         UC_ShareLine(["UC07: สรุปและแชร์เตียงคนไข้ให้เพื่อน/ส่ง LINE"])
         
-        %% Group 3: Pearls & Knowledge
-        UC_ReadPearls(["UC08: อ่านเกร็ดความรู้ & กดหัวใจขอบคุณ"])
-        UC_PostPearl(["UC09: เผยแพร่เกร็ดความรู้/ทริคพยาบาล"])
-        UC_KnowledgeHub(["UC10: ค้นคว้าคู่มือ CCU & ถาม Pocket Tutor"])
-        UC_PlayQuiz(["UC11: เล่นเกมควิซทบทวนเคส & สะสม EXP"])
+        %% Group 3: Knowledge Hub
+        UC_KnowledgeRepo(["UC08: ค้นคว้าคลังคู่มือ CCU (ยา, EKG, อุปกรณ์, Lab)"])
+        UC_AskTutor(["UC09: สนทนาถาม-ตอบพี่เลี้ยง AI (Safe Nurse Tutor)"])
+        UC_Pearls(["UC10: อ่าน/แบ่งปันเกร็ดความรู้พยาบาล & ส่งหัวใจ"])
         
-        %% Group 4: Admin & Governance
-        UC_ManageWards(["UC12: จัดการเตียงและสถานะวอร์ด"])
-        UC_AuditLog(["UC13: ตรวจสอบประวัติความปลอดภัย (Audit Log)"])
-        UC_Sanitize(["UC14: กรองข้อมูลระบุตัวตนคนไข้ (PDPA Filter)"])
+        %% Group 4: Quiz & Growth
+        UC_PlayQuiz(["UC11: ทำควิซทบทวนเคส & สะสม EXP"])
+        UC_CreateQuiz(["UC12: สร้างโจทย์ข้อสอบสำหรับการฝึกหัด (Quiz Generator)"])
+        
+        %% Group 5: Admin & Governance
+        UC_ApproveFaq(["UC13: รุ่นพี่ Approve FAQ & สร้าง Vector Train AI"])
+        UC_ManageUsers(["UC14: จัดการผู้ใช้งานระบบ (Admin เท่านั้น)"])
+        UC_AuditLog(["UC15: ตรวจสอบประวัติความปลอดภัย (Audit Log)"])
+        UC_Sanitize(["UC16: กรองข้อมูลระบุตัวตนคนไข้ (PDPA Filter)"])
     end
 
     %% Relations for Junior Nurse
     JN --> UC_Auth
     JN --> UC_Shift
     JN --> UC_BedStatus
-    JN --> UC_RecordVoice
+    JN --> UC_RecordWork
     JN --> UC_CheatSheet
+    JN --> UC_SbarGen
     JN --> UC_ShareLine
-    JN --> UC_ReadPearls
-    JN --> UC_KnowledgeHub
+    JN --> UC_KnowledgeRepo
+    JN --> UC_AskTutor
+    JN --> UC_Pearls
     JN --> UC_PlayQuiz
 
     %% Relations for Senior Nurse (Inherits Junior abilities + Mentoring)
     SN --> UC_Auth
     SN --> UC_Shift
-    SN --> UC_RecordVoice
+    SN --> UC_BedStatus
+    SN --> UC_RecordWork
+    SN --> UC_SbarGen
     SN --> UC_ShareLine
-    SN --> UC_PostPearl
-    SN --> UC_ReadPearls
-    SN --> UC_KnowledgeHub
+    SN --> UC_Pearls
+    SN --> UC_KnowledgeRepo
+    SN --> UC_AskTutor
+    SN --> UC_ApproveFaq
+    SN --> UC_CreateQuiz
 
     %% Relations for Charge Nurse (Management)
     CN --> UC_Auth
     CN --> UC_Shift
-    CN --> UC_ManageWards
+    CN --> UC_BedStatus
+    CN --> UC_RecordWork
+    CN --> UC_SbarGen
     CN --> UC_ShareLine
-    CN --> UC_PostPearl
+    CN --> UC_Pearls
+    CN --> UC_ApproveFaq
+    CN --> UC_CreateQuiz
 
     %% Relations for Admin
     AD --> UC_Auth
+    AD --> UC_ManageUsers
     AD --> UC_AuditLog
-    AD --> UC_ManageWards
+    AD --> UC_BedStatus
 
     %% Include / Extend / AI connections
-    UC_RecordVoice -.->|<<include>>| UC_Sanitize
-    UC_Sanitize -.->|<<include>>| UC_SbarGen
+    UC_RecordWork -.->|<<include>>| UC_Sanitize
+    UC_RecordWork -.->|สร้างข้อมูลส่งเวร| UC_SbarGen
     UC_SbarGen -.->|<<include>>| UC_CheatSheet
     UC_SbarGen <--> AI
-    UC_KnowledgeHub <--> AI
-    UC_PostPearl -.->|<<extend>> แปลงเป็นโจทย์| UC_PlayQuiz
+    UC_AskTutor <--> AI
+    UC_ApproveFaq -.->|สร้าง Vector Train| AI
 ```
 
 ---
 
 ### 2. คำอธิบายสาระสำคัญของ Use Case
 
+| รหัส Use Case | ชื่อ Use Case | ผู้ใช้งานหลัก | คำอธิบายสาระสำคัญ |
+| :--- | :--- | :--- | :--- |
 | **UC01** | ลงทะเบียน, ล็อกอิน (Email/Social) & ปลดล็อก Quick PIN | ทุกคน | ลงทะเบียนพร้อมตั้งและยืนยัน Quick PIN 4 หลัก, ยืนยันตัวตนด้วยอีเมล/รหัสผ่าน หรือ Social Login (Google, LINE, Facebook), ผูกอุปกรณ์ส่วนตัวพยาบาล (Device Binding) ป้องกันล็อกอินซ้อน และปลดล็อกด่วนกรณีล็อกจออัตโนมัติ 5 นาที |
-| **UC02** | เลือกรอบเวร & เตียงที่รับผิดชอบ | JN, SN, CN | คัดกรองเฉพาะคนไข้ในความรับผิดชอบ ไม่สับสนกับเตียงอื่นในวอร์ด |
-| **UC03** | อัปเดตประวัติ & สายยาง & ยา | JN, SN, CN | บันทึกประวัติ อุปกรณ์ที่คาอยู่ (Lines) และยาเสี่ยงสูงประจำเตียง |
-| **UC04** | อัดเสียงเล่าอาการ / พิมพ์โน้ต | JN, SN | พูดเล่าอาการภาษาธรรมชาติผ่านไมค์ได้อย่างอิสระ ไม่ต้องกังวลเรื่องแบบฟอร์ม |
-| **UC05** | จัดทำรายงานส่งเวร SBAR | JN, SN, AI | AI แปลงข้อความเป็น SBAR ที่ถูกต้องตามมาตรฐานพยาบาลวิชาชีพ |
-| **UC06** | ดูคำถามดักคอของรุ่นพี่ | JN | แสดงสิ่งที่รุ่นพี่มักจะถามจี้ ให้น้องเตรียมคำตอบก่อนเดินไปส่งเวรจริง |
+| **UC02** | จัดการรอบเวร & กรองเตียงอัตโนมัติ | JN, SN, CN | จัดการวันที่และปุ่มรอบเวร (เช้า/บ่าย/ดึก) แบบแถวเดียว และกรองรายการเตียงอัตโนมัติตามเวร |
+| **UC03** | จัดการเตียงผู้ป่วย (CRUD) | JN, SN, CN | แสดงจำนวนเตียงรวม, ปุ่มไอคอน "+" เพิ่มเตียง, แก้ไข และลบข้อมูลเตียงผู้ป่วยในเวร |
+| **UC04** | บันทึกรายการทำงาน (พิมพ์/เสียง) | JN, SN, CN | บันทึกกิจกรรมการพยาบาลแบบรายการตามเวลา มีกล่องป้อนงานแบบ Toggle และรองรับการพูดถอดความจากเสียง |
+| **UC05** | ดูคำถามดักคอของรุ่นพี่ (Cheat Sheet) | JN, SN | แสดงโพยคำถามดักคอที่รุ่นพี่/แพทย์มักจะถามจี้ไว้บนสุดของหน้าการทำงาน ให้น้องเตรียมตัวล่วงหน้า |
+| **UC06** | สร้างข้อมูลส่งเวร SBAR อัจฉริยะ | JN, SN, AI | ประมวลผลจากรายการทำงานและข้อมูลผู้ป่วย แปลงเป็นข้อความ SBAR ที่ถูกต้องตามมาตรฐานวิชาชีพ |
 | **UC07** | แชร์เตียงคนไข้ให้เพื่อน/ส่ง LINE | JN, SN, CN | จัดฟอร์แมตสรุปข้อมูลเตียงใน 1 คลิก ส่งต่อเพื่อนร่วมเวรหรือกลุ่ม LINE ปลอดภัยตาม PDPA |
-| **UC08** | อ่านเกร็ดความรู้ & กดหัวใจ | JN, SN | รับความรู้ประจำวันและส่งคำขอบคุณสร้างกำลังใจให้รุ่นพี่ |
-| **UC09** | เผยแพร่เกร็ดความรู้/ทริคพยาบาล | SN, CN | รุ่นพี่ถ่ายทอดประสบการณ์จริงเฉพาะวอร์ด CCU สู่รุ่นน้อง |
-| **UC10** | ค้นคว้าคู่มือ CCU & ถาม Tutor | JN, SN, AI | ค้นหายา, EKG, ผลแล็บ และถาม AI พี่เลี้ยงได้ 24 ชม. ไม่โดนด่า |
+| **UC08** | ค้นคว้าคลังคู่มือ CCU | JN, SN | คลังเอกสารแบ่งหมวดหมู่: ยาเสี่ยงสูง, แถบ EKG, อุปกรณ์ช่วยชีวิต, และผลตรวจทางห้องปฏิบัติการ |
+| **UC09** | ถามพี่เลี้ยง AI (Safe Nurse Tutor) | JN, SN, AI | สนทนาถาม-ตอบข้อสงสัยการพยาบาล 24 ชม. ไม่ดุ ไม่ด่า มีเหตุผลทางคลินิกรองรับ |
+| **UC10** | อ่าน/แบ่งปันเกร็ดความรู้พยาบาล | ทุกคน | บอร์ดแลกเปลี่ยนทริคจากรุ่นพี่ พร้อมปุ่มส่งหัวใจแสดงความขอบคุณ (Heart Reaction) |
 | **UC11** | เล่นเกมควิซ & สะสม EXP | JN, SN | ฝึกตอบคำถามจำลองสถานการณ์ส่งเวร เพิ่มความมั่นใจและเลเวลพยาบาล |
-| **UC12** | จัดการเตียงและสถานะวอร์ด | CN, AD | เพิ่ม/แก้ไข/ย้ายเตียง และปรับระดับความวิกฤตของทั้งวอร์ด |
-| **UC13** | ตรวจสอบประวัติ (Audit Log) | AD | ตรวจสอบประวัติการเข้าใช้งานตามข้อกำหนด พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล |
-| **UC14** | กรองข้อมูลระบุตัวตนคนไข้ | ระบบอัตโนมัติ | กรองชื่อ-นามสกุล, เลขประจำตัวประชาชน และ HN ออกก่อนส่งให้ AI ภายนอก |
+| **UC12** | สร้างโจทย์ข้อสอบฝึกหัด (Quiz Generator) | SN, CN, AD | ออกข้อสอบเคสใหม่เพื่อกระจายให้พยาบาลทุกคนในวอร์ดได้ฝึกทำ |
+| **UC13** | รุ่นพี่ Approve FAQ & Vector Train AI | SN, CN | ตรวจสอบรับรองคำตอบ FAQ และสั่งสร้าง Vector Embeddings เข้าโมเดล AI ติวเตอร์ทันที |
+| **UC14** | จัดการผู้ใช้งานระบบ (User Management) | AD | จัดการบัญชีพยาบาล ตรวจสอบสถานะการผูกอุปกรณ์ และสิทธิ์ในระบบ (เฉพาะ Admin) |
+| **UC15** | ตรวจสอบประวัติความปลอดภัย (Audit Log) | AD | ตรวจสอบประวัติการเข้าใช้งานตามข้อกำหนด พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล |
+| **UC16** | กรองข้อมูลระบุตัวตนคนไข้ (PDPA Filter) | ระบบอัตโนมัติ | กรองชื่อ-นามสกุล, เลขประจำตัวประชาชน และ HN ออกก่อนส่งให้ AI ภายนอก |
 

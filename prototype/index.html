@@ -891,7 +891,136 @@
       font-size: 11.5px;
       color: var(--muted);
     }
+
+    /* Sub-tabs & Segmented Controls */
+    .tab-pills {
+      display: flex;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .tab-pill-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .tab-pill-btn.active {
+      background: var(--active-tab);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+
+    /* Modal styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      width: 100%;
+      max-width: 420px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+    .btn-close-modal {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .btn-sm-danger {
+      background: rgba(251, 113, 133, 0.15);
+      border: 1px solid rgba(251, 113, 133, 0.35);
+      color: var(--rose);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-sm-edit {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--cyan);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-sm-success {
+      background: rgba(52, 211, 153, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: var(--green);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .audio-upload-box {
+      border: 2px dashed rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.6);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .audio-upload-box:hover {
+      border-color: var(--cyan);
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .admin-only-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
   </style>
+
 </head>
 <body>
 
@@ -939,7 +1068,54 @@
     </div>
   </div>
 
+
+  <!-- Bed Add/Edit Modal -->
+  <div class="modal-overlay" id="bedModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="bedModalTitle" style="margin: 0; font-size: 16px; color: #fff;">➕ เพิ่มเตียงผู้ป่วยใหม่</h3>
+        <button type="button" class="btn-close-modal" onclick="closeBedModal()">✕</button>
+      </div>
+      <form id="bedForm" onsubmit="saveBed(event)">
+        <input type="hidden" id="bedEditIndex" value="-1">
+        <div class="form-group">
+          <label class="form-label">หมายเลขเตียง</label>
+          <input type="text" id="bedInputName" class="form-input" style="padding-left: 14px;" placeholder="เช่น เตียง 4" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ข้อมูลผู้ป่วย (เพศ, อายุ)</label>
+          <input type="text" id="bedInputPatient" class="form-input" style="padding-left: 14px;" placeholder="เช่น ชาย 65 ปี" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">การวินิจฉัยโรคหลัก (Dx)</label>
+          <input type="text" id="bedInputDx" class="form-input" style="padding-left: 14px;" placeholder="เช่น Acute NSTEMI, Killip II" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ระดับความวิกฤต (Acuity)</label>
+          <select id="bedInputAcuity" class="form-input" style="padding-left: 14px;">
+            <option value="🔴 วิกฤตใกล้ชิด">🔴 วิกฤตใกล้ชิด (Red)</option>
+            <option value="🟡 เฝ้าระวัง">🟡 เฝ้าระวัง (Yellow)</option>
+            <option value="🟢 ทรงตัว">🟢 ทรงตัว (Green)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ยาเสี่ยงสูง (High Alert Drugs)</label>
+          <input type="text" id="bedInputDrugs" class="form-input" style="padding-left: 14px;" placeholder="คั่นด้วยจุลภาค เช่น Levophed 4mcg, Heparin drip">
+        </div>
+        <div class="form-group">
+          <label class="form-label">สายยาง / อุปกรณ์ (Lines & Tubes)</label>
+          <input type="text" id="bedInputLines" class="form-input" style="padding-left: 14px;" placeholder="คั่นด้วยจุลภาค เช่น A-line, Foley cath">
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 20px;">
+          <button type="button" class="btn-line" style="background: rgba(255,255,255,0.08); flex: 1; justify-content: center;" onclick="closeBedModal()">ยกเลิก</button>
+          <button type="submit" class="btn-primary" style="flex: 2; padding: 10px;">บันทึกเตียง</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="app-frame">
+
     <!-- Header -->
     <div class="header-bar">
       <div class="brand-logo">
@@ -950,7 +1126,6 @@
         </div>
       </div>
       <div class="header-right">
-        <span class="pill-badge" id="currentShiftBadge" style="display: none;">🌅 เวรเช้า</span>
         <button id="headerLogoutBtn" onclick="handleLogout()" title="ออกจากระบบ" style="display: none; background: rgba(251, 113, 133, 0.15); border: 1px solid rgba(251, 113, 133, 0.3); color: var(--rose); border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">🚪 ออก</button>
       </div>
     </div>
@@ -1179,88 +1354,122 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- SCREEN 2: SHIFT & BED ROSTER                   -->
+    <!-- 1. ผู้ป่วย (BEDS & PATIENTS: 1. เวร / 2. เตียง)  -->
     <!-- ============================================== -->
     <div id="screen-beds" class="screen">
-      <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <div style="margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
-          <h2 style="font-size: 18px; margin: 0 0 4px 0;">การจัดเวรและเตียงที่ดูแล</h2>
-          <div style="font-size: 13px; color: var(--muted);">เลือกรอบเวรและเตียงที่น้องรับผิดชอบในวันนี้</div>
+          <h2 style="margin: 0 0 4px 0; font-size: 18px; color: #fff;">ผู้ป่วย (หออภิบาล CCU)</h2>
+          <div style="font-size: 12.5px; color: var(--muted);">จัดการรอบเวร และข้อมูลเตียงผู้ป่วยที่รับผิดชอบ</div>
         </div>
         <button type="button" onclick="triggerAutoLock(true)" title="ทดสอบระบบล็อกจอหลังพัก 5 นาที" style="background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35); border-radius: 8px; color: var(--amber); font-size: 11px; padding: 4px 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;">
           <span>⏱️ จำลองทิ้งจอ 5 นาที</span>
         </button>
       </div>
 
-      <div class="shift-pills">
-        <div class="shift-pill active" onclick="setShift('เช้า', this)">🌅 เวรเช้า</div>
-        <div class="shift-pill" onclick="setShift('บ่าย', this)">🌇 เวรบ่าย</div>
-        <div class="shift-pill" onclick="setShift('ดึก', this)">🌙 เวรดึก</div>
+      <!-- กลุ่มที่ 1: เวร (หัวข้ออยู่นอกการ์ด) -->
+      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+        <span style="font-size: 16px;">⏱️</span>
+        <span style="font-size: 13.5px; font-weight: 700; color: #fff;">1. ข้อมูลเวรปฏิบัติงาน</span>
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <span style="font-size: 13px; font-weight: 600; color: var(--cyan);">เตียงใน CCU (เลือกแตะเพื่อส่งเวร)</span>
-        <button class="btn-line" onclick="shareAllBeds()">📲 สรุปส่งเวรทั้งรอบ</button>
+      <div class="card" style="padding: 12px 14px; margin-bottom: 16px; background: linear-gradient(135deg, #0e1c34, #0b1528); border-color: rgba(56, 189, 248, 0.3);">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <!-- วันที่ (compact inline input) -->
+          <div style="flex: 1.1; min-width: 0;">
+            <div class="input-wrapper">
+              <span class="input-icon-left" style="left: 10px; font-size: 15px;">🗓️</span>
+              <input type="date" id="shiftDatePicker" class="form-input" style="padding: 9px 8px 9px 34px; font-size: 12.5px; height: 38px; color-scheme: dark; border-radius: 10px;" onchange="onShiftDateChange(this.value)">
+            </div>
+          </div>
+
+          <!-- รอบเวร (3 ปุ่มแนวนอน) -->
+          <div style="flex: 1.2; min-width: 0;">
+            <div class="shift-pills" style="margin-bottom: 0; gap: 4px;">
+              <div class="shift-pill active" style="padding: 9px 4px; font-size: 12px; border-radius: 10px;" onclick="setShift('เช้า', this)">เช้า</div>
+              <div class="shift-pill" style="padding: 9px 4px; font-size: 12px; border-radius: 10px;" onclick="setShift('บ่าย', this)">บ่าย</div>
+              <div class="shift-pill" style="padding: 9px 4px; font-size: 12px; border-radius: 10px;" onclick="setShift('ดึก', this)">ดึก</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="bed-grid">
-        <!-- Bed 1 -->
-        <div class="bed-card" onclick="openHandover('เตียง 1', 'ชาย 68 ปี', 'Acute STEMI Anterior post PCI d1', '🔴 วิกฤตใกล้ชิด', ['A-line', 'Foley cath'], ['Levophed 8 mcg/min', 'Heparin 800u/hr'])">
-          <div class="bed-header">
-            <span class="bed-number">🛏️ เตียง 1 (ชาย 68 ปี)</span>
-            <span class="tag-acuity tag-red">🔴 วิกฤตใกล้ชิด</span>
+      <!-- กลุ่มที่ 2: เตียง (แสดงเตียงที่มี - เพิ่ม ลบ แก้ไข) -->
+      <div class="card" style="padding: 14px; background: transparent; border: none; padding: 0; margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 16px;">🛏️</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #fff;">2. รายการเตียงผู้ป่วย</span>
+            <span id="bedCountBadge" style="background: rgba(56, 189, 248, 0.18); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.35); font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-left: 2px;">
+              3 เตียง
+            </span>
           </div>
-          <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Dx: Acute STEMI Anterior wall post PCI (LAD stent) Day 1</div>
-          <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">💉 ยาเสี่ยงสูง: <span style="color: var(--amber);">Levophed 8 mcg/min, Heparin drip</span></div>
-          <div style="font-size: 12px; color: var(--muted);">🩺 สายยาง: A-line ข้อมือขวา, Foley's cath urine ออกดี</div>
+          <div>
+            <button class="btn-sm-success" onclick="openAddBedModal()" title="เพิ่มเตียงใหม่" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border-radius: 50%; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
+              +
+            </button>
+          </div>
         </div>
 
-        <!-- Bed 2 -->
-        <div class="bed-card" onclick="openHandover('เตียง 2', 'หญิง 62 ปี', 'Acute Decompensated Heart Failure', '🟡 เฝ้าระวัง', ['Nasal cannula 3L', 'IV NSS KVO'], ['Lasix 40 mg IV q 12h'])">
-          <div class="bed-header">
-            <span class="bed-number">🛏️ เตียง 2 (หญิง 62 ปี)</span>
-            <span class="tag-acuity tag-yellow">🟡 เฝ้าระวัง</span>
-          </div>
-          <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Dx: Acute Decompensated Heart Failure (EF 28%)</div>
-          <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">💉 การรักษา: Lasix IV, On Oxygen cannula 3 LPM</div>
-          <div style="font-size: 12px; color: var(--muted);">🩺 ข้อควรระวัง: Record Urine output ทุก 2 ชม., Keep I/O negative</div>
-        </div>
-
-        <!-- Bed 3 -->
-        <div class="bed-card" onclick="openHandover('เตียง 3', 'ชาย 55 ปี', 'Post Elective CAG with Stent Day 2', '🟢 ทรงตัว', ['แผล Femoral ขวา'], ['Aspirin', 'Brilinta'])">
-          <div class="bed-header">
-            <span class="bed-number">🛏️ เตียง 3 (ชาย 55 ปี)</span>
-            <span class="tag-acuity tag-green">🟢 ทรงตัว</span>
-          </div>
-          <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Dx: Post Elective CAG with Stent Day 2 (เตรียมย้ายออกวอร์ด)</div>
-          <div style="font-size: 12px; color: var(--muted);">🩺 สถานะ: แผล femoral ขวาแห้งดี ไม่มี hematoma ชีพจรหลังเท้าชัดเจน</div>
+        <div class="bed-grid" id="bedsContainer">
+          <!-- Rendered dynamically by renderBedsList() -->
         </div>
       </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- SCREEN 3: HANDOVER STUDIO (SBAR & SHIELD)      -->
+    <!-- งาน (NURSING WORK & HANDOVER SBAR)             -->
     <!-- ============================================== -->
-    <div id="screen-handover" class="screen">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-        <button onclick="navTo('screen-beds')" style="background: none; border: none; color: var(--cyan); font-size: 14px; font-weight: 600; cursor: pointer; padding: 0;">← กลับหน้ารวมเตียง</button>
-        <span class="pill-badge" id="handoverTargetBed">🛏️ เตียง 1</span>
+    <div id="screen-work" class="screen">
+      <div style="margin-bottom: 14px;">
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;">งานพยาบาล & ส่งเวร</h2>
+        <div style="font-size: 13px; color: var(--muted);">เลือกเวรและเตียง บันทึกการทำงาน และประมวลผลข้อความส่งเวร</div>
       </div>
 
-      <div class="card" style="padding: 14px; margin-bottom: 14px; background: #0c182d;">
-        <div style="font-size: 12px; color: var(--muted);">ข้อมูลผู้ป่วยประจำเตียง:</div>
-        <div id="handoverPatientDx" style="font-size: 13.5px; font-weight: 600; color: #fff; margin-top: 2px;">Acute STEMI Anterior post PCI Day 1</div>
+      <!-- ส่วนที่ 1: ข้อมูลเวรปฏิบัติงาน & เลือกเตียง -->
+      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+        <span style="font-size: 16px;">⏱️</span>
+        <span style="font-size: 13.5px; font-weight: 700; color: #fff;">1. ข้อมูลเวรปฏิบัติงาน & เตียงที่ดูแล</span>
       </div>
 
-      <!-- Mic Recording Action -->
-      <div class="mic-section">
-        <button class="mic-button" id="micBtn" onclick="toggleRecord()">🎙️</button>
-        <div id="micStatusText" style="font-size: 13px; color: var(--cyan); margin-top: 10px; font-weight: 600;">แตะไมค์เพื่อพูดเล่าอาการภาษาธรรมชาติ</div>
-        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">(AI จะช่วยเรียบเรียงเป็น SBAR และกรองชื่อ/HN อัตโนมัติ)</div>
+      <div class="card" style="padding: 12px 14px; margin-bottom: 16px; background: linear-gradient(135deg, #0e1c34, #0b1528); border-color: rgba(56, 189, 248, 0.3);">
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+          <!-- วันที่ -->
+          <div style="flex: 1.1; min-width: 0;">
+            <div class="input-wrapper">
+              <span class="input-icon-left" style="left: 10px; font-size: 15px;">🗓️</span>
+              <input type="date" id="workShiftDatePicker" class="form-input" style="padding: 9px 8px 9px 34px; font-size: 12.5px; height: 38px; color-scheme: dark; border-radius: 10px;" onchange="onWorkShiftDateChange(this.value)">
+            </div>
+          </div>
+
+          <!-- รอบเวร -->
+          <div style="flex: 1.2; min-width: 0;">
+            <div class="shift-pills" style="margin-bottom: 0; gap: 4px;">
+              <div class="shift-pill active" id="workPillMorning" style="padding: 9px 4px; font-size: 12px; border-radius: 10px;" onclick="setWorkShift('เช้า', this)">เช้า</div>
+              <div class="shift-pill" id="workPillAfternoon" style="padding: 9px 4px; font-size: 12px; border-radius: 10px;" onclick="setWorkShift('บ่าย', this)">บ่าย</div>
+              <div class="shift-pill" id="workPillNight" style="padding: 9px 4px; font-size: 12px; border-radius: 10px;" onclick="setWorkShift('ดึก', this)">ดึก</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- เลือกเตียงในเวรนี้ -->
+        <div style="border-top: 1px dashed rgba(56, 189, 248, 0.2); padding-top: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0; font-weight: 600; color: #fff;">🛏️ เลือกเตียงผู้ป่วย:</label>
+            <span id="workBedCountNotice" style="font-size: 11px; color: var(--cyan);">มี 3 เตียงในเวรนี้</span>
+          </div>
+          <select id="workBedSelect" class="form-input" style="padding-left: 12px; height: 40px; font-size: 13px;" onchange="onWorkBedChange(this.value)">
+            <!-- Populated dynamically -->
+          </select>
+          <div id="workPatientInfo" style="font-size: 12px; color: var(--cyan); margin-top: 6px; padding: 4px 8px; background: rgba(56, 189, 248, 0.08); border-radius: 6px;">
+            ชาย 68 ปี • Acute STEMI Anterior post PCI d1
+          </div>
+        </div>
       </div>
 
-      <!-- Preceptor Cheat Sheet (ดักคำถามรุ่นพี่) -->
-      <div class="cheat-box" id="cheatBox">
+      <!-- ส่วนที่ 2: การทำงาน (รายการบันทึกการทำงาน สามารถสร้างจากเสียงได้) -->
+      <!-- Preceptor Cheat Sheet (ดักคำถามรุ่นพี่ - ย้ายมาไว้บนสุดของหัวข้อการทำงาน) -->
+      <div class="cheat-box" id="cheatBox" style="margin-top: 0; margin-bottom: 14px;">
         <div class="cheat-header">
           <span>💡</span> สิ่งที่รุ่นพี่/แพทย์มักจะถามจี้ในเคสนี้ (เตรียมคำตอบล่วงหน้า):
         </div>
@@ -1271,8 +1480,56 @@
         </ul>
       </div>
 
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 16px;">📝</span>
+          <span style="font-size: 13.5px; font-weight: 700; color: #fff;">2. การทำงาน (Nursing Activities)</span>
+        </div>
+        <button class="btn-sm-success" id="btnToggleAddWork" onclick="toggleAddWorkForm()" style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; font-size: 12px; font-weight: 600;">
+          <span id="btnToggleAddWorkText">➕ เพิ่มรายการ</span>
+        </button>
+      </div>
+
+      <!-- Quick Add Work Item with Mic / Voice (ซ่อนไว้เป็นค่าเริ่มต้น เปิดปิดเมื่อกดเพิ่มรายการ) -->
+      <div id="addWorkInputCard" class="card" style="display: none; padding: 12px; margin-bottom: 12px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.35); box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <input type="text" id="newWorkItemText" class="form-input" style="padding: 9px 12px; font-size: 13px; flex: 1;" placeholder="พิมพ์งาน หรือแตะไมค์พูดบันทึก...">
+          <button type="button" id="workMicBtn" onclick="toggleWorkItemRecord()" title="พูดเพื่อเพิ่มงานจากเสียง" style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #0284c7, #38bdf8); border: none; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 12px var(--cyan-glow);">
+            🎙️
+          </button>
+          <button type="button" class="btn-sm-success" onclick="addWorkItemFromInput()" style="padding: 9px 14px; font-size: 12.5px; font-weight: 600; border-radius: 10px; height: 40px;">
+            บันทึก
+          </button>
+        </div>
+        <div id="workVoiceStatus" style="display: none; font-size: 11.5px; color: var(--rose); margin-top: 6px; font-weight: 600;">
+          🔴 กำลังฟังบันทึกเสียง... แตะไมค์อีกครั้งเพื่อแปลงเป็นข้อความ
+        </div>
+      </div>
+
+      <!-- List of Work Activity Items -->
+      <div id="workItemsList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+        <!-- Rendered dynamically by renderWorkItemsList() -->
+      </div>
+
+      <!-- ส่วนที่ 3: การส่งเวร (SBAR & Cheat Sheet) -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 16px;">📋</span>
+          <span style="font-size: 13.5px; font-weight: 700; color: #fff;">3. การส่งเวร (Handover SBAR)</span>
+        </div>
+      </div>
+
+      <!-- Generate Handover Button (เปลี่ยนปุ่มเดิมเป็น "สร้างข้อมูลส่งเวร") -->
+      <button class="btn-primary" onclick="generateSbarFromWork()" style="margin-bottom: 14px; padding: 12px 14px; font-size: 14px;">
+        <span>✨ สร้างข้อมูลส่งเวร (จากรายการทำงาน + ข้อมูลผู้ป่วย)</span>
+      </button>
+
       <!-- SBAR Output Container -->
       <div id="sbarContainer">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 13px; font-weight: 700; color: #fff;">📋 ข้อความส่งเวร SBAR:</span>
+          <span class="tag-acuity tag-green">AI Formatted</span>
+        </div>
         <div class="sbar-card" style="border-left-color: #38bdf8;">
           <div class="sbar-title" style="color: #38bdf8;">📌 S - Situation (สถานการณ์สำคัญในเวรนี้)</div>
           <div class="sbar-desc" id="sbarS">เตียง 1 ผู้ป่วยชาย 68 ปี Post-PCI Day 1 สัญญาณชีพโดยรวมคงตัว ไม่มีอาการแน่นหน้าอกซ้ำระหว่างเวร</div>
@@ -1291,67 +1548,136 @@
         </div>
       </div>
 
-      <div style="display: flex; gap: 10px; margin-top: 18px;">
+      <div style="display: flex; gap: 10px; margin-top: 16px; margin-bottom: 24px;">
         <button class="btn-primary" onclick="copyBedForLine()">📲 คัดลอกสรุป SBAR ส่ง LINE</button>
       </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- SCREEN 4: KNOWLEDGE HUB & SENIOR PEARLS        -->
+    <!-- ความรู้ (KNOWLEDGE: คลัง / AI / เกร็ดความรู้)   -->
     <!-- ============================================== -->
     <div id="screen-knowledge" class="screen">
-      <div style="margin-bottom: 16px;">
-        <h2 style="font-size: 18px; margin: 0 0 4px 0;">เกร็ดความรู้ & คลังคู่มือ CCU</h2>
-        <div style="font-size: 13px; color: var(--muted);">เรียนรู้ทริคจากรุ่นพี่ และค้นคว้าคู่มือฉุกเฉิน</div>
+      <div style="margin-bottom: 14px;">
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;">ความรู้พยาบาล</h2>
+        <div style="font-size: 13px; color: var(--muted);">คลังเอกสาร, สนทนา AI ติวเตอร์ และเกร็ดความรู้พยาบาล</div>
       </div>
 
-      <!-- Senior Tip Highlight -->
-      <div class="card" style="background: linear-gradient(135deg, #152238, #182e50); border-color: rgba(56, 189, 248, 0.4);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span style="font-size: 12px; font-weight: 700; color: var(--amber);">💡 เกร็ดความรู้ประจำวันจากพี่ CCU</span>
-          <span style="font-size: 11px; color: var(--muted);">วันนี้ 10:30 น.</span>
+      <!-- Segmented Tabs for Knowledge -->
+      <div class="tab-pills">
+        <button class="tab-pill-btn active" onclick="switchKnowledgeTab('repo', this)">📚 คลังเอกสาร</button>
+        <button class="tab-pill-btn" onclick="switchKnowledgeTab('ai', this)">🤖 ถาม AI ติวเตอร์</button>
+        <button class="tab-pill-btn" onclick="switchKnowledgeTab('pearls', this)">💡 เกร็ดความรู้</button>
+      </div>
+
+      <!-- Tab 1: คลังเอกสาร (รวมเอกสารเป็นหมวดหมู่) -->
+      <div id="tab-know-repo" class="know-tab-content">
+        <div style="font-size: 13px; font-weight: 600; color: var(--cyan); margin-bottom: 10px;">
+          📂 หมวดหมู่เอกสารความรู้การพยาบาล
         </div>
-        <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;">"การสังเกต Retroperitoneal Bleed หลังทำ PCI"</div>
-        <div style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
-          ถ้าน้องเจอคนไข้แทงสายสวนที่ขาหนีบ แล้วอยู่ๆ บ่นปวดหลัง/สะโพก หรือความดันดรอปโดยไม่มีเลือดออกที่แผลภายนอก ให้รีบคลำหน้าท้องด้านล่าง และรายงานหมอทันทีนะจ๊ะ เลือดอาจออกในช่องท้องหลังเยื่อบุ!
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('💊 คู่มือยาเสี่ยงสูง CCU: Levophed, Cordarone, Dopamine, Dobutamine, Nicardipine พร้อมสูตรผสมและการ Titrate')">
+            <div style="font-size: 22px; margin-bottom: 4px;">💊</div>
+            <div style="font-weight: 600; font-size: 13px;">High Alert Drugs</div>
+            <div style="font-size: 11px; color: var(--muted);">14 รายการยาเสี่ยงสูง</div>
+          </div>
+          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('📈 แถบคลื่นไฟฟ้าหัวใจ EKG: 12 Leads STEMI Identification, Arrhythmia Alarm (VT/VF/AF/SVT)')">
+            <div style="font-size: 22px; margin-bottom: 4px;">📈</div>
+            <div style="font-weight: 600; font-size: 13px;">EKG & Arrhythmia</div>
+            <div style="font-size: 11px; color: var(--muted);">การแปลผล & เฝ้าระวัง</div>
+          </div>
+          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('🫁 หัตถการและการดูแลเครื่องมือ: IABP, Temporary Pacemaker, ET-Tube, Ventilator care bundle')">
+            <div style="font-size: 22px; margin-bottom: 4px;">🫁</div>
+            <div style="font-weight: 600; font-size: 13px;">อุปกรณ์ช่วยชีวิต</div>
+            <div style="font-size: 11px; color: var(--muted);">IABP, Pacemaker, Vent</div>
+          </div>
+          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('🩸 การตรวจทางห้องปฏิบัติการ: Cardiac Markers (Troponin-T, CK-MB), aPTT, Electrolytes, ABG interpretation')">
+            <div style="font-size: 22px; margin-bottom: 4px;">🩸</div>
+            <div style="font-weight: 600; font-size: 13px;">Lab & วิกฤตฉุกเฉิน</div>
+            <div style="font-size: 11px; color: var(--muted);">Troponin, aPTT, ABG</div>
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 12px; color: var(--cyan);">✍️ พี่ไหม (Charge Nurse CCU)</span>
-          <button class="btn-heart" onclick="addHeart(this)">❤️ ขอบคุณพี่ <span class="heart-num">24</span></button>
+
+        <div class="card" style="padding: 12px; background: #0c182d;">
+          <div style="font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 6px;">📄 เอกสารแนวปฏิบัติ CCU ล่าสุด</div>
+          <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: #94a3b8; line-height: 1.6;">
+            <li>แนวปฏิบัติการเฝ้าระวังเลือดออกหลังแทงสายสวน PCI (Femoral vs Radial)</li>
+            <li>ขั้นตอนการให้ยา ละลายลิ่มเลือด (Fibrinolytic Protocol) ใน STEMI</li>
+            <li>คู่มือการพยาบาลผู้ป่วยภาวะ Cardiogenic Shock</li>
+          </ul>
         </div>
       </div>
 
-      <!-- Quick Manual Categories -->
-      <h3 style="font-size: 15px; color: var(--cyan); margin: 20px 0 10px 0;">📖 คู่มือฉบับพกพา (Quick Ref)</h3>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="card" style="padding: 14px; cursor: pointer;" onclick="alert('💊 ยาเสี่ยงสูง: Levophed ผสม 4mg in D5W 250ml, Cordarone drip ผสมเฉพาะ D5W เท่านั้น!')">
-          <div style="font-size: 22px; margin-bottom: 4px;">💊</div>
-          <div style="font-weight: 600; font-size: 13px;">High Alert Drugs</div>
-          <div style="font-size: 11px; color: var(--muted);">วิธีผสม & ข้อควรระวัง</div>
-        </div>
-        <div class="card" style="padding: 14px; cursor: pointer;" onclick="alert('📈 แถบ EKG: V1-V4 = Anterior (LAD), II,III,aVF = Inferior (RCA)')">
-          <div style="font-size: 22px; margin-bottom: 4px;">📈</div>
-          <div style="font-weight: 600; font-size: 13px;">EKG & Arrhythmia</div>
-          <div style="font-size: 11px; color: var(--muted);">สูตรจำ Lead & Rhythm</div>
+      <!-- Tab 2: AI (สนทนาถาม-ตอบ) -->
+      <div id="tab-know-ai" class="know-tab-content" style="display: none;">
+        <div class="card" style="margin-bottom: 12px; background: linear-gradient(135deg, #0d1e38, #0b172a);">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 20px;">🤖</span>
+            <div>
+              <div style="font-weight: 700; font-size: 13.5px; color: #fff;">พี่เลี้ยง AI อัจฉริยะ (Safe Nurse Tutor)</div>
+              <div style="font-size: 11px; color: var(--cyan);">ตอบข้อสงสัยการพยาบาล แม่นยำ ปลอดภัย ไม่ดุ ไม่ด่า</div>
+            </div>
+          </div>
+          <div style="font-size: 12.5px; color: var(--muted); margin-bottom: 10px;">
+            ฐานความรู้เชื่อมโยงจากคู่มือ CCU และข้อคำถาม FAQ ที่พยาบาลรุ่นพี่รับรองแล้ว (Vector RAG)
+          </div>
+
+          <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+            <input type="text" id="tutorInput" placeholder="พิมพ์ถามคำถาม เช่น Cordarone drip ผสม D5W หรือ NSS..." style="flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: #fff; font-size: 13px;">
+            <button class="btn-primary" style="width: auto; padding: 0 16px; font-size: 13px;" onclick="askTutor()">ส่งถาม</button>
+          </div>
+
+          <!-- Suggested quick questions -->
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;">
+            <span class="demo-account-chip" onclick="askQuickPrompt('Levophed ดริปเรทสูงสุดเท่าไหร่และเฝ้าระวังอะไร?')">💉 Levophed เรทสูงสุด?</span>
+            <span class="demo-account-chip" onclick="askQuickPrompt('คนไข้เจ็บหน้าอกซ้ำหลังทำ PCI ต้องทำอะไรทันที?')">⚡ เจ็บหน้าอกซ้ำหลัง PCI?</span>
+            <span class="demo-account-chip" onclick="askQuickPrompt('aPTT เป้าหมายสำหรับ Heparin drip คือเท่าไหร่?')">🩸 เป้าหมาย aPTT?</span>
+          </div>
+
+          <div id="tutorAnswer" style="display: none; margin-top: 12px; font-size: 13px; background: #0f172a; padding: 12px; border-radius: 8px; border-left: 3px solid var(--green); line-height: 1.5;"></div>
         </div>
       </div>
 
-      <!-- Pocket Tutor Input -->
-      <div class="card" style="margin-top: 14px;">
-        <div style="font-weight: 600; font-size: 13px; margin-bottom: 8px;">🤖 ถามข้อสงสัยพยาบาล (AI Safe Tutor)</div>
-        <input type="text" id="tutorInput" placeholder="พิมพ์ถามศัพท์/ยา เช่น Cordarone drip ผสมอะไร..." style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: #fff; font-size: 13px; margin-bottom: 8px;">
-        <button class="btn-primary" style="padding: 10px;" onclick="askTutor()">ถามพี่เลี้ยง AI (ไม่ดุ ไม่ด่า)</button>
-        <div id="tutorAnswer" style="display: none; margin-top: 10px; font-size: 13px; background: #0f172a; padding: 10px; border-radius: 8px; border-left: 3px solid var(--green);"></div>
+      <!-- Tab 3: เกร็ดความรู้ (Pearls จากรุ่นพี่) -->
+      <div id="tab-know-pearls" class="know-tab-content" style="display: none;">
+        <div class="card" style="background: linear-gradient(135deg, #152238, #182e50); border-color: rgba(56, 189, 248, 0.4); margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 700; color: var(--amber);">💡 เกร็ดความรู้เด่นจากพี่ CCU</span>
+            <span style="font-size: 11px; color: var(--muted);">วันนี้ 10:30 น.</span>
+          </div>
+          <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;">"การสังเกต Retroperitoneal Bleed หลังทำ PCI"</div>
+          <div style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
+            ถ้าน้องเจอคนไข้แทงสายสวนที่ขาหนีบ แล้วอยู่ๆ บ่นปวดหลัง/สะโพก หรือความดันดรอปโดยไม่มีเลือดออกที่แผลภายนอก ให้รีบคลำหน้าท้องด้านล่าง และรายงานหมอทันทีนะจ๊ะ เลือดอาจออกในช่องท้องหลังเยื่อบุ!
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; color: var(--cyan);">✍️ พว. วรรณา สว่างวงศ์ (Charge Nurse CCU)</span>
+            <button class="btn-heart" onclick="addHeart(this)">❤️ ขอบคุณพี่ <span class="heart-num">25</span></button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 700; color: var(--cyan);">💡 ทริคประจำวอร์ด</span>
+            <span style="font-size: 11px; color: var(--muted);">เมื่อวาน</span>
+          </div>
+          <div style="font-size: 13.5px; font-weight: 600; color: #fff; margin-bottom: 4px;">"ก่อนปลด A-line ต้องตรวจอะไรบ้าง?"</div>
+          <div style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 8px;">
+            ตรวจ Allen's test หรือดู Ulnar artery flow ก่อนเสมอ และเตรียมผ้าก๊อซพร้อมกดแผลแน่นอย่างน้อย 10-15 นาที อย่าเพิ่งรีบปล่อยมือจ้า
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11.5px; color: var(--muted);">✍️ พว. สมพร เจริญสุข (Preceptor)</span>
+            <button class="btn-heart" onclick="addHeart(this)">❤️ ขอบคุณพี่ <span class="heart-num">18</span></button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- SCREEN 5: QUIZ QUEST & GROWTH                  -->
+    <!-- ฝึกหัด (QUIZ & LEVEL)                          -->
     <!-- ============================================== -->
     <div id="screen-quiz" class="screen">
       <div style="margin-bottom: 16px;">
-        <h2 style="font-size: 18px; margin: 0 0 4px 0;">เกมควิซทบทวนเคส (Quiz Quest)</h2>
-        <div style="font-size: 13px; color: var(--muted);">ฝึกตอบคำถาม เสริมความมั่นใจ ไม่ต้องกลัวตอบผิด</div>
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;">ฝึกหัด (Quiz & Level)</h2>
+        <div style="font-size: 13px; color: var(--muted);">ฝึกตอบคำถามจำลองสถานการณ์ เสริมความมั่นใจและสะสม EXP</div>
       </div>
 
       <div class="exp-bar-box">
@@ -1384,23 +1710,274 @@
       </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- ============================================== -->
+    <!-- ระบบ (SYSTEM SETTINGS & ADMIN MANAGEMENT)      -->
+    <!-- ============================================== -->
+    <div id="screen-system" class="screen">
+      <div style="margin-bottom: 14px;">
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;">ระบบ (System Settings)</h2>
+        <div style="font-size: 13px; color: var(--muted);">จัดการโปรไฟล์, ผู้ใช้งาน, ความรู้ และคลังข้อสอบ</div>
+      </div>
+
+      <!-- System Submenu Pills -->
+      <div class="tab-pills" style="margin-bottom: 14px;">
+        <button class="tab-pill-btn active" onclick="switchSystemTab('profile', this)">👤 โปรไฟล์</button>
+        <button class="tab-pill-btn" onclick="switchSystemTab('users', this)" id="tabBtnUsers">👥 ผู้ใช้งาน <span class="admin-only-badge">Admin</span></button>
+        <button class="tab-pill-btn" onclick="switchSystemTab('knowledge', this)">📖 จัดการความรู้</button>
+        <button class="tab-pill-btn" onclick="switchSystemTab('quizgen', this)">🎯 สร้างโจทย์</button>
+      </div>
+
+      <!-- Submenu 1: โปรไฟล์ (Profile) -->
+      <div id="sys-tab-profile" class="sys-tab-content">
+        <div class="card" style="text-align: center; padding: 20px 16px; margin-bottom: 14px;">
+          <div class="user-avatar" id="profAvatar" style="font-size: 32px; width: 64px; height: 64px; margin-bottom: 10px;">👩‍⚕️</div>
+          <h3 id="profName" style="margin: 0 0 4px 0; font-size: 17px; color: #fff;">พว. ไหมแก้ว สมใจ</h3>
+          <div id="profRole" style="font-size: 13px; color: var(--cyan); font-weight: 600;">พยาบาลจบใหม่ (Junior Nurse)</div>
+          <div id="profWard" style="font-size: 12px; color: var(--muted); margin-top: 2px;">CCU Ward • โรงพยาบาลศูนย์</div>
+
+          <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; text-align: center;">
+            <div>
+              <div style="font-size: 11px; color: var(--muted);">แต้มสะสม</div>
+              <div style="font-size: 16px; font-weight: 700; color: var(--amber);">370 EXP</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--muted);">ระดับขั้น</div>
+              <div style="font-size: 16px; font-weight: 700; color: var(--green);">Level 2</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--muted);">Quick PIN</div>
+              <div style="font-size: 16px; font-weight: 700; color: var(--cyan);" id="profPin">••••</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 14px; margin-bottom: 14px;">
+          <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 10px;">🔒 ความปลอดภัยอุปกรณ์ส่วนตัว (BYOD)</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12.5px; color: var(--muted);">สถานะเครื่องปัจจุบัน</span>
+            <span style="font-size: 12px; color: var(--green); font-weight: 600;">✅ ผูกอุปกรณ์สำเร็จ (Bound)</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 12.5px; color: var(--muted);">ล็อกจอเมื่อพักเครื่อง</span>
+            <span style="font-size: 12px; color: var(--amber); font-weight: 600;">⏱️ 5 นาที (Quick PIN)</span>
+          </div>
+          <button class="btn-sm-edit" style="width: 100%; padding: 8px; margin-top: 6px;" onclick="promptChangePin()">
+            🔑 เปลี่ยนรหัส Quick PIN
+          </button>
+        </div>
+
+        <button class="btn-sm-danger" style="width: 100%; padding: 12px; font-size: 13px;" onclick="handleLogout()">
+          🚪 ออกจากระบบ (Logout)
+        </button>
+      </div>
+
+      <!-- Submenu 2: ผู้ใช้งานระบบ (Admin เท่านั้น) -->
+      <div id="sys-tab-users" class="sys-tab-content" style="display: none;">
+        <div id="adminNotice" class="card" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.35); padding: 12px; margin-bottom: 12px;">
+          <div style="font-size: 12.5px; color: #fca5a5; font-weight: 600;">🛡️ เฉพาะผู้ดูแลระบบ (Admin Access Only)</div>
+          <div style="font-size: 11.5px; color: var(--muted); margin-top: 2px;">
+            จัดการสิทธิ์, ตรวจสอบ Device Binding, รีเซ็ตรหัสผ่าน และระงับสิทธิ์บัญชีพยาบาล
+          </div>
+        </div>
+
+        <div class="card" style="padding: 12px; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 13px; font-weight: 600; color: #fff;">รายชื่อพยาบาลในระบบ (4 บัญชี)</span>
+            <button class="btn-sm-success" onclick="alert('เพิ่มผู้ใช้งานใหม่โดยผู้ดูแลระบบ')">➕ เพิ่มผู้ใช้</button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: #fff;">พว. ไหมแก้ว สมใจ</div>
+                <div style="font-size: 11px; color: var(--muted);">RN-680459 • Junior Nurse (CCU)</div>
+              </div>
+              <span class="role-card-tag tag-junior">Junior</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: #fff;">พว. สมพร เจริญสุข</div>
+                <div style="font-size: 11px; color: var(--muted);">RN-590123 • Senior Preceptor</div>
+              </div>
+              <span class="role-card-tag tag-senior">Senior</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: #fff;">พว. วรรณา สว่างวงศ์</div>
+                <div style="font-size: 11px; color: var(--muted);">RN-510008 • Charge Nurse</div>
+              </div>
+              <span class="role-card-tag tag-charge">Charge</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: #fff;">นายภานุเดช มั่นคง</div>
+                <div style="font-size: 11px; color: var(--muted);">IT-ADMIN • ฝ่ายสารสนเทศ</div>
+              </div>
+              <span class="role-card-tag tag-admin">Admin</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submenu 3: จัดการความรู้ (แท็บ เอกสาร / FAQ / เกร็ดความรู้) -->
+      <div id="sys-tab-knowledge" class="sys-tab-content" style="display: none;">
+        <div class="tab-pills" style="margin-bottom: 12px; background: #0a1020;">
+          <button class="tab-pill-btn active" onclick="switchSysKnowTab('docs', this)">📄 เอกสาร</button>
+          <button class="tab-pill-btn" onclick="switchSysKnowTab('faq', this)">❓ FAQ & Vector Train</button>
+          <button class="tab-pill-btn" onclick="switchSysKnowTab('tips', this)">💡 เกร็ดความรู้พยาบาล</button>
+        </div>
+
+        <!-- แท็บย่อย: เอกสาร -->
+        <div id="sys-know-docs" class="sys-know-sub">
+          <div class="card" style="padding: 12px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; font-weight: 600; color: #fff;">คลังเอกสารแนวปฏิบัติ (Guidelines)</span>
+              <button class="btn-sm-success" onclick="alert('อัปโหลดไฟล์ PDF/DOCX เข้าสู่ระบบคลังเอกสาร')">📤 อัปโหลดเอกสาร</button>
+            </div>
+            <div style="font-size: 12.5px; color: var(--muted); line-height: 1.6;">
+              • Guideline_Acute_STEMI_2026.pdf (อนุมัติแล้ว)<br/>
+              • High_Alert_Drugs_Titrate_CCU.pdf (อนุมัติแล้ว)<br/>
+              • Post_PCI_Bleeding_Protocol_v2.pdf (ฉบับร่าง)
+            </div>
+          </div>
+        </div>
+
+        <!-- แท็บย่อย: FAQ (ให้พยาบาลรุ่นพี่ Approve + สร้าง Vector Train AI ทุกครั้งที่เปลี่ยน) -->
+        <div id="sys-know-faq" class="sys-know-sub" style="display: none;">
+          <div class="card" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.35); padding: 12px; margin-bottom: 12px;">
+            <div style="font-size: 13px; font-weight: 700; color: #6ee7b7;">
+              ✅ ระบบตรวจสอบและอนุมัติ FAQ โดยพยาบาลรุ่นพี่
+            </div>
+            <div style="font-size: 12px; color: #cbd5e1; margin-top: 4px; line-height: 1.5;">
+              คำถาม-คำตอบที่ได้รับการอนุมัติ (Approved) จะถูกส่งเข้าโมเดลเพื่อ <strong>สร้าง Vector Embeddings & Train AI</strong> ทันที เพื่อให้ AI ติวเตอร์ตอบได้ถูกต้องตามมาตรฐานวอร์ด
+            </div>
+          </div>
+
+          <div class="card" style="padding: 12px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; font-weight: 600; color: #fff;">รายการข้อซักถามในวอร์ด (FAQ List)</span>
+              <button class="btn-sm-edit" onclick="triggerTrainVector()">⚡ สร้าง Vector Train AI ทันที</button>
+            </div>
+
+            <!-- FAQ Item 1 -->
+            <div style="background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--green);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="font-weight: 600; font-size: 13px; color: #fff;">Q: Cordarone drip ผสมในสารน้ำอะไรได้บ้าง?</div>
+                <span style="font-size: 11px; color: var(--green); font-weight: 600;">✓ Approved</span>
+              </div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+                A: ผสมใน 5% Dextrose in Water (D5W) เท่านั้น ห้ามผสมใน NSS เพื่อป้องกันการตกตะกอน
+              </div>
+              <div style="font-size: 11px; color: var(--cyan); margin-top: 4px;">
+                ผู้อนุมัติ: พว. วรรณา สว่างวงศ์ (Charge Nurse) • Vector: Synced ✅
+              </div>
+            </div>
+
+            <!-- FAQ Item 2 (Pending) -->
+            <div style="background: #0f172a; padding: 10px; border-radius: 8px; border-left: 3px solid var(--amber);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="font-weight: 600; font-size: 13px; color: #fff;">Q: คนไข้หลังดึง A-line ต้องกดแผลนานกี่นาที?</div>
+                <button class="btn-sm-success" id="btnApproveFaq" onclick="approveFaqAndTrain(this)">Approve & Train</button>
+              </div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+                A: กดแน่นอย่างน้อย 10-15 นาที และติด Pressure dressing พร้อมตรวจชีพจรส่วนปลาย
+              </div>
+              <div style="font-size: 11px; color: var(--amber); margin-top: 4px;" id="faqStatusPending">
+                สถานะ: รอพยาบาลรุ่นพี่กด Approve
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- แท็บย่อย: เกร็ดความรู้พยาบาล -->
+        <div id="sys-know-tips" class="sys-know-sub" style="display: none;">
+          <div class="card" style="padding: 12px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 13px; font-weight: 600; color: #fff;">เกร็ดความรู้พยาบาล (Senior Pearls)</span>
+              <button class="btn-sm-success" onclick="addNewPearlModal()">➕ โพสต์เกร็ดความรู้</button>
+            </div>
+            <div style="font-size: 12.5px; color: var(--muted); line-height: 1.6;">
+              • การสังเกต Retroperitoneal Bleed หลังทำ PCI (ยอดหัวใจ: 25 ❤️)<br/>
+              • ก่อนปลด A-line ต้องตรวจ Allen's test (ยอดหัวใจ: 18 ❤️)<br/>
+              • การ Titrate Levophed ให้สัมพันธ์กับ Urine Output (ฉบับร่าง)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submenu 4: ฝึกหัด (สร้างโจทย์ข้อสอบสำหรับการฝึกหัดให้พยาบาลทุกคน) -->
+      <div id="sys-tab-quizgen" class="sys-tab-content" style="display: none;">
+        <div class="card" style="padding: 14px; margin-bottom: 12px;">
+          <div style="font-size: 13.5px; font-weight: 700; color: #fff; margin-bottom: 4px;">
+            🎯 สร้างโจทย์ข้อสอบสำหรับการฝึกหัด (Quiz Generator)
+          </div>
+          <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+            ออกข้อสอบจำลองสถานการณ์ส่งเวรและเคสวอร์ด เพื่อกระจายให้พยาบาลทุกคนฝึกทำ
+          </div>
+
+          <form onsubmit="handleCreateQuiz(event)">
+            <div class="form-group">
+              <label class="form-label">คำถาม / สถานการณ์จำลอง</label>
+              <textarea id="quizGenQuestion" rows="3" class="form-input" style="padding: 10px; width: 100%; font-size: 13px;" placeholder="เช่น คนไข้ STEMI ได้รับยา Levophed ทาง C-line อยู่ๆ มีอาการหอบเหนื่อย SpO2 ดรอป สิ่งแรกที่ต้องประเมินคืออะไร?" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ตัวเลือก A</label>
+              <input type="text" id="quizGenChoiceA" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก A" required value="ฟังเสียงปอด (Crepitation / Wheezing)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ตัวเลือก B</label>
+              <input type="text" id="quizGenChoiceB" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก B" required value="เจาะเลือดส่งตรวจ Electrolytes">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ตัวเลือก C</label>
+              <input type="text" id="quizGenChoiceC" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก C" required value="วัดรอบเอวคนไข้">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ตัวเลือก D</label>
+              <input type="text" id="quizGenChoiceD" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก D" required value="ปรับลดเรท Levophed ทันที">
+            </div>
+            <div class="form-group">
+              <label class="form-label">เฉลยข้อที่ถูกต้อง</label>
+              <select id="quizGenCorrect" class="form-input" style="padding-left: 12px;">
+                <option value="A">ข้อ A (ถูกต้อง)</option>
+                <option value="B">ข้อ B</option>
+                <option value="C">ข้อ C</option>
+                <option value="D">ข้อ D</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">คำอธิบายเฉลยและเหตุผลทางคลินิก</label>
+              <input type="text" id="quizGenRationale" class="form-input" style="padding-left: 12px;" placeholder="คำอธิบายเพิ่มเติมเพื่อการเรียนรู้" required value="เพื่อประเมินภาวะ Pulmonary Edema หรือหัวใจวายเฉียบพลัน">
+            </div>
+            <button type="submit" class="btn-primary" style="padding: 12px; margin-top: 6px;">
+              <span>🚀 บันทึกและเผยแพร่โจทย์ให้ทุกคน</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar (5 เมนูหลัก) -->
     <div class="bottom-nav" id="appBottomNav" style="display: none;">
       <button class="nav-item active" onclick="navTo('screen-beds', this)">
         <span class="nav-icon">🛏️</span>
-        <span>เตียง & เวร</span>
+        <span>ผู้ป่วย</span>
       </button>
-      <button class="nav-item" onclick="navTo('screen-handover', this)">
-        <span class="nav-icon">🎙️</span>
-        <span>ส่งเวร SBAR</span>
+      <button class="nav-item" onclick="navTo('screen-work', this)">
+        <span class="nav-icon">📋</span>
+        <span>งาน</span>
       </button>
       <button class="nav-item" onclick="navTo('screen-knowledge', this)">
         <span class="nav-icon">📚</span>
-        <span>ความรู้ & ทริค</span>
+        <span>ความรู้</span>
       </button>
       <button class="nav-item" onclick="navTo('screen-quiz', this)">
         <span class="nav-icon">🎮</span>
-        <span>ควิซ & เลเวล</span>
+        <span>ฝึกหัด</span>
+      </button>
+      <button class="nav-item" onclick="navTo('screen-system', this)">
+        <span class="nav-icon">⚙️</span>
+        <span>ระบบ</span>
       </button>
     </div>
   </div>
@@ -1475,7 +2052,7 @@
         
         document.getElementById('appBottomNav').style.display = 'flex';
         document.getElementById('headerLogoutBtn').style.display = 'inline-block';
-        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+        // shift badge removed from header
 
         navTo('screen-beds');
         resetInactivityTimer();
@@ -1631,7 +2208,7 @@
       setTimeout(() => {
         document.getElementById('appBottomNav').style.display = 'flex';
         document.getElementById('headerLogoutBtn').style.display = 'inline-block';
-        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+        // shift badge removed from header
         navTo('screen-beds');
         resetInactivityTimer();
         showToast(`✅ เข้าสู่ระบบสำเร็จผ่าน ${provider}! ยินดีต้อนรับ พว. ไหมแก้ว สมใจ`);
@@ -1682,7 +2259,7 @@
         // Auto sign-in to ward
         document.getElementById('appBottomNav').style.display = 'flex';
         document.getElementById('headerLogoutBtn').style.display = 'inline-block';
-        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+        // shift badge removed from header
         navTo('screen-beds');
         resetInactivityTimer();
       }, 800);
@@ -1697,11 +2274,11 @@
       if (screenId === 'screen-login' || screenId === 'screen-register') {
         document.getElementById('appBottomNav').style.display = 'none';
         document.getElementById('headerLogoutBtn').style.display = 'none';
-        document.getElementById('currentShiftBadge').style.display = 'none';
+        // shift badge removed from header
       } else {
         document.getElementById('appBottomNav').style.display = 'flex';
         document.getElementById('headerLogoutBtn').style.display = 'inline-block';
-        document.getElementById('currentShiftBadge').style.display = 'inline-block';
+        // shift badge removed from header
       }
 
       if (navEl) {
@@ -1710,23 +2287,622 @@
       }
     }
 
-    // Shift Selector
-    function setShift(shiftName, el) {
-      document.querySelectorAll('.shift-pill').forEach(p => p.classList.remove('active'));
-      el.classList.add('active');
-      document.getElementById('currentShiftBadge').textContent = `เวร${shiftName}`;
-      showToast(`เปลี่ยนเป็นเวร${shiftName} เรียบร้อยแล้ว`);
+    // Shift & Date State
+    let currentShiftDate = new Date().toISOString().split('T')[0];
+    let currentShiftType = "เช้า";
+
+    function onShiftDateChange(dateVal) {
+      if (!dateVal) return;
+      currentShiftDate = dateVal;
+      const d = new Date(dateVal);
+      const thaiDate = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+      const displayEl = document.getElementById('shiftDateDisplay');
+      if (displayEl) displayEl.textContent = thaiDate;
+      syncWorkShiftControls();
+      renderBedsList();
+      showToast(`📅 สลับข้อมูลเวรวันที่ ${thaiDate} (${currentShiftType})`);
     }
 
-    // Open Handover Studio
-    function openHandover(bedName, patientAge, dx, acuity, lines, drugs) {
-      document.getElementById('handoverTargetBed').textContent = bedName;
-      document.getElementById('handoverPatientDx').textContent = `${patientAge} • ${dx}`;
-      navTo('screen-handover');
+    function setShift(shiftName, el) {
+      document.querySelectorAll('#screen-beds .shift-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      currentShiftType = shiftName;
+      syncWorkShiftControls();
+      renderBedsList();
+      showToast(`🔄 สลับแสดงเตียงเวร${shiftName} เรียบร้อยแล้ว`);
+    }
+
+    // Work screen date & shift synchronization
+    function onWorkShiftDateChange(dateVal) {
+      if (!dateVal) return;
+      currentShiftDate = dateVal;
+      const mainDatePicker = document.getElementById('shiftDatePicker');
+      if (mainDatePicker) mainDatePicker.value = dateVal;
+      const d = new Date(dateVal);
+      const thaiDate = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+      const displayEl = document.getElementById('shiftDateDisplay');
+      if (displayEl) displayEl.textContent = thaiDate;
+      renderBedsList();
+      showToast(`📅 สลับเวรวันที่ ${thaiDate} (${currentShiftType})`);
+    }
+
+    function setWorkShift(shiftName, el) {
+      document.querySelectorAll('#screen-work .shift-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      currentShiftType = shiftName;
+      // Also sync main beds screen pills
+      document.querySelectorAll('#screen-beds .shift-pill').forEach(p => {
+        if (p.textContent.trim() === shiftName) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+      renderBedsList();
+      showToast(`🔄 สลับงานประจำเวร${shiftName}`);
+    }
+
+    function syncWorkShiftControls() {
+      const workDate = document.getElementById('workShiftDatePicker');
+      if (workDate) workDate.value = currentShiftDate;
+      document.querySelectorAll('#screen-work .shift-pill').forEach(p => {
+        if (p.textContent.trim() === currentShiftType) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+    }
+
+    // 1. ผู้ป่วย (Beds State & CRUD Management)
+    // Beds Store with date and shift association
+    const todayStr = new Date().toISOString().split('T')[0];
+    let allBedsData = [
+      {
+        id: "b1",
+        date: todayStr,
+        shift: "เช้า",
+        name: "เตียง 1",
+        patient: "ชาย 68 ปี",
+        dx: "Acute STEMI Anterior post PCI d1",
+        acuity: "🔴 วิกฤตใกล้ชิด",
+        lines: ["A-line ข้อมือขวา", "Foley cath urine ออกดี"],
+        drugs: ["Levophed 8 mcg/min", "Heparin drip 800u/hr"],
+        notes: "08:30 V/S 115/68 HR 78 เจ็บหน้าอกทุเลา แผล Femoral ขวาแห้งดี ไม่บวม คลำ pulse ชัดเจน"
+      },
+      {
+        id: "b2",
+        date: todayStr,
+        shift: "เช้า",
+        name: "เตียง 2",
+        patient: "หญิง 62 ปี",
+        dx: "Acute Decompensated Heart Failure (EF 28%)",
+        acuity: "🟡 เฝ้าระวัง",
+        lines: ["Nasal cannula 3L", "IV NSS KVO"],
+        drugs: ["Lasix 40 mg IV q 12h"],
+        notes: "09:00 หอบเหนื่อยลดลง ปัสสาวะออก 350 ml/2hr Keep I/O negative ตามแผนการรักษา"
+      },
+      {
+        id: "b3",
+        date: todayStr,
+        shift: "เช้า",
+        name: "เตียง 3",
+        patient: "ชาย 55 ปี",
+        dx: "Post Elective CAG with Stent Day 2",
+        acuity: "🟢 ทรงตัว",
+        lines: ["แผล Femoral ขวา"],
+        drugs: ["Aspirin 81 mg", "Brilinta 90 mg"],
+        notes: "10:00 ผู้ป่วยลุกนั่งได้ ไม่มีเวียนศีรษะ ชีพจรปกติ เตรียมย้ายออกหอผู้ป่วยสามัญบ่ายนี้"
+      },
+      // Sample beds for Afternoon shift (เวรบ่าย)
+      {
+        id: "b4",
+        date: todayStr,
+        shift: "บ่าย",
+        name: "เตียง 1",
+        patient: "ชาย 68 ปี",
+        dx: "Acute STEMI Anterior post PCI d1 (เวรบ่าย)",
+        acuity: "🔴 วิกฤตใกล้ชิด",
+        lines: ["A-line ข้อมือขวา", "Foley cath urine 80ml/hr"],
+        drugs: ["Levophed 6 mcg/min (titrate down)", "Heparin drip 800u/hr"],
+        notes: "14:30 เจาะ aPTT รอบบ่ายเรียบร้อย รอผลแล็บ V/S คงที่"
+      },
+      {
+        id: "b5",
+        date: todayStr,
+        shift: "บ่าย",
+        name: "เตียง 4",
+        patient: "หญิง 70 ปี",
+        dx: "Complete Heart Block with Temporary Pacemaker",
+        acuity: "🔴 วิกฤตใกล้ชิด",
+        lines: ["Temporary Pacing wire", "Femoral sheath"],
+        drugs: ["Dopamine 5 mcg/min"],
+        notes: "แรกรับจาก Cath lab V/S 110/60 HR 70 pace on demand"
+      },
+      // Sample beds for Night shift (เวรดึก)
+      {
+        id: "b6",
+        date: todayStr,
+        shift: "ดึก",
+        name: "เตียง 1",
+        patient: "ชาย 68 ปี",
+        dx: "Acute STEMI Anterior post PCI d1 (เวรดึก)",
+        acuity: "🔴 วิกฤตใกล้ชิด",
+        lines: ["A-line ข้อมือขวา", "Foley cath"],
+        drugs: ["Levophed 4 mcg/min", "Heparin drip"],
+        notes: "02:00 คนไข้นอนหลับได้ดี ไม่มี chest pain ซ้ำ Urine ออกดี"
+      }
+    ];
+
+    // Reference alias for active filtered beds
+    let bedsData = [];
+    let currentWorkBedIndex = 0;
+
+    function getFilteredBeds() {
+      const filtered = allBedsData.filter(b => (!b.date || b.date === currentShiftDate) && (!b.shift || b.shift === currentShiftType));
+      if (filtered.length > 0) return filtered;
       
-      // Update SBAR sample
-      document.getElementById('sbarS').textContent = `${bedName}: ${patientAge} ${dx} สัญญาณชีพทรงตัว ไม่มีแน่นหน้าอกซ้ำในเวรนี้`;
-      document.getElementById('sbarA').textContent = `ยาที่ได้: ${drugs.join(', ')} | สายระบาย: ${lines.join(', ')}`;
+      // Fallback: If no bed for specific date, return default beds adapted for this date/shift
+      return allBedsData.filter(b => b.shift === currentShiftType);
+    }
+
+    function renderBedsList() {
+      bedsData = getFilteredBeds();
+      const container = document.getElementById('bedsContainer');
+      const select = document.getElementById('workBedSelect');
+      const countBadge = document.getElementById('bedCountBadge');
+      if (!container) return;
+
+      container.innerHTML = "";
+      if (select) select.innerHTML = "";
+
+      // Update count badge
+      if (countBadge) {
+        countBadge.textContent = `${bedsData.length} เตียง`;
+      }
+
+      if (bedsData.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 30px 16px; background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border); border-radius: 12px; color: var(--muted);">
+            <div style="font-size: 28px; margin-bottom: 6px;">🛏️</div>
+            <div style="font-size: 13.5px; font-weight: 600; color: #fff;">ยังไม่มีเตียงในเวร${currentShiftType} วันนี้</div>
+            <div style="font-size: 12px; margin-top: 4px;">แตะปุ่ม "+" ด้านบนเพื่อเพิ่มเตียงในรอบเวรนี้ได้ทันที</div>
+          </div>
+        `;
+      } else {
+        bedsData.forEach((bed, idx) => {
+          // Tag class
+          let tagClass = "tag-red";
+          if (bed.acuity.includes("เฝ้าระวัง")) tagClass = "tag-yellow";
+          else if (bed.acuity.includes("ทรงตัว")) tagClass = "tag-green";
+
+          // Bed card for Screen 1
+          const card = document.createElement('div');
+          card.className = "bed-card";
+          card.innerHTML = `
+            <div class="bed-header">
+              <span class="bed-number">🛏️ ${bed.name} (${bed.patient})</span>
+              <span class="tag-acuity ${tagClass}">${bed.acuity}</span>
+            </div>
+            <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Dx: ${bed.dx}</div>
+            <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">💉 ยา: <span style="color: var(--amber);">${bed.drugs.join(', ') || '-'}</span></div>
+            <div style="font-size: 12px; color: var(--muted); margin-bottom: 10px;">🩺 สาย/อุปกรณ์: ${bed.lines.join(', ') || '-'}</div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 6px;">
+              <div style="display: flex; gap: 6px;">
+                <button class="btn-sm-edit" onclick="event.stopPropagation(); editBed(${idx})">✏️ แก้ไข</button>
+                <button class="btn-sm-danger" onclick="event.stopPropagation(); deleteBed(${idx})">🗑️ ลบ</button>
+              </div>
+              <button class="btn-sm-success" onclick="goToWorkBed(${idx})">📋 ไปที่งานเตียงนี้ →</button>
+            </div>
+          `;
+          container.appendChild(card);
+
+          // Populate workBedSelect
+          if (select) {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `${bed.name} - ${bed.patient} (${bed.dx.substring(0, 24)}...)`;
+            if (idx === currentWorkBedIndex) opt.selected = true;
+            select.appendChild(opt);
+          }
+        });
+      }
+
+      if (currentWorkBedIndex >= bedsData.length) {
+        currentWorkBedIndex = Math.max(0, bedsData.length - 1);
+      }
+
+      updateWorkBedDisplay();
+    }
+
+    function openAddBedModal() {
+      document.getElementById('bedModalTitle').textContent = "➕ เพิ่มเตียงผู้ป่วยใหม่";
+      document.getElementById('bedEditIndex').value = "-1";
+      document.getElementById('bedInputName').value = `เตียง ${bedsData.length + 1}`;
+      document.getElementById('bedInputPatient').value = "";
+      document.getElementById('bedInputDx').value = "";
+      document.getElementById('bedInputAcuity').value = "🔴 วิกฤตใกล้ชิด";
+      document.getElementById('bedInputDrugs').value = "";
+      document.getElementById('bedInputLines').value = "";
+      document.getElementById('bedModal').classList.add('active');
+    }
+
+    function editBed(idx) {
+      const b = bedsData[idx];
+      document.getElementById('bedModalTitle').textContent = `✏️ แก้ไขข้อมูล ${b.name}`;
+      document.getElementById('bedEditIndex').value = idx;
+      document.getElementById('bedInputName').value = b.name;
+      document.getElementById('bedInputPatient').value = b.patient;
+      document.getElementById('bedInputDx').value = b.dx;
+      document.getElementById('bedInputAcuity').value = b.acuity;
+      document.getElementById('bedInputDrugs').value = b.drugs.join(', ');
+      document.getElementById('bedInputLines').value = b.lines.join(', ');
+      document.getElementById('bedModal').classList.add('active');
+    }
+
+    function closeBedModal() {
+      document.getElementById('bedModal').classList.remove('active');
+    }
+
+    function saveBed(e) {
+      if (e) e.preventDefault();
+      const idx = parseInt(document.getElementById('bedEditIndex').value);
+      const name = document.getElementById('bedInputName').value.trim();
+      const patient = document.getElementById('bedInputPatient').value.trim();
+      const dx = document.getElementById('bedInputDx').value.trim();
+      const acuity = document.getElementById('bedInputAcuity').value;
+      const drugs = document.getElementById('bedInputDrugs').value.split(',').map(s => s.trim()).filter(Boolean);
+      const lines = document.getElementById('bedInputLines').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      if (idx === -1) {
+        // Add new bed to active date and shift
+        allBedsData.push({
+          id: `b${Date.now()}`,
+          date: currentShiftDate,
+          shift: currentShiftType,
+          name, patient, dx, acuity, lines, drugs,
+          notes: "แรกรับเข้ารับการรักษาในหอผู้ป่วยวิกฤต CCU"
+        });
+        showToast(`✅ เพิ่ม ${name} ในเวร${currentShiftType} แล้ว!`);
+      } else {
+        // Edit active bed
+        const targetBed = bedsData[idx];
+        const masterIdx = allBedsData.findIndex(b => b.id === targetBed.id);
+        if (masterIdx !== -1) {
+          allBedsData[masterIdx].name = name;
+          allBedsData[masterIdx].patient = patient;
+          allBedsData[masterIdx].dx = dx;
+          allBedsData[masterIdx].acuity = acuity;
+          allBedsData[masterIdx].drugs = drugs;
+          allBedsData[masterIdx].lines = lines;
+        }
+        showToast(`✅ อัปเดตข้อมูล ${name} เรียบร้อยแล้ว!`);
+      }
+
+      closeBedModal();
+      renderBedsList();
+    }
+
+    function deleteBed(idx) {
+      const b = bedsData[idx];
+      if (confirm(`ยืนยันการลบ ${b.name} (${b.patient}) ออกจากเวรนี้หรือไม่?`)) {
+        const masterIdx = allBedsData.findIndex(item => item.id === b.id);
+        if (masterIdx !== -1) {
+          allBedsData.splice(masterIdx, 1);
+        }
+        if (currentWorkBedIndex >= bedsData.length) {
+          currentWorkBedIndex = Math.max(0, bedsData.length - 1);
+        }
+        renderBedsList();
+        showToast(`🗑️ ลบข้อมูล ${b.name} เรียบร้อยแล้ว`);
+      }
+    }
+
+    function goToWorkBed(idx) {
+      currentWorkBedIndex = idx;
+      navTo('screen-work', document.querySelectorAll('.bottom-nav .nav-item')[1]);
+      updateWorkBedDisplay();
+    }
+
+    // 2. งานพยาบาล & ส่งเวร (Work Screen)
+    // Structure of work items per bed
+    const defaultWorkActivities = {
+      b1: [
+        { id: "w1", time: "08:30", text: "วัด V/S: BP 115/68 mmHg, HR 78/min regular, SpO2 99% RA", source: "text" },
+        { id: "w2", time: "09:00", text: "ตรวจประเมินแผล Femoral ขวา แห้งดี ไม่มี hematoma ชีพจรหลังเท้าชัดเจน", source: "voice" },
+        { id: "w3", time: "10:15", text: "Titrate Levophed ลงเหลือ 4 mcg/min ตาม MAP > 65 mmHg", source: "voice" },
+        { id: "w4", time: "11:00", text: "ปัสสาวะออก 120 ml/2hr สีเหลืองใส ไม่มีตะกอน", source: "text" }
+      ],
+      b2: [
+        { id: "w201", time: "08:45", text: "ให้ยา Lasix 40 mg IV slow push ตามแผนการรักษา", source: "text" },
+        { id: "w202", time: "09:30", text: "ผู้ป่วยอาการเหนื่อยลดลง นอนราบได้ 30 องศา", source: "voice" },
+        { id: "w203", time: "10:45", text: "Record Urine output รวม 350 ml/2hr Keep I/O negative", source: "text" }
+      ],
+      b3: [
+        { id: "w301", time: "09:00", text: "ผู้ป่วยรู้สึกตัวดี รับประทานอาหารเช้าได้ ไม่มีแน่นหน้าอก", source: "text" },
+        { id: "w302", time: "10:30", text: "ให้ยา Aspirin 81 mg, Brilinta 90 mg หลังอาหารทันที", source: "text" }
+      ]
+    };
+
+    let isWorkVoiceRecording = false;
+
+    function onWorkBedChange(val) {
+      currentWorkBedIndex = parseInt(val);
+      updateWorkBedDisplay();
+    }
+
+    function getActiveBedActivities() {
+      if (!bedsData[currentWorkBedIndex]) return [];
+      const b = bedsData[currentWorkBedIndex];
+      if (!b.activities) {
+        b.activities = defaultWorkActivities[b.id] ? [...defaultWorkActivities[b.id]] : [
+          { id: `w_${Date.now()}`, time: "08:30", text: b.notes || "แรกรับดูแลผู้ป่วย V/S ทรงตัว", source: "text" }
+        ];
+      }
+      return b.activities;
+    }
+
+    function renderWorkItemsList() {
+      const listEl = document.getElementById('workItemsList');
+      if (!listEl) return;
+      const activities = getActiveBedActivities();
+
+      if (activities.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 20px; background: rgba(15, 23, 42, 0.4); border-radius: 10px; border: 1px dashed var(--border); color: var(--muted); font-size: 12.5px;">
+            ยังไม่มีรายการงานสำหรับเตียงนี้ • พิมพ์หรือแตะไมค์ 🎙️ เพื่อเพิ่มงานได้ทันที
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      activities.forEach((act, actIdx) => {
+        const item = document.createElement('div');
+        item.style.cssText = "display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 12px; background: #0f1d36; border: 1px solid var(--border); border-radius: 10px; gap: 8px;";
+        
+        const isVoice = act.source === "voice";
+        const iconBadge = isVoice 
+          ? `<span style="font-size: 11px; background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; padding: 1px 5px;">🎙️ เสียง</span>` 
+          : `<span style="font-size: 11px; background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 4px; padding: 1px 5px;">✍️ บันทึก</span>`;
+
+        item.innerHTML = `
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--amber);">⏰ ${act.time}</span>
+              ${iconBadge}
+            </div>
+            <div style="font-size: 13px; color: #e2e8f0; line-height: 1.4;">${act.text}</div>
+          </div>
+          <button type="button" class="btn-close-modal" onclick="deleteWorkItem(${actIdx})" title="ลบรายการ" style="font-size: 16px; color: var(--rose); padding: 0 4px; line-height: 1;">✕</button>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    function toggleAddWorkForm() {
+      const card = document.getElementById('addWorkInputCard');
+      const btnText = document.getElementById('btnToggleAddWorkText');
+      const input = document.getElementById('newWorkItemText');
+      if (!card) return;
+
+      const isHidden = card.style.display === 'none' || !card.style.display;
+      if (isHidden) {
+        card.style.display = 'block';
+        if (btnText) btnText.textContent = "✕ ปิด";
+        if (input) setTimeout(() => input.focus(), 150);
+      } else {
+        card.style.display = 'none';
+        if (btnText) btnText.textContent = "➕ เพิ่มรายการ";
+        if (isWorkVoiceRecording) toggleWorkItemRecord();
+      }
+    }
+
+    function addWorkItemFromInput() {
+      const input = document.getElementById('newWorkItemText');
+      const text = input.value.trim();
+      if (!text) {
+        showToast("⚠️ กรุณากรอกข้อความงานหรือพูดผ่านไมค์");
+        return;
+      }
+      addWorkActivityItem(text, "text");
+      input.value = "";
+      
+      // Close form on save
+      const card = document.getElementById('addWorkInputCard');
+      const btnText = document.getElementById('btnToggleAddWorkText');
+      if (card) card.style.display = 'none';
+      if (btnText) btnText.textContent = "➕ เพิ่มรายการ";
+      if (isWorkVoiceRecording) toggleWorkItemRecord();
+    }
+
+    function toggleWorkItemRecord() {
+      const btn = document.getElementById('workMicBtn');
+      const status = document.getElementById('workVoiceStatus');
+      const input = document.getElementById('newWorkItemText');
+      isWorkVoiceRecording = !isWorkVoiceRecording;
+
+      if (isWorkVoiceRecording) {
+        btn.style.background = "linear-gradient(135deg, #e11d48, #fb7185)";
+        status.style.display = "block";
+        showToast("🎙️ กำลังฟังเสียงบันทึกงาน... พูดได้เลยครับ");
+      } else {
+        btn.style.background = "linear-gradient(135deg, #0284c7, #38bdf8)";
+        status.style.display = "none";
+        
+        // Simulated voice transcript samples
+        const sampleTranscripts = [
+          "ตรวจแผล Femoral ขวา ไม่บวม ไม่มี hematoma คลำ pulse ชัดเจน",
+          "วัดสัญญาณชีพ BP 118/70 PR 76 bpm ไม่มีอาการแน่นหน้าอกซ้ำ",
+          "คนไข้ปัสสาวะออก 150 ซีซี สีเหลืองใส Titrate Heparin ตามโปรโตคอล",
+          "ดูดเสมหะทางสายยาง มีเสมหะสีขาวใสเล็กน้อย หายใจโล่งขึ้น"
+        ];
+        const randomText = sampleTranscripts[Math.floor(Math.random() * sampleTranscripts.length)];
+        input.value = randomText;
+        showToast("✨ AI ถอดความเสียงสำเร็จ! กดบันทึกเพื่อเพิ่มในรายการงาน");
+      }
+    }
+
+    function addWorkActivityItem(text, source = "text") {
+      const activities = getActiveBedActivities();
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      activities.unshift({
+        id: `w_${Date.now()}`,
+        time: timeStr,
+        text: text,
+        source: source
+      });
+      renderWorkItemsList();
+      showToast("✅ บันทึกรายการงานเรียบร้อยแล้ว");
+    }
+
+    function deleteWorkItem(actIdx) {
+      const activities = getActiveBedActivities();
+      activities.splice(actIdx, 1);
+      renderWorkItemsList();
+      showToast("🗑️ ลบรายการงานเรียบร้อย");
+    }
+
+    function openAddWorkItemModal() {
+      const text = prompt("กรอกรายละเอียดการทำงานพยาบาลสำหรับเตียงนี้:");
+      if (text && text.trim()) {
+        addWorkActivityItem(text.trim(), "text");
+      }
+    }
+
+    function updateWorkBedDisplay() {
+      syncWorkShiftControls();
+      if (!bedsData[currentWorkBedIndex]) return;
+      const b = bedsData[currentWorkBedIndex];
+      const infoEl = document.getElementById('workPatientInfo');
+      const select = document.getElementById('workBedSelect');
+      const noticeEl = document.getElementById('workBedCountNotice');
+      
+      if (infoEl) infoEl.textContent = `${b.name} (${b.patient}) • Dx: ${b.dx} • ยา: ${b.drugs.join(', ') || 'ไม่มี'}`;
+      if (select) select.value = currentWorkBedIndex;
+      if (noticeEl) noticeEl.textContent = `มี ${bedsData.length} เตียงในเวร${currentShiftType}`;
+
+      renderWorkItemsList();
+      updateSbarFromBed(b);
+    }
+
+    function updateSbarFromBed(b) {
+      const s = document.getElementById('sbarS');
+      const bg = document.getElementById('sbarB');
+      const a = document.getElementById('sbarA');
+      const r = document.getElementById('sbarR');
+
+      const activities = getActiveBedActivities();
+      const actSummary = activities.map(item => `[${item.time}] ${item.text}`).slice(0, 3).join("; ");
+
+      if (s) s.textContent = `${b.name} (${b.patient}) Dx: ${b.dx} สัญญาณชีพทรงตัว ไม่มีเจ็บหน้าอกซ้ำในเวร${currentShiftType}นี้`;
+      if (bg) bg.textContent = `ประวัติ: ${b.dx} • สัญญาณชีพล่าสุด BP 118/72, PR 76/min, O2 Sat 99% RA`;
+      if (a) a.textContent = `การรักษา & ยา: [${b.drugs.join(', ') || 'ไม่มี'}] • สายระบาย: [${b.lines.join(', ') || 'ไม่มี'}] • สรุปงานเวรนี้: ${actSummary || 'อาการคงที่'}`;
+      if (r) r.textContent = `แผนฝากเวรถัดไป: ติดตาม V/S และ Urine output ทุก 2 ชม., เฝ้าระวังภาวะแทรกซ้อน และส่งตรวจแล็บตามนัด`;
+    }
+
+    function generateSbarFromWork() {
+      const b = bedsData[currentWorkBedIndex];
+      showToast("⏳ กำลังประมวลผลสร้างข้อมูลส่งเวร จากรายการงาน + ข้อมูลผู้ป่วย...");
+      setTimeout(() => {
+        updateSbarFromBed(b);
+        showToast("✨ สร้างข้อมูลส่งเวร SBAR เรียบร้อยแล้ว!");
+      }, 600);
+    }
+
+    // 3. ความรู้ (Knowledge Tabs)
+    function switchKnowledgeTab(tabKey, btn) {
+      document.querySelectorAll('#screen-knowledge .tab-pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.querySelectorAll('.know-tab-content').forEach(c => c.style.display = 'none');
+      if (tabKey === 'repo') document.getElementById('tab-know-repo').style.display = 'block';
+      else if (tabKey === 'ai') document.getElementById('tab-know-ai').style.display = 'block';
+      else if (tabKey === 'pearls') document.getElementById('tab-know-pearls').style.display = 'block';
+    }
+
+    function askQuickPrompt(promptText) {
+      const input = document.getElementById('tutorInput');
+      input.value = promptText;
+      askTutor();
+    }
+
+    // 5. ระบบ (System Tabs & FAQ Approve & Train)
+    function switchSystemTab(tabKey, btn) {
+      document.querySelectorAll('#screen-system .tab-pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.querySelectorAll('.sys-tab-content').forEach(c => c.style.display = 'none');
+      document.getElementById(`sys-tab-${tabKey}`).style.display = 'block';
+
+      // Admin check
+      if (tabKey === 'users') {
+        const isAdmin = currentAuthUser.includes("มั่นคง") || currentAuthUser.includes("Admin");
+        const notice = document.getElementById('adminNotice');
+        if (!isAdmin) {
+          showToast("⚠️ ท่านกำลังเข้าดูในโหมดจำลองสิทธิ์ (Admin Preview)");
+        }
+      }
+    }
+
+    function switchSysKnowTab(subKey, btn) {
+      document.querySelectorAll('#sys-tab-knowledge .tab-pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.querySelectorAll('.sys-know-sub').forEach(s => s.style.display = 'none');
+      document.getElementById(`sys-know-${subKey}`).style.display = 'block';
+    }
+
+    function approveFaqAndTrain(btn) {
+      btn.disabled = true;
+      btn.textContent = "⏳ Training AI...";
+      showToast("🔄 พยาบาลรุ่นพี่ Approve แล้ว! กำลังสร้าง Vector Embeddings & Train AI...");
+
+      setTimeout(() => {
+        btn.parentElement.innerHTML = '<span style="font-size: 11px; color: var(--green); font-weight: 600;">✓ Approved & Vector Synced</span>';
+        const statusEl = document.getElementById('faqStatusPending');
+        if (statusEl) {
+          statusEl.textContent = `ผู้อนุมัติ: ${currentAuthUser} • Vector: Synced ✅`;
+          statusEl.style.color = "var(--green)";
+        }
+        showToast("🎉 สำเร็จ! ข้อคำถามถูกสร้าง Vector Embeddings และรวมเข้าฐานความรู้ AI ติวเตอร์เรียบร้อยแล้ว");
+      }, 1200);
+    }
+
+    function triggerTrainVector() {
+      showToast("⚡ กำลังสร้าง Vector Embeddings ใหม่อัตโนมัติจาก FAQ และคู่มือทั้งหมด...");
+      setTimeout(() => {
+        showToast("✅ Vector Store อัปเดตสมบูรณ์! พร้อมใช้งานกับ AI Safe Tutor");
+      }, 1000);
+    }
+
+    function addNewPearlModal() {
+      const tip = prompt("พิมพ์เกร็ดความรู้พยาบาล (Senior Pearl) ที่ต้องการแบ่งปัน:");
+      if (tip) {
+        showToast("✨ เผยแพร่เกร็ดความรู้จากรุ่นพี่เข้าสู่ระบบเรียบร้อย!");
+      }
+    }
+
+    function handleCreateQuiz(e) {
+      if (e) e.preventDefault();
+      const q = document.getElementById('quizGenQuestion').value.trim();
+      const cor = document.getElementById('quizGenCorrect').value;
+      const rat = document.getElementById('quizGenRationale').value.trim();
+
+      showToast("⏳ กำลังบันทึกโจทย์และกระจายสู่ระบบฝึกหัด...");
+      setTimeout(() => {
+        showToast("🎉 บันทึกโจทย์สำเร็จ! เผยแพร่ข้อสอบให้พยาบาลทุกคนฝึกทำเรียบร้อย");
+        document.getElementById('quizGenQuestion').value = "";
+        // Switch to Quiz view to show success
+        switchSystemTab('profile', document.querySelectorAll('#screen-system .tab-pill-btn')[0]);
+      }, 800);
+    }
+
+    function promptChangePin() {
+      const newPin = prompt("กรุณาระบุรหัส Quick PIN 4 หลักใหม่:");
+      if (newPin && newPin.length === 4 && /^\d{4}$/.test(newPin)) {
+        registeredPin = newPin;
+        document.getElementById('profPin').textContent = newPin;
+        showToast(`🔑 เปลี่ยนรหัส Quick PIN เป็น [${newPin}] เรียบร้อยแล้ว!`);
+      } else if (newPin) {
+        showToast("⚠️ กรุณาระบุเป็นตัวเลข 4 หลักเท่านั้น");
+      }
     }
 
     // Recording Toggle
@@ -1821,6 +2997,20 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 2800);
     }
+
+    // Initialize Beds on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderBedsList();
+      const datePicker = document.getElementById('shiftDatePicker');
+      if (datePicker) {
+        const today = new Date().toISOString().split('T')[0];
+        datePicker.value = today;
+        const thaiDate = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+        const displayEl = document.getElementById('shiftDateDisplay');
+        if (displayEl) displayEl.textContent = thaiDate;
+      }
+    });
+
   </script>
 </body>
 </html>

@@ -67,50 +67,61 @@ sequenceDiagram
 
 ---
 
-### Flow 1: การบันทึกเสียง ➡️ กรอง PDPA ➡️ แปลงเป็น SBAR + Cheat Sheet ดักคำถาม
+### Flow 1: การดูคำถามดัก ➡️ บันทึกกิจกรรมการทำงาน (เสียง/พิมพ์) ➡️ สร้างรายงาน SBAR + Cheat Sheet ดักคำถาม
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Nurse as 👩‍⚕️ พยาบาลรุ่นน้อง (Junior Nurse)
-    participant UI as 📱 Voice/SBAR UI
+    participant UI as 📱 Work Screen UI (หน้างาน)
     participant Gateway as 🛡️ API Gateway & Sanitizer (PDPA)
     participant AudioAPI as 🤖 Gemini Audio API (STT)
-    participant SbarSvc as 🧠 SBAR & CheatSheet Service
+    participant WorkSvc as 📝 Work Activity Service
+    participant SbarSvc as 🧠 SBAR Structuring Service
     participant GeminiLLM as 🤖 Gemini LLM Engine
     participant Fallback as ⚙️ Rule-based Parser (Fallback)
-    participant DB as 💾 Handover Database
+    participant DB as 💾 Work & Handover Database
     participant Audit as 🔒 Audit Logger
 
-    Nurse->>UI: 1. แตะปุ่มอัดเสียง เล่าอาการคนไข้ภาษาพูด
-    UI-->>Nurse: แสดงคลื่นเสียงกำลังบันทึก (Recording...)
-    Nurse->>UI: 2. แตะหยุดบันทึกเสียง (Stop & Process)
+    %% Step 1: Bed Selection & Cheat Sheet Review
+    Nurse->>UI: 1. เลือกเตียงที่ดูแล (เช่น เตียง 2 - STEMI)
+    UI->>UI: 2. แสดง "💡 สิ่งที่รุ่นพี่/แพทย์มักจะถามจี้ในเคสนี้" ด้านบนสุด เพื่อทบทวนก่อนปฏิบัติงาน
     
-    UI->>Gateway: 3. ส่ง Audio (Base64) + BedNo (เช่น "เตียง 2")
-    Gateway->>Audit: 4. บันทึก Audit Log (User, Bed, Action: VoiceNote)
-    
-    Gateway->>AudioAPI: 5. ส่งเสียงแปลงเป็นข้อความ (Ephemeral Stream)
-    alt ถอดเสียงสำเร็จ
-        AudioAPI-->>Gateway: 6. ส่งข้อความดิบกลับ (Raw Clinical Text)
-    else ล้มเหลว / ไม่มีเน็ต
-        AudioAPI-->>Gateway: Error Timeout
-        Gateway->>UI: แจ้งเตือนใช้ระบบพิมพ์ข้อความแทน
+    %% Step 2: Add Nursing Activity via Voice or Text
+    Nurse->>UI: 3. กดปุ่ม "➕ เพิ่มรายการ" (ฟอร์มบันทึกเปิดออก)
+    alt บันทึกกิจกรรมด้วยเสียง (Voice Note)
+        Nurse->>UI: 4a. กดไอคอนไมค์ 🎙️ และพูดบันทึกกิจกรรม (เช่น "10:30 ปรับ NTG เป็น 15 mcg/min ตาม BP ล่าสุด")
+        UI->>Gateway: 5a. ส่ง Audio Stream (Base64) + BedId
+        Gateway->>AudioAPI: 6a. ส่งเสียงถอดความเป็นข้อความคลินิก
+        AudioAPI-->>Gateway: 7a. ข้อความกิจกรรมที่ถอดความได้
+        Gateway->>Gateway: 8a. 🛡️ PDPA Filter: ตรวจจับ & Masking ชื่อ/HN ออก
+        Gateway-->>UI: 9a. กรอกข้อความลงช่องพิมพ์ให้อัตโนมัติ พร้อมสัญลักษณ์ 🎙️
+    else พิมพ์บันทึกข้อความ (Text Note)
+        Nurse->>UI: 4b. พิมพ์ข้อความกิจกรรมลงในช่องพิมพ์ ⌨️
     end
 
-    Gateway->>Gateway: 7. 🛡️ PDPA Filter: ตรวจจับ & Masking ชื่อ/HN ออก
-    Gateway->>SbarSvc: 8. ส่งข้อความที่ Clean แล้ว + ข้อมูลเตียง
+    Nurse->>UI: 10. กดปุ่ม "💾 บันทึก" (ฟอร์มบันทึกปิดตัวลงทันที)
+    UI->>WorkSvc: 11. บันทึกรายการกิจกรรมใหม่ (BedId, Time, Text, Source)
+    WorkSvc->>DB: 12. Insert Nursing Activity Item
+    WorkSvc-->>UI: 13. แสดงรายการกิจกรรมที่อัปเดตในตารางกิจกรรม
+
+    %% Step 3: Generate SBAR
+    Nurse->>UI: 14. กดปุ่ม "✨ สร้างข้อมูลส่งเวร (จากรายการทำงาน + ข้อมูลผู้ป่วย)"
+    UI->>Gateway: 15. รวบรวมข้อมูลคนไข้ + รายการกิจกรรมทั้งหมดในเวร
+    Gateway->>Audit: 16. บันทึก Audit Log (User, Bed, Action: GenerateHandover)
+    Gateway->>SbarSvc: 17. ส่งรายการกิจกรรมที่ Cleaned แล้ว
     
-    SbarSvc->>GeminiLLM: 9. Prompt: สรุป SBAR + สรุปคำถามที่รุ่นพี่มักจะถามจี้
+    SbarSvc->>GeminiLLM: 18. Prompt: สรุปเป็นโครงสร้าง SBAR + สกัด Cheat Sheet คำถามเตรียมตัวส่งเวร
     alt Gemini AI ตอบกลับปกติ
-        GeminiLLM-->>SbarSvc: 10. JSON: { S, B, A, R, cheatSheetQuestions }
+        GeminiLLM-->>SbarSvc: 19. JSON: { S, B, A, R, preceptorQuestions }
     else Gemini Offline
-        SbarSvc->>Fallback: 11. ใช้ Rule-based Regex สกัดค่า BP, HR, O2, แผนยา
-        Fallback-->>SbarSvc: 12. Fallback SBAR Object
+        SbarSvc->>Fallback: 20. ใช้ Rule-based Regex สกัดค่า BP, HR, O2, แผนยา
+        Fallback-->>SbarSvc: 21. Fallback SBAR Object
     end
 
-    SbarSvc->>DB: 13. บันทึก SBAR Note ลงฐานข้อมูล (Revision 1)
-    SbarSvc-->>UI: 14. ส่งผลลัพธ์ SBAR + คำถาม Cheat Sheet
-    UI-->>Nurse: 15. แสดงผลบนหน้าจอ น้องอ่านซ้อมก่อนเดินไปส่งเวร
+    SbarSvc->>DB: 22. บันทึก SBAR Note ลงฐานข้อมูล (Revision)
+    SbarSvc-->>UI: 23. ส่งผลลัพธ์ SBAR พร้อมปุ่ม "คัดลอกส่งเวร (LINE)"
+    UI-->>Nurse: 24. แสดงการ์ด SBAR และปุ่มคัดลอก น้องอ่านทบทวนก่อนเดินไปส่งเวร
 ```
 
 ---
@@ -144,40 +155,51 @@ sequenceDiagram
 
 ---
 
-### Flow 3: การแชร์เกร็ดความรู้จากรุ่นพี่ ➡️ แปลงเป็นโจทย์ควิซ ➡️ รุ่นน้องฝึกทำข้อสอบ
+### Flow 3: การแชร์เกร็ดความรู้ / อนุมัติ FAQ ➡️ Train Vector RAG ➡️ แปลงเป็นโจทย์ควิซ ➡️ รุ่นน้องฝึกทำข้อสอบ
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Senior as 👩‍⚕️ พยาบาลรุ่นพี่ (Senior Nurse)
-    participant UI_Senior as 📱 Senior Portal UI
-    participant PearlSvc as 💡 Pearls Service
+    actor Senior as 👩‍⚕️ พยาบาลรุ่นพี่ / หัวหน้าเวร (Senior / Charge Nurse)
+    participant UI_System as ⚙️ System & Knowledge UI (หน้าระบบ)
+    participant PearlSvc as 💡 Pearls & Knowledge Service
+    participant VectorDB as 🔍 Ward Vector Store (RAG)
     participant QuizEngine as 🎯 Quiz Quest Engine
-    participant DB as 💾 Pearls & Quiz DB
+    participant DB as 💾 Pearls, Knowledge & Quiz DB
     actor Junior as 👩‍⚕️ พยาบาลรุ่นน้อง (Junior Nurse)
-    participant UI_Junior as 📱 Junior Feed & Quiz UI
+    participant UI_Junior as 📱 Knowledge & Quiz UI (หน้าความรู้/ฝึกหัด)
 
-    Senior->>UI_Senior: 1. เขียนทริค "การระวังความดันตกตอนดริป NTG"
-    UI_Senior->>PearlSvc: 2. ส่งเนื้อหาเกร็ดความรู้ + หมวดหมู่ (High Alert Drug)
-    PearlSvc->>DB: 3. บันทึกเกร็ดความรู้ลงคลังวอร์ด
-    
-    PearlSvc->>QuizEngine: 4. ส่ง Trigger สร้างข้อสอบจากเกร็ดความรู้นี้
-    QuizEngine->>QuizEngine: 5. AI สกัดเป็นคำถาม Multiple Choice 4 ตัวเลือก
-    QuizEngine->>DB: 6. บันทึกชุดข้อสอบลงธนาคารควิซ (Quiz Bank)
+    %% Part 1: Senior Shares Pearl & Approves FAQ
+    Senior->>UI_System: 1. เขียนทริค "การระวังความดันตกตอนดริป NTG"
+    UI_System->>PearlSvc: 2. บันทึกเกร็ดความรู้ลงคลังวอร์ด
+    PearlSvc->>DB: 3. บันทึก Senior Pearl (หมวด High Alert Drug)
 
-    Note over Junior, UI_Junior: ในเวลาว่างระหว่างเวร
-    Junior->>UI_Junior: 7. เปิดอ่าน "เกร็ดความรู้ประจำวันจากพี่ๆ"
-    UI_Junior->>DB: 8. ดึงทริคของรุ่นพี่มาแสดง
-    DB-->>UI_Junior: 9. แสดงการ์ดทริค NTG
-    Junior->>UI_Junior: 10. แตะปุ่ม "ส่งหัวใจขอบคุณพี่ ❤️"
-    UI_Junior->>DB: 11. อัปเดตยอด Reaction ให้รุ่นพี่
+    Senior->>UI_System: 4. ตรวจสอบรายการ "คำถามพยาบาลที่รออนุมัติ (Pending FAQ)"
+    Senior->>UI_System: 5. กดปุ่ม "อนุมัติ & Train Vector" (Approve & Sync)
+    UI_System->>PearlSvc: 6. อัปเดตสถานะ FAQ เป็น Approved
+    PearlSvc->>VectorDB: 7. ส่ง Embeddings เข้าสู่ Vector Store ของวอร์ดทันที
+    VectorDB-->>UI_System: 8. แจ้งผล: อัปเดต Vector Database สำเร็จ (AI ติวเตอร์พร้อมตอบคำถามนี้)
 
-    Junior->>UI_Junior: 12. กดเริ่มเล่นเกมควิซทบทวน (Daily Quiz)
-    UI_Junior->>QuizEngine: 13. ดึงคำถามที่สร้างจากทริค NTG
-    QuizEngine-->>UI_Junior: 14. แสดงโจทย์และตัวเลือก
-    Junior->>UI_Junior: 15. เลือกคำตอบ
-    UI_Junior->>QuizEngine: 16. ส่งคำตอบตรวจ
-    QuizEngine-->>UI_Junior: 17. เฉลยพร้อมคำอธิบายให้กำลังใจ + มอบแต้ม 50 EXP
-    UI_Junior-->>Junior: 18. เลเวลพยาบาลอัปเกรด มั่นใจขึ้น!
+    %% Part 2: Quiz Generation
+    PearlSvc->>QuizEngine: 9. ส่ง Trigger สร้างข้อสอบจากเกร็ดความรู้และ FAQ นี้
+    QuizEngine->>QuizEngine: 10. AI สกัดเป็นคำถาม Multiple Choice 4 ตัวเลือก พร้อม Rationale
+    QuizEngine->>DB: 11. บันทึกชุดข้อสอบลงธนาคารควิซ (Quiz Bank)
+
+    %% Part 3: Junior Studies & Quizzes
+    Note over Junior, UI_Junior: ในเวลาว่างระหว่างเวร หรือช่วงทบทวนความรู้
+    Junior->>UI_Junior: 12. เปิดแท็บ "💡 เกร็ดความรู้" เพื่ออ่านทริคประจำวันจากพี่ๆ
+    UI_Junior->>DB: 13. ดึงทริคของรุ่นพี่มาแสดง
+    DB-->>UI_Junior: 14. แสดงการ์ดทริค NTG
+    Junior->>UI_Junior: 15. แตะปุ่ม "ส่งหัวใจขอบคุณพี่ ❤️"
+    UI_Junior->>DB: 16. อัปเดตยอด Reaction ให้รุ่นพี่
+
+    Junior->>UI_Junior: 17. เปิดเมนู "ฝึกหัด" และเริ่มเล่นเกมควิซประจำวัน (Daily Quiz)
+    UI_Junior->>QuizEngine: 18. ดึงคำถามที่สร้างจากทริค NTG และเคสในวอร์ด
+    QuizEngine-->>UI_Junior: 19. แสดงโจทย์และตัวเลือก
+    Junior->>UI_Junior: 20. เลือกคำตอบ
+    UI_Junior->>QuizEngine: 21. ส่งคำตอบตรวจ
+    QuizEngine-->>UI_Junior: 22. เฉลยพร้อมคำอธิบายให้กำลังใจ + มอบแต้ม 50 EXP
+    UI_Junior-->>Junior: 23. เลเวลพยาบาลอัปเกรด มั่นใจขึ้น!
+```
 ```
 
