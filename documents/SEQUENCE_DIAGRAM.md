@@ -37,7 +37,7 @@ sequenceDiagram
 
     %% Part 2: Standard Login or Social Login
     alt เข้าสู่ระบบด้วย Email & Password หรือ Social Login
-        Nurse->>UI: 11. ป้อน Email + Password (หรือกดปุ่ม Google / LINE / Facebook)
+        Nurse->>UI: 11. ป้อน Email + Password (หรือกดปุ่ม Google Sign-In)
         UI->>Gateway: 12. POST /api/auth/login หรือ POST /api/auth/social-callback
         Gateway->>Audit: 13. บันทึก Attempt Log (IP, User, DeviceId, Timestamp)
         Gateway->>AuthSvc: 14. ตรวจสอบข้อมูลประจำตัว + DeviceId

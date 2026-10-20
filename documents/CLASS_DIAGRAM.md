@@ -40,8 +40,6 @@ classDiagram
         <<enumeration>>
         LOCAL_PASSWORD
         GOOGLE
-        LINE
-        FACEBOOK
     }
 
     class Role {
