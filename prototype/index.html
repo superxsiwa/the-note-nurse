@@ -1237,6 +1237,31 @@
   </div>
 
 
+  <!-- Knowledge Document Viewer Modal (แสดงเนื้อหาเอกสารเมื่อคลิกดู) -->
+  <div class="modal-overlay" id="docViewerModal">
+    <div class="modal-card" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+          <span id="docViewerIcon" style="font-size: 20px;">📄</span>
+          <div style="min-width: 0;">
+            <h3 id="docViewerTitle" style="margin: 0; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">เอกสารแนวปฏิบัติ</h3>
+            <div id="docViewerCategory" style="font-size: 11px; color: var(--cyan);">หมวดหมู่</div>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeDocViewerModal()">✕</button>
+      </div>
+      <div style="overflow-y: auto; padding: 14px 4px 6px 4px; font-size: 12.5px; line-height: 1.6; color: #cbd5e1;" id="docViewerBody">
+        <!-- Document content rendered by JS -->
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;">
+        <button type="button" class="btn-line" style="flex: 1; justify-content: center; font-size: 12px;" onclick="closeDocViewerModal()">ปิดหน้าต่าง</button>
+        <button type="button" class="btn-primary" style="flex: 1.5; font-size: 12px; padding: 8px 12px;" onclick="askDocToAITutor()">
+          🤖 ถาม AI เกี่ยวกับเอกสารนี้
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Bed Add/Edit Modal -->
   <div class="modal-overlay" id="bedModal">
     <div class="modal-card">
@@ -1822,39 +1847,65 @@
 
       <!-- Tab 1: คลังเอกสาร (รวมเอกสารเป็นหมวดหมู่) -->
       <div id="tab-know-repo" class="know-tab-content">
-        <div style="font-size: 13px; font-weight: 600; color: var(--cyan); margin-bottom: 10px;">
-          📂 หมวดหมู่เอกสารความรู้การพยาบาล
+        <div style="font-size: 13px; font-weight: 600; color: var(--cyan); margin-bottom: 8px;">
+          📂 หมวดหมู่เอกสารความรู้การพยาบาล (คลิกเพื่อเลือกหมวดหมู่)
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
-          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('💊 คู่มือยาเสี่ยงสูง CCU: Levophed, Cordarone, Dopamine, Dobutamine, Nicardipine พร้อมสูตรผสมและการ Titrate')">
+        
+        <!-- หมวดหมู่ 4 หมวดหลัก -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;" id="knowCategoryGrid">
+          <div class="card know-cat-card active" id="catCard-drugs" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1.5px solid var(--cyan); transition: all 0.2s;" onclick="selectKnowledgeCategory('drugs')">
             <div style="font-size: 22px; margin-bottom: 4px;">💊</div>
-            <div style="font-weight: 600; font-size: 13px;">High Alert Drugs</div>
+            <div style="font-weight: 600; font-size: 13px; color: #fff;">High Alert Drugs</div>
             <div style="font-size: 11px; color: var(--muted);">14 รายการยาเสี่ยงสูง</div>
           </div>
-          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('📈 แถบคลื่นไฟฟ้าหัวใจ EKG: 12 Leads STEMI Identification, Arrhythmia Alarm (VT/VF/AF/SVT)')">
+          <div class="card know-cat-card" id="catCard-ekg" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); transition: all 0.2s;" onclick="selectKnowledgeCategory('ekg')">
             <div style="font-size: 22px; margin-bottom: 4px;">📈</div>
-            <div style="font-weight: 600; font-size: 13px;">EKG & Arrhythmia</div>
+            <div style="font-weight: 600; font-size: 13px; color: #fff;">EKG & Arrhythmia</div>
             <div style="font-size: 11px; color: var(--muted);">การแปลผล & เฝ้าระวัง</div>
           </div>
-          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('🫁 หัตถการและการดูแลเครื่องมือ: IABP, Temporary Pacemaker, ET-Tube, Ventilator care bundle')">
+          <div class="card know-cat-card" id="catCard-devices" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); transition: all 0.2s;" onclick="selectKnowledgeCategory('devices')">
             <div style="font-size: 22px; margin-bottom: 4px;">🫁</div>
-            <div style="font-weight: 600; font-size: 13px;">อุปกรณ์ช่วยชีวิต</div>
+            <div style="font-weight: 600; font-size: 13px; color: #fff;">อุปกรณ์ช่วยชีวิต</div>
             <div style="font-size: 11px; color: var(--muted);">IABP, Pacemaker, Vent</div>
           </div>
-          <div class="card" style="padding: 12px; cursor: pointer; margin-bottom: 0;" onclick="alert('🩸 การตรวจทางห้องปฏิบัติการ: Cardiac Markers (Troponin-T, CK-MB), aPTT, Electrolytes, ABG interpretation')">
+          <div class="card know-cat-card" id="catCard-labs" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); transition: all 0.2s;" onclick="selectKnowledgeCategory('labs')">
             <div style="font-size: 22px; margin-bottom: 4px;">🩸</div>
-            <div style="font-weight: 600; font-size: 13px;">Lab & วิกฤตฉุกเฉิน</div>
+            <div style="font-weight: 600; font-size: 13px; color: #fff;">Lab & วิกฤตฉุกเฉิน</div>
             <div style="font-size: 11px; color: var(--muted);">Troponin, aPTT, ABG</div>
           </div>
         </div>
 
-        <div class="card" style="padding: 12px; background: #0c182d;">
-          <div style="font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 6px;">📄 เอกสารแนวปฏิบัติ CCU ล่าสุด</div>
-          <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: #94a3b8; line-height: 1.6;">
-            <li>แนวปฏิบัติการเฝ้าระวังเลือดออกหลังแทงสายสวน PCI (Femoral vs Radial)</li>
-            <li>ขั้นตอนการให้ยา ละลายลิ่มเลือด (Fibrinolytic Protocol) ใน STEMI</li>
-            <li>คู่มือการพยาบาลผู้ป่วยภาวะ Cardiogenic Shock</li>
-          </ul>
+        <!-- รายการเอกสารภายใต้หมวดหมู่ที่เลือก (คลิกเพื่อเปิดอ่าน) -->
+        <div class="card" style="padding: 14px; background: #0c182d; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; gap: 6px;" id="knowDocListHeader">
+              <span>📄</span>
+              <span>รายการเอกสาร: High Alert Drugs</span>
+            </div>
+            <span style="font-size: 11px; color: var(--cyan); background: rgba(56, 189, 248, 0.12); padding: 2px 6px; border-radius: 4px;" id="knowDocCountBadge">3 ฉบับ</span>
+          </div>
+          
+          <div id="knowDocListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Document items rendered by JS -->
+          </div>
+        </div>
+
+        <!-- กล่องแนวปฏิบัติ CCU ล่าสุด (รวมเอกสารสำคัญที่เปิดดูได้ทันที) -->
+        <div class="card" style="padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border);">
+          <div style="font-weight: 600; font-size: 12.5px; color: #cbd5e1; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <span>⭐</span>
+            <span>แนวปฏิบัติสำคัญประจำวอร์ด CCU (คลิกอ่านด่วน)</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <button type="button" class="btn-line" onclick="openDocViewer('protocol-pci')" style="justify-content: space-between; font-size: 12px; padding: 8px 10px; width: 100%;">
+              <span>📌 แนวปฏิบัติการเฝ้าระวังเลือดออกหลังแทงสายสวน PCI</span>
+              <span style="color: var(--cyan); font-size: 11px;">เปิดดู ➜</span>
+            </button>
+            <button type="button" class="btn-line" onclick="openDocViewer('protocol-shock')" style="justify-content: space-between; font-size: 12px; padding: 8px 10px; width: 100%;">
+              <span>📌 คู่มือการพยาบาลผู้ป่วยภาวะ Cardiogenic Shock</span>
+              <span style="color: var(--cyan); font-size: 11px;">เปิดดู ➜</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2727,6 +2778,9 @@
         const headerProfile = document.getElementById('headerUserProfile');
         if (headerProfile) headerProfile.style.display = 'flex';
         updateHeaderProfile();
+        if (screenId === 'screen-knowledge') {
+          renderKnowledgeDocList();
+        }
       }
 
       if (navEl) {
@@ -3863,13 +3917,341 @@
       }, 600);
     }
 
+    // ==========================================
+    // 📚 KNOWLEDGE REPOSITORY DATA & VIEWER
+    // ==========================================
+    let activeKnowledgeCategory = 'drugs';
+
+    const knowledgeRepositoryData = {
+      drugs: {
+        title: "High Alert Drugs (ยาเสี่ยงสูง)",
+        icon: "💊",
+        docs: [
+          {
+            id: "drug-levophed",
+            title: "คู่มือการบริหารยา Norepinephrine (Levophed)",
+            sub: "ข้อบ่งชี้, สูตรการผสม, Titrate เรท และการป้องกัน Extravasation",
+            badge: "วิกฤตความดัน",
+            content: `
+              <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--rose); padding: 8px 10px; margin-bottom: 10px; border-radius: 4px;">
+                <strong>⚠️ ยาเสี่ยงสูงระดับวิกฤต (HAD):</strong> ต้องให้ผ่าน Central Line เท่านั้น ห้ามให้ทาง Peripheral IV เพื่อป้องกันเนื้อเยื่อขาดเลือดและเน่าตาย (Tissue Necrosis)
+              </div>
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. สูตรการผสมมาตรฐาน CCU</h4>
+              <p>• <strong>Single Strength:</strong> Levophed 4 mg + D5W 250 mL (16 mcg/mL)<br/>
+              • <strong>Double Strength (จำกัดน้ำ):</strong> Levophed 8 mg + D5W 250 mL (32 mcg/mL)</p>
+              
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. การปรับขนาดยา (Titration)</h4>
+              <p>• เริ่มต้น 2-4 mcg/min ปรับเพิ่มทีละ 1-2 mcg/min ทุก 2-5 นาที โดยตั้งเป้า <strong>MAP ≥ 65 mmHg</strong><br/>
+              • ติดตามวัดความดันโลหิตผ่าน Arterial line แบบ Real-time หรือวัด NIBP ทุก 2-5 นาทีขณะกำลัง Titrate</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">3. การแก้ไขภาวะรั่วซึม (Extravasation)</h4>
+              <p>หากรั่วซึม หยุดให้ยาทันที ดูดยาที่ค้างในสายออก ประคบอุ่น และรายงานแพทย์เพื่อพิจารณาฉีด <strong>Phentolamine 5-10 mg</strong> เข้าบริเวณที่ยาซึมทันที</p>
+            `
+          },
+          {
+            id: "drug-cordarone",
+            title: "คู่มือการบริหารยา Amiodarone (Cordarone)",
+            sub: "การผสมใน D5W, ข้อห้าม NSS และการเฝ้าระวัง Phlebitis / QT prolongation",
+            badge: "ควบคุมหัวใจเต้นผิดจังหวะ",
+            content: `
+              <div style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--amber); padding: 8px 10px; margin-bottom: 10px; border-radius: 4px;">
+                <strong>⚠️ ข้อควรระวังสูงสุด:</strong> ห้ามผสมใน Normal Saline (NSS) เด็ดขาด เพราะจะเกิดการตกตะกอน ต้องผสมใน <strong>5% Dextrose in Water (D5W)</strong> เท่านั้น
+              </div>
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. โครงสร้างการให้ยา (Dosing Regimen)</h4>
+              <p>• <strong>Loading Dose:</strong> 150 mg ผสม D5W 100 mL IV drip ใน 10-15 นาที<br/>
+              • <strong>Maintenance 1:</strong> 360 mg ผสม D5W 500 mL IV drip ใน 6 ชั่วโมงแรก (1 mg/min หรือ 33 mL/hr)<br/>
+              • <strong>Maintenance 2:</strong> 540 mg ผสม D5W 500 mL IV drip ใน 18 ชั่วโมงถัดมา (0.5 mg/min หรือ 17 mL/hr)</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. การติดตามและการพยาบาล</h4>
+              <p>• เฝ้าระวัง Bradycardia, Hypotension และวัดช่วง <strong>QT Interval</strong> บนแถบ EKG<br/>
+              • หากให้ทาง Peripheral line เสี่ยงต่อหลอดเลือดดำอักเสบ (Phlebitis) สูง ควรเปลี่ยนตำแหน่งทุก 24-48 ชม. หรือขอย้ายขึ้น Central line</p>
+            `
+          },
+          {
+            id: "drug-heparin",
+            title: "แนวปฏิบัติการให้ Unfractionated Heparin (UFH) Drip",
+            sub: "เป้าหมายค่า aPTT (1.5 - 2.5 เท่า), ข้อระวัง HIT และ Antidote",
+            badge: "ยาต้านการแข็งตัวเลือด",
+            content: `
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. เป้าหมายการรักษา (Therapeutic Goal)</h4>
+              <p>• ติดตามผลตรวจเลือด <strong>aPTT</strong> ทุก 6 ชั่วโมงหลังปรับขนาดยา โดยเป้าหมายควบคุมอยู่ที่ <strong>1.5 - 2.5 เท่าของค่า Control (ประมาณ 50 - 70 วินาที)</strong></p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. ภาวะแทรกซ้อนอันตรายที่ต้องระวัง</h4>
+              <p>• <strong>Bleeding:</strong> สังเกตปัสสาวะเป็นเลือด (Hematuria), เลือดออกตามไรฟัน, จุดจ้ำเลือดตามตัว, แผลแทงสายสวน<br/>
+              • <strong>HIT (Heparin-Induced Thrombocytopenia):</strong> เฝ้าระวังเกล็ดเลือดลดลงเกิน 50% ของค่าเริ่มต้นภายใน 5-10 วันหลังได้รับยา</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">3. ยาต้านฤทธิ์ฉุกเฉิน (Antidote)</h4>
+              <p>• <strong>Protamine Sulfate:</strong> 1 mg ต่อ Heparin 100 ยูนิตที่ให้ในช่วง 2-3 ชั่วโมงที่ผ่านมา (ให้ทาง IV ช้าๆ เพื่อป้องกัน Severe Hypotension)</p>
+            `
+          }
+        ]
+      },
+      ekg: {
+        title: "EKG & Arrhythmia (คลื่นไฟฟ้าหัวใจ)",
+        icon: "📈",
+        docs: [
+          {
+            id: "ekg-stemi",
+            title: "การแปลผล 12-Leads EKG ในผู้ป่วย STEMI",
+            sub: "เกณฑ์ ST elevation, การระบุตำแหน่งผนังหัวใจขาดเลือด (Anterior, Inferior, Lateral)",
+            badge: "วิกฤตหลอดเลือดหัวใจ",
+            content: `
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. เกณฑ์การวินิจฉัย ST-Elevation (STEMI)</h4>
+              <p>• ST-segment ยกตัวที่ J-point ≥ 1 mm ในอย่างน้อย 2 leads ติดกัน (ยกเว้น V2-V3 ที่ต้อง ≥ 2 mm ในชาย หรือ ≥ 1.5 mm ในหญิง)</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. การระบุตำแหน่งผนังกล้ามเนื้อหัวใจ (Coronary Anatomy)</h4>
+              <p>• <strong>Anterior Wall:</strong> Leads V1 - V4 (LAD)<br/>
+              • <strong>Inferior Wall:</strong> Leads II, III, aVF (RCA) <em>*ห้ามให้ Nitroglycerin หากสงสัย RV Infarct (V4R)*</em><br/>
+              • <strong>Lateral Wall:</strong> Leads I, aVL, V5, V6 (LCx)<br/>
+              • <strong>Posterior Wall:</strong> ST depression ลึกใน V1-V3 ร่วมกับ Tall R wave</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">3. พยาบาลต้องทำทันทีเมื่อพบ ST ยก</h4>
+              <p>กด Activate Code STEMI เพื่อเตรียมส่งต่อห้องปฏิบัติการสวนหัวใจ (Cath Lab) ภายใน <strong>Door to Balloon ≤ 90 นาที</strong></p>
+            `
+          },
+          {
+            id: "ekg-vt-vf",
+            title: "แนวทางการรับมือหัวใจเต้นผิดจังหวะขั้นวิกฤต (VT / VF / Asystole)",
+            sub: "การแยกระหว่าง Pulseless VT กับ VT with Pulse, Defibrillation Protocol",
+            badge: "กู้ชีพฉุกเฉิน CPR",
+            content: `
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. Shockable Rhythms: VF และ Pulseless VT</h4>
+              <p>• <strong>ปฏิบัติการ:</strong> เริ่ม CPR ทันที + ชาร์จเครื่อง Defibrillator ทันที (Biphasic 200J หรือ Monophasic 360J)<br/>
+              • ให้ยา <strong>Adrenaline 1 mg IV</strong> ทุก 3-5 นาที<br/>
+              • พิจารณาให้ <strong>Amiodarone 300 mg IV push</strong> หลังจากการช็อกไฟฟ้าครั้งที่ 3 (และให้ซ้ำ 150 mg ได้อีก 1 ครั้ง)</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. Non-Shockable Rhythms: PEA และ Asystole</h4>
+              <p>• <strong>ห้ามช็อกไฟฟ้า</strong> ให้ทำ CPR คุณภาพสูงอย่างต่อเนื่อง + ให้ Adrenaline 1 mg IV ทุก 3-5 นาที และค้นหาสาเหตุ <strong>5H 5T</strong> ทันที</p>
+            `
+          }
+        ]
+      },
+      devices: {
+        title: "อุปกรณ์ช่วยชีวิต (Critical Devices)",
+        icon: "🫁",
+        docs: [
+          {
+            id: "device-iabp",
+            title: "คู่มือการดูแลผู้ป่วยคาสาย Intra-Aortic Balloon Pump (IABP)",
+            sub: "การตรวจสอบตำแหน่งบอลลูน, อัตราส่วน 1:1, การเฝ้าระวัง Limb Ischemia",
+            badge: "เครื่องพยุงหัวใจ",
+            content: `
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. กลไกการทำงานของ IABP</h4>
+              <p>• <strong>Inflation (ขณะ Diastole):</strong> บอลลูนพองตัวเพื่อเพิ่มการไหลเวียนเลือดไปเลี้ยงกล้ามเนื้อหัวใจ (Coronary Perfusion)<br/>
+              • <strong>Deflation (ช่วงก่อน Systole):</strong> บอลลูนแฟบตัวเพื่อลดภาระงานหัวใจห้องล่างซ้าย (Afterload Reduction)</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. การประเมินทางการพยาบาลสำคัญ</h4>
+              <p>• <strong>ตรวจชีพจรส่วนปลาย (Dorsalis Pedis):</strong> วัดทุก 1 ชั่วโมงที่ขาข้างที่แทงสาย สังเกตสีผิว อุณหภูมิ และ Capillary refill<br/>
+              • <strong>ปัสสาวะ (Urine output):</strong> ต้องออก ≥ 0.5 mL/kg/hr หากปัสสาวะไม่ออก บอลลูนอาจเลื่อนลงไปอุด Renal artery<br/>
+              • <strong>เฝ้าระวังสายฉีกขาด:</strong> หากเห็นคราบเลือดในสาย Helium tubing ให้กดหยุดเครื่องทันทีเพราะเสร็จสิ้นความปลอดภัย</p>
+            `
+          },
+          {
+            id: "device-pacemaker",
+            title: "การเฝ้าระวังผู้ป่วยใส่ Temporary Pacemaker (TPM)",
+            sub: "การตั้งค่า Rate, Output (mA), Sensitivity (mV) และการแก้ปัญหา Failure to Pace / Sense",
+            badge: "เครื่องกระตุ้นหัวใจชั่วคราว",
+            content: `
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. ปัญหา Failure to Capture</h4>
+              <p>• <strong>ลักษณะ:</strong> มี Pacing spike แต่ไม่มี QRS complex ตามมา<br/>
+              • <strong>การแก้ไข:</strong> ตรวจขั้วต่อสาย, ปรับเพิ่ม Output (mA), จับผู้ป่วยนอนตะแคงซ้าย และรายงานแพทย์</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. ปัญหา Failure to Sense (Undersensing)</h4>
+              <p>• <strong>ลักษณะ:</strong> Pacing spike ยิงตกลงบนคลื่นธรรมชาติของผู้ป่วย (เสี่ยงต่อ R-on-T Phenomenon นำไปสู่ VF)<br/>
+              • <strong>การแก้ไข:</strong> ปรับลดค่า Sensitivity (mV) ลง เพื่อให้เครื่องรับรู้สัญญาณไฟฟ้าของหัวใจได้ไวยิ่งขึ้น</p>
+            `
+          }
+        ]
+      },
+      labs: {
+        title: "Lab & วิกฤตฉุกเฉิน (Critical Labs)",
+        icon: "🩸",
+        docs: [
+          {
+            id: "lab-troponin",
+            title: "การแปลผล Cardiac Biomarkers (High Sensitivity Troponin)",
+            sub: "Dynamic Rise & Fall, ค่า Cut-off และจุดสังเกตแยกโรค Non-cardiac cause",
+            badge: "ตรวจเอนไซม์หัวใจ",
+            content: `
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. การแปลผลค่า hs-cTnI / hs-cTnT</h4>
+              <p>• ค่า Troponin จะเริ่มสูงขึ้นใน 2-4 ชม. หลังกล้ามเนื้อหัวใจขาดเลือด และมีระดับสูงสุดที่ 12-24 ชม.<br/>
+              • ต้องดูการเปลี่ยนแปลงแบบ <strong>Dynamic Change (Rise and/or Fall)</strong> ร่วมกับอาการเจ็บหน้าอกหรือ EKG change</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. ภาวะอื่นที่ทำให้ Troponin สูงแต่ไม่ได้เป็น STEMI</h4>
+              <p>• ภาวะไตวายเรื้อรัง (ESRD), โรคลิ่มเลือดอุดกั้นปอด (PE), การติดเชื้อในกระแสเลือด (Sepsis), กล้ามเนื้อหัวใจอักเสบ (Myocarditis)</p>
+            `
+          },
+          {
+            id: "lab-abg",
+            title: "คู่มืออ่านผลก๊าซในเลือดแดง (Arterial Blood Gas - ABG)",
+            sub: "การแยก Metabolic vs Respiratory Acidosis/Alkalosis และค่า Lactate",
+            badge: "ก๊าซในเลือดแดง",
+            content: `
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. ค่าปกติอ้างอิง</h4>
+              <p>• pH: 7.35 - 7.45<br/>
+              • PaCO2: 35 - 45 mmHg<br/>
+              • HCO3-: 22 - 26 mEq/L<br/>
+              • PaO2: 80 - 100 mmHg | Lactate: < 2.0 mmol/L</p>
+
+              <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. สัญญาณเตือนในผู้ป่วย CCU</h4>
+              <p>• <strong>Lactate > 4.0 mmol/L ร่วมกับ Metabolic Acidosis:</strong> บ่งบอกว่าเนื้อเยื่อขาดออกซิเจนรุนแรงจากภาวะ Cardiogenic Shock ต้องรีบให้สารน้ำและพิจารณา Inotropes/Vasopressors ทันที</p>
+            `
+          }
+        ]
+      }
+    };
+
+    // เอกสารด่วนประจำวอร์ด (Protocols)
+    const quickProtocolsData = {
+      'protocol-pci': {
+        title: "แนวปฏิบัติการเฝ้าระวังเลือดออกหลังแทงสายสวน PCI",
+        category: "CCU Ward Protocol • Post-PCI Care",
+        icon: "📌",
+        content: `
+          <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. การดูแลแผลสายสวน Femoral Sheath</h4>
+          <p>• ให้ผู้ป่วยนอนราบศีรษะสูงไม่เกิน 30 องศา และห้ามงอขาข้างที่ทำหัตถการอย่างน้อย <strong>6-8 ชั่วโมง</strong><br/>
+          • วางถุงทราย (Sand bag 2-3 kg) กดทับแผลนาน 2-4 ชั่วโมงตามแผนการรักษา</p>
+
+          <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. การประเมินสัญญาณเตือนเลือดออกซ่อนเร้น</h4>
+          <p>• สังเกตอาการปวดบั้นเอว ปวดสะโพก เหงื่อแตก หน้ามืด BP ดรอปทันที แม้ไม่มีเลือดออกที่ปากแผล (สงสัย <strong>Retroperitoneal Hematoma</strong>)<br/>
+          • คลำชีพจรส่วนปลาย (Dorsalis Pedis) และประเมินสีผิว ความอุ่นของปลายเท้าทุก 15 นาทีในชั่วโมงแรก และทุก 30 นาทีใน 2 ชั่วโมงถัดมา</p>
+        `
+      },
+      'protocol-shock': {
+        title: "คู่มือการพยาบาลผู้ป่วยภาวะ Cardiogenic Shock",
+        category: "CCU Ward Protocol • Emergency Shock Care",
+        icon: "📌",
+        content: `
+          <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">1. นิยามและเกณฑ์ประเมิน</h4>
+          <p>• SBP < 90 mmHg นานเกิน 30 นาที หรือต้องการ Inotrope/Vasopressor เพื่อคง MAP ≥ 65 mmHg<br/>
+          • มีอาการเนื้อเยื่อขาดเลือด: ปัสสาวะออกน้อย (< 0.5 mL/kg/hr), แขนขาเย็นชื้น, ซึมสับสน, Lactate > 2.0</p>
+
+          <h4 style="color: var(--cyan); margin: 8px 0 4px 0;">2. แนวทางการจัดการทางการพยาบาล</h4>
+          <p>• ให้ออกซิเจน รักษา SpO2 ≥ 95% (พิจารณา High-flow หรือ Intubation หากหอบเหนื่อยรุนแรง)<br/>
+          • ให้ยา <strong>Norepinephrine (Levophed)</strong> เพิ่มความดันโลหิตเป็นลำดับแรก ร่วมกับ <strong>Dobutamine</strong> เพื่อเพิ่ม Cardiac Output<br/>
+          • เตรียมผู้ป่วยและเครื่องมือสำหรับใส่ <strong>IABP</strong> หรือส่งต่อไปยังห้องสวนหัวใจ (Cath Lab) ฉุกเฉิน</p>
+        `
+      }
+    };
+
+    function selectKnowledgeCategory(catKey) {
+      activeKnowledgeCategory = catKey;
+      
+      // อัปเดตสไตล์ของกริดการ์ด
+      document.querySelectorAll('.know-cat-card').forEach(c => {
+        c.style.border = '1px solid var(--border)';
+      });
+      const activeCard = document.getElementById(`catCard-${catKey}`);
+      if (activeCard) {
+        activeCard.style.border = '1.5px solid var(--cyan)';
+      }
+
+      renderKnowledgeDocList();
+    }
+
+    function renderKnowledgeDocList() {
+      const container = document.getElementById('knowDocListContainer');
+      const headerEl = document.getElementById('knowDocListHeader');
+      const countEl = document.getElementById('knowDocCountBadge');
+      
+      const catData = knowledgeRepositoryData[activeKnowledgeCategory];
+      if (!catData || !container) return;
+
+      if (headerEl) {
+        headerEl.innerHTML = `<span>${catData.icon}</span> <span>รายการเอกสาร: ${catData.title}</span>`;
+      }
+      if (countEl) {
+        countEl.textContent = `${catData.docs.length} ฉบับ`;
+      }
+
+      container.innerHTML = catData.docs.map((doc, idx) => `
+        <div class="card" style="padding: 10px 12px; background: #0f172a; margin-bottom: 0; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s;" onclick="openDocViewer('${activeKnowledgeCategory}', ${idx})">
+          <div style="min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-weight: 600; font-size: 13px; color: #fff;">${doc.title}</span>
+              <span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.3); padding: 1px 6px; border-radius: 4px;">${doc.badge}</span>
+            </div>
+            <div style="font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4;">
+              ${doc.sub}
+            </div>
+          </div>
+          <button type="button" class="btn-sm-edit" style="flex-shrink: 0; font-size: 11px; padding: 4px 8px;" onclick="event.stopPropagation(); openDocViewer('${activeKnowledgeCategory}', ${idx})">
+            📖 เปิดดู
+          </button>
+        </div>
+      `).join('');
+    }
+
+    let currentOpenDocTitle = "";
+
+    function openDocViewer(arg1, arg2) {
+      const modal = document.getElementById('docViewerModal');
+      const titleEl = document.getElementById('docViewerTitle');
+      const catEl = document.getElementById('docViewerCategory');
+      const bodyEl = document.getElementById('docViewerBody');
+      const iconEl = document.getElementById('docViewerIcon');
+
+      let doc = null;
+      let categoryName = "";
+      let icon = "📄";
+
+      if (typeof arg2 === 'number') {
+        // จากหมวดหมู่ปกติ
+        const catKey = arg1;
+        const catData = knowledgeRepositoryData[catKey];
+        if (catData && catData.docs[arg2]) {
+          doc = catData.docs[arg2];
+          categoryName = catData.title;
+          icon = catData.icon;
+        }
+      } else {
+        // จาก Quick Protocols
+        const protoKey = arg1;
+        const proto = quickProtocolsData[protoKey];
+        if (proto) {
+          doc = proto;
+          categoryName = proto.category;
+          icon = proto.icon;
+        }
+      }
+
+      if (!doc || !modal) return;
+
+      currentOpenDocTitle = doc.title;
+      if (titleEl) titleEl.textContent = doc.title;
+      if (catEl) catEl.textContent = categoryName;
+      if (iconEl) iconEl.textContent = icon;
+      if (bodyEl) bodyEl.innerHTML = doc.content;
+
+      modal.classList.add('active');
+    }
+
+    function closeDocViewerModal() {
+      const modal = document.getElementById('docViewerModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function askDocToAITutor() {
+      closeDocViewerModal();
+      // สลับไปแท็บ AI ติวเตอร์
+      switchKnowledgeTab('ai', document.querySelectorAll('#screen-knowledge .tab-pill-btn')[1]);
+      const tutorInput = document.getElementById('tutorInput');
+      if (tutorInput && currentOpenDocTitle) {
+        tutorInput.value = `ช่วยอธิบายและสรุปสาระสำคัญของ "${currentOpenDocTitle}" ให้เข้าใจง่ายสำหรับเวร CCU หน่อยค่ะ`;
+        askTutor();
+      }
+    }
+
     // 3. ความรู้ (Knowledge Tabs)
     function switchKnowledgeTab(tabKey, btn) {
       document.querySelectorAll('#screen-knowledge .tab-pill-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       document.querySelectorAll('.know-tab-content').forEach(c => c.style.display = 'none');
-      if (tabKey === 'repo') document.getElementById('tab-know-repo').style.display = 'block';
+      if (tabKey === 'repo') {
+        document.getElementById('tab-know-repo').style.display = 'block';
+        renderKnowledgeDocList();
+      }
       else if (tabKey === 'ai') document.getElementById('tab-know-ai').style.display = 'block';
       else if (tabKey === 'pearls') document.getElementById('tab-know-pearls').style.display = 'block';
     }
