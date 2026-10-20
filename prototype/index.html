@@ -797,51 +797,6 @@
       transform: scale(1.15);
     }
 
-    /* Quiz Screen */
-    .exp-bar-box {
-      background: var(--card);
-      padding: 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
-    .progress-track {
-      background: #0f172a;
-      height: 10px;
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 10px 0 6px 0;
-      border: 1px solid var(--border);
-    }
-    .progress-fill {
-      width: 65%;
-      height: 100%;
-      background: linear-gradient(90deg, #0284c7, #38bdf8);
-      border-radius: 10px;
-    }
-
-    .btn-choice {
-      width: 100%;
-      text-align: left;
-      padding: 14px 16px;
-      border-radius: 12px;
-      background: #111d35;
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-size: 14px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-choice:hover {
-      background: var(--card-hover);
-      border-color: var(--cyan);
-    }
-    .btn-choice.correct {
-      background: rgba(52, 211, 153, 0.2);
-      border-color: var(--green);
-      color: var(--green);
-    }
 
     /* Common Buttons */
     .btn-primary {
@@ -1976,45 +1931,6 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- ฝึกหัด (QUIZ & LEVEL)                          -->
-    <!-- ============================================== -->
-    <div id="screen-quiz" class="screen">
-      <div style="margin-bottom: 16px;">
-        <h2 style="font-size: 18px; margin: 0 0 4px 0;">ฝึกหัด (Quiz & Level)</h2>
-        <div style="font-size: 13px; color: var(--muted);">ฝึกตอบคำถามจำลองสถานการณ์ เสริมความมั่นใจและสะสม EXP</div>
-      </div>
-
-      <div class="exp-bar-box">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-weight: 700; color: #fff; font-size: 14px;">🌟 Level 2: CCU Rookie Star</span>
-          <span style="font-size: 12px; color: var(--cyan); font-weight: 600;" id="expText">320 / 500 EXP</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="expFill" style="width: 64%;"></div>
-        </div>
-        <div style="font-size: 11px; color: var(--muted);">ตอบถูกอีก 2 ข้อ เพื่อเลื่อนขั้นเป็น "Staff Nurse"</div>
-      </div>
-
-      <!-- Question Card -->
-      <div class="card" id="quizCard">
-        <div style="font-size: 11px; color: var(--cyan); font-weight: 700; margin-bottom: 6px;">โจทย์จำลองส่งเวรประจำวัน (ข้อ 1/3)</div>
-        <div style="font-size: 14.5px; font-weight: 600; line-height: 1.5; color: #fff; margin-bottom: 16px;">
-          "คนไข้เคส STEMI ได้ยา Heparin Drip ต่อเนื่อง ค่าการตรวจทางห้องปฏิบัติการใดที่น้องต้องติดตามทุก 6 ชั่วโมงเพื่อปรับเรทยายา?"
-        </div>
-
-        <button class="btn-choice" onclick="answerQuiz(0, false)">A. ค่า PT / INR</button>
-        <button class="btn-choice" onclick="answerQuiz(1, true)">B. ค่า aPTT (Activated Partial Thromboplastin Time)</button>
-        <button class="btn-choice" onclick="answerQuiz(2, false)">C. ค่า Troponin-T</button>
-        <button class="btn-choice" onclick="answerQuiz(3, false)">D. ค่า Platelet Count อย่างเดียว</button>
-
-        <div id="quizResult" style="display: none; margin-top: 14px; padding: 12px; border-radius: 10px; background: rgba(52, 211, 153, 0.15); border: 1px solid var(--green); font-size: 13px; color: #a7f3d0; line-height: 1.5;">
-          🎉 <strong>ตอบถูกต้องยอดเยี่ยม! (+50 EXP)</strong><br/>
-          เพราะ Heparin ออกฤทธิ์ยับยั้ง Thrombin ผ่านทาง Intrinsic pathway จึงต้องตรวจติดตามด้วย <strong>aPTT</strong> โดยรักษาค่าให้อยู่ในช่วง 1.5 - 2.5 เท่าของค่าควบคุม เก่งมากจ้า!
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================== -->
     <!-- ระบบ (SYSTEM SETTINGS & ADMIN MANAGEMENT)      -->
     <!-- ============================================== -->
     <div id="screen-system" class="screen">
@@ -2259,57 +2175,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Submenu 4: ฝึกหัด (สร้างโจทย์ข้อสอบสำหรับการฝึกหัดให้พยาบาลทุกคน) -->
-      <div id="sys-tab-quizgen" class="sys-tab-content" style="display: none;">
-        <div class="card" style="padding: 14px; margin-bottom: 12px;">
-          <div style="font-size: 13.5px; font-weight: 700; color: #fff; margin-bottom: 4px;">
-            🎯 สร้างโจทย์ข้อสอบสำหรับการฝึกหัด (Quiz Generator)
-          </div>
-          <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
-            ออกข้อสอบจำลองสถานการณ์ส่งเวรและเคสวอร์ด เพื่อกระจายให้พยาบาลทุกคนฝึกทำ
-          </div>
-
-          <form onsubmit="handleCreateQuiz(event)">
-            <div class="form-group">
-              <label class="form-label">คำถาม / สถานการณ์จำลอง</label>
-              <textarea id="quizGenQuestion" rows="3" class="form-input" style="padding: 10px; width: 100%; font-size: 13px;" placeholder="เช่น คนไข้ STEMI ได้รับยา Levophed ทาง C-line อยู่ๆ มีอาการหอบเหนื่อย SpO2 ดรอป สิ่งแรกที่ต้องประเมินคืออะไร?" required></textarea>
-            </div>
-            <div class="form-group">
-              <label class="form-label">ตัวเลือก A</label>
-              <input type="text" id="quizGenChoiceA" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก A" required value="ฟังเสียงปอด (Crepitation / Wheezing)">
-            </div>
-            <div class="form-group">
-              <label class="form-label">ตัวเลือก B</label>
-              <input type="text" id="quizGenChoiceB" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก B" required value="เจาะเลือดส่งตรวจ Electrolytes">
-            </div>
-            <div class="form-group">
-              <label class="form-label">ตัวเลือก C</label>
-              <input type="text" id="quizGenChoiceC" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก C" required value="วัดรอบเอวคนไข้">
-            </div>
-            <div class="form-group">
-              <label class="form-label">ตัวเลือก D</label>
-              <input type="text" id="quizGenChoiceD" class="form-input" style="padding-left: 12px;" placeholder="ตัวเลือก D" required value="ปรับลดเรท Levophed ทันที">
-            </div>
-            <div class="form-group">
-              <label class="form-label">เฉลยข้อที่ถูกต้อง</label>
-              <select id="quizGenCorrect" class="form-input" style="padding-left: 12px;">
-                <option value="A">ข้อ A (ถูกต้อง)</option>
-                <option value="B">ข้อ B</option>
-                <option value="C">ข้อ C</option>
-                <option value="D">ข้อ D</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">คำอธิบายเฉลยและเหตุผลทางคลินิก</label>
-              <input type="text" id="quizGenRationale" class="form-input" style="padding-left: 12px;" placeholder="คำอธิบายเพิ่มเติมเพื่อการเรียนรู้" required value="เพื่อประเมินภาวะ Pulmonary Edema หรือหัวใจวายเฉียบพลัน">
-            </div>
-            <button type="submit" class="btn-primary" style="padding: 12px; margin-top: 6px;">
-              <span>🚀 บันทึกและเผยแพร่โจทย์ให้ทุกคน</span>
-            </button>
-          </form>
-        </div>
-      </div>
     </div>
 
     <!-- Popup Menu: ระบบ (System Menu Popup) -->
@@ -2334,7 +2199,7 @@
       </button>
     </div>
 
-    <!-- Bottom Navigation Bar (5 เมนูหลัก) -->
+    <!-- Bottom Navigation Bar (4 เมนูหลัก) -->
     <div class="bottom-nav" id="appBottomNav" style="display: none;">
       <button class="nav-item active" onclick="navTo('screen-beds', this)">
         <span class="nav-icon">🛏️</span>
@@ -2347,10 +2212,6 @@
       <button class="nav-item" onclick="navTo('screen-knowledge', this)">
         <span class="nav-icon">📚</span>
         <span>ความรู้</span>
-      </button>
-      <button class="nav-item" onclick="navTo('screen-quiz', this)">
-        <span class="nav-icon">🎮</span>
-        <span>ฝึกหัด</span>
       </button>
       <button class="nav-item" id="navItemSystem" onclick="handleSystemNavClick(this)">
         <span class="nav-icon">⚙️</span>
@@ -2895,10 +2756,6 @@
         document.getElementById('sys-tab-pearls').style.display = 'block';
         if (titleEl) titleEl.textContent = '💡 เกร็ดความรู้';
         if (subtitleEl) subtitleEl.textContent = 'คลังเกร็ดความรู้และทริคสำคัญจากพยาบาลรุ่นพี่ประจำวอร์ด';
-      } else if (subKey === 'quizgen') {
-        document.getElementById('sys-tab-quizgen').style.display = 'block';
-        if (titleEl) titleEl.textContent = '🎯 โจทย์ฝึกหัด';
-        if (subtitleEl) subtitleEl.textContent = 'สร้างโจทย์ข้อสอบจำลองสถานการณ์เพื่อกระจายให้พยาบาลทุกคนฝึกทำ';
       }
     }
 
@@ -4431,21 +4288,6 @@
       }
     }
 
-    function handleCreateQuiz(e) {
-      if (e) e.preventDefault();
-      const q = document.getElementById('quizGenQuestion').value.trim();
-      const cor = document.getElementById('quizGenCorrect').value;
-      const rat = document.getElementById('quizGenRationale').value.trim();
-
-      showToast("⏳ กำลังบันทึกโจทย์และกระจายสู่ระบบฝึกหัด...");
-      setTimeout(() => {
-        showToast("🎉 บันทึกโจทย์สำเร็จ! เผยแพร่ข้อสอบให้พยาบาลทุกคนฝึกทำเรียบร้อย");
-        document.getElementById('quizGenQuestion').value = "";
-        // Switch to Profile view to show success
-        switchSystemSubView('profile');
-      }, 800);
-    }
-
     function promptChangePin() {
       const newPin = prompt("กรุณาระบุรหัส Quick PIN 4 หลักใหม่:");
       if (newPin && newPin.length === 4 && /^\d{4}$/.test(newPin)) {
@@ -4618,25 +4460,6 @@
       ans.style.display = "block";
       ans.innerHTML = `💡 <strong>คำแนะนำจากพี่เลี้ยง AI:</strong><br/>ยา <em>Cordarone (Amiodarone)</em> ต้องผสมในสารน้ำ <strong>D5W เท่านั้น</strong> ห้ามผสมใน NSS เด็ดขาด เพราะจะเกิดการตกตะกอน และต้องต่อเข้ากับ Infusion Pump เสมอนะจ๊ะ!`;
       input.value = "";
-    }
-
-    // Quiz
-    let answered = false;
-    function answerQuiz(idx, isCorrect) {
-      if (answered) return;
-      answered = true;
-
-      const choices = document.querySelectorAll('.btn-choice');
-      choices[idx].classList.add(isCorrect ? 'correct' : 'wrong');
-      
-      const res = document.getElementById('quizResult');
-      res.style.display = "block";
-
-      if (isCorrect) {
-        document.getElementById('expFill').style.width = "74%";
-        document.getElementById('expText').textContent = "370 / 500 EXP";
-        showToast("🎉 ตอบถูก! ได้รับ +50 EXP");
-      }
     }
 
     // Toast Helper
