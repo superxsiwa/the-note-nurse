@@ -3082,23 +3082,13 @@
                 </div>
               </div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;">
-              <div style="display: flex; gap: 5px;">
-                <button class="btn-sm-edit" onclick="openUserModal(${originalIndex})" title="แก้ไขข้อมูลและการ Login" style="font-size: 11px; padding: 4px 8px;">
-                  ✏️ แก้ไข Login
-                </button>
-                <button class="btn-sm-danger" onclick="toggleBlockUser(${originalIndex})" title="บล็อกการใช้งาน" style="font-size: 11px; padding: 4px 8px;">
-                  🚫 บล็อก
-                </button>
-              </div>
-              <div style="display: flex; gap: 5px;">
-                <button class="btn-line" onclick="resetUserPasswordQuick(${originalIndex})" title="รีเซ็ตรหัสผ่านเป็นค่าเริ่มต้น" style="font-size: 10.5px; padding: 3px 6px; color: var(--amber); border-color: rgba(245, 158, 11, 0.4); justify-content: center;">
-                  🔄 รีเซ็ต PW
-                </button>
-                <button class="btn-line" onclick="clearUserLoginCredentials(${originalIndex})" title="ลบข้อมูลการ Login (ระงับการเข้าสู่ระบบ)" style="font-size: 10.5px; padding: 3px 6px; color: var(--rose); border-color: rgba(244, 63, 94, 0.4); justify-content: center;">
-                  🗑️ ลบ Login
-                </button>
-              </div>
+            <div style="display: flex; gap: 6px; flex-shrink: 0;">
+              <button class="btn-sm-edit" onclick="openUserModal(${originalIndex})" title="แก้ไขข้อมูลผู้ใช้" style="font-size: 11px; padding: 4px 8px;">
+                ✏️ แก้ไข
+              </button>
+              <button class="btn-sm-danger" onclick="toggleBlockUser(${originalIndex})" title="บล็อกการใช้งาน" style="font-size: 11px; padding: 4px 8px;">
+                🚫 บล็อก
+              </button>
             </div>
           </div>
         `;
@@ -3128,7 +3118,7 @@
         pinInput.value = "1234";
       } else {
         const u = systemUsersData[index];
-        title.textContent = `✏️ แก้ไขข้อมูลและการ Login: ${u.name}`;
+        title.textContent = `✏️ แก้ไขข้อมูลผู้ใช้: ${u.name}`;
         nameInput.value = u.name;
         staffIdInput.value = u.staffId;
         passwordInput.value = u.password || "NursePass1234!";
