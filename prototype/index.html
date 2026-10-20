@@ -1342,6 +1342,26 @@
           <div style="font-size: 11px; color: var(--muted); margin-top: 3px;">ใช้ปลดล็อกหน้าจอเวรขณะพักเครื่อง</div>
         </div>
 
+        <!-- การเชื่อมโยง Google Workspace / Google Account (เชิญ และ ปลด) -->
+        <div style="margin-top: 14px; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 14px;">🌐</span>
+              <span style="font-size: 12px; font-weight: 700; color: #fff;">การเชื่อมโยง Google Account</span>
+            </div>
+            <span id="userGoogleStatusBadge" style="font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px;"></span>
+          </div>
+          <div id="userGoogleStatusDesc" style="font-size: 11.5px; color: var(--muted); margin-bottom: 10px; line-height: 1.4;"></div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" id="btnUserInviteGoogle" class="btn-line" onclick="inviteUserGoogle()" style="font-size: 11px; padding: 6px 10px; color: var(--cyan); border-color: rgba(56, 189, 248, 0.4); display: none;">
+              📩 ส่งคำเชิญผูก Google
+            </button>
+            <button type="button" id="btnUserUnlinkGoogle" class="btn-line" onclick="unlinkUserGoogle()" style="font-size: 11px; padding: 6px 10px; color: var(--rose); border-color: rgba(244, 63, 94, 0.4); display: none;">
+              🔓 ปลดการเชื่อมโยง Google
+            </button>
+          </div>
+        </div>
+
         <div style="display: flex; gap: 8px; margin-top: 20px;">
           <button type="button" class="btn-line" style="background: rgba(255,255,255,0.08); flex: 1; justify-content: center;" onclick="closeUserModal()">ยกเลิก</button>
           <button type="submit" class="btn-primary" style="flex: 2; padding: 10px;">💾 บันทึกข้อมูลผู้ใช้</button>
@@ -2321,6 +2341,8 @@
         name: "พว. ไหมแก้ว สมใจ",
         staffId: "maikaew.ccu",
         password: "NursePass1234!",
+        googleEmail: "maikaew.nurse@hospital.go.th",
+        googleLinked: true,
         role: "junior",
         roleTitle: "พยาบาลจบใหม่ (Junior Nurse)",
         ward: "CCU Ward • หออภิบาลวิกฤตหัวใจ",
@@ -2333,6 +2355,8 @@
         name: "พว. สมพร เจริญสุข",
         staffId: "somporn.senior",
         password: "NursePass1234!",
+        googleEmail: "",
+        googleLinked: false,
         role: "senior",
         roleTitle: "พยาบาลพี่เลี้ยง (Preceptor / Senior Nurse)",
         ward: "CCU Ward • ประจำเวรตรวจเยี่ยม",
@@ -2345,6 +2369,8 @@
         name: "พว. วรรณา สว่างวงศ์",
         staffId: "wanna.charge",
         password: "NursePass1234!",
+        googleEmail: "wanna.charge@hospital.go.th",
+        googleLinked: true,
         role: "charge",
         roleTitle: "หัวหน้าเวร (Charge Nurse CCU)",
         ward: "CCU Ward • หัวหน้าเวรบริหารเตียง",
@@ -2357,6 +2383,8 @@
         name: "นายภานุเดช มั่นคง",
         staffId: "admin.security",
         password: "NursePass1234!",
+        googleEmail: "admin.security@hospital.go.th",
+        googleLinked: true,
         role: "admin",
         roleTitle: "ผู้ดูแลระบบสารสนเทศ (System Admin)",
         ward: "ฝ่ายสารสนเทศและการคุ้มครองข้อมูล (PDPA IT)",
@@ -2369,6 +2397,8 @@
         name: "พว. กานดา ใจดี (ลาออก)",
         staffId: "kanda.former",
         password: "NursePass1234!",
+        googleEmail: "",
+        googleLinked: false,
         role: "junior",
         roleTitle: "พยาบาลจบใหม่ (ระงับสิทธิ์)",
         ward: "CCU Ward (อดีตพนักงาน)",
@@ -3079,6 +3109,7 @@
                 <div style="font-size: 11px; color: #94a3b8; margin-top: 2px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                   <span>🔒 รหัสผ่าน: <span style="font-family: monospace; color: #f1f5f9;">${user.password ? '••••••••' : 'NursePass1234!'}</span></span>
                   <span>🔑 Quick PIN: <span style="color: var(--cyan); font-family: monospace; font-weight: 600;">${user.pin || '1234'}</span></span>
+                  <span>${user.googleLinked ? '<span style="color: #6ee7b7; font-weight: 600;">🌐 ผูก Google แล้ว</span>' : '<span style="color: var(--muted);">🌐 ยังไม่ผูก Google</span>'}</span>
                 </div>
               </div>
             </div>
@@ -3106,6 +3137,11 @@
       const wardInput = document.getElementById('userInputWard');
       const pinInput = document.getElementById('userInputPin');
 
+      const googleBadge = document.getElementById('userGoogleStatusBadge');
+      const googleDesc = document.getElementById('userGoogleStatusDesc');
+      const btnInvite = document.getElementById('btnUserInviteGoogle');
+      const btnUnlink = document.getElementById('btnUserUnlinkGoogle');
+
       editIndex.value = index;
 
       if (index === -1) {
@@ -3116,6 +3152,18 @@
         roleInput.value = "junior";
         wardInput.value = "CCU Ward • โรงพยาบาลศูนย์";
         pinInput.value = "1234";
+
+        // สถานะ Google สำหรับผู้ใช้ใหม่
+        if (googleBadge) {
+          googleBadge.textContent = "ยังไม่ผูก";
+          googleBadge.style.background = "rgba(148, 163, 184, 0.2)";
+          googleBadge.style.color = "var(--muted)";
+        }
+        if (googleDesc) {
+          googleDesc.textContent = "บันทึกข้อมูลผู้ใช้ก่อน เพื่อส่งคำเชิญผูกบัญชี Google Workspace ของโรงพยาบาล";
+        }
+        if (btnInvite) btnInvite.style.display = "none";
+        if (btnUnlink) btnUnlink.style.display = "none";
       } else {
         const u = systemUsersData[index];
         title.textContent = `✏️ แก้ไขข้อมูลผู้ใช้: ${u.name}`;
@@ -3125,9 +3173,68 @@
         roleInput.value = u.role;
         wardInput.value = u.ward;
         pinInput.value = u.pin || "1234";
+
+        // สถานะ Google สำหรับผู้ใช้เดิม
+        updateUserGoogleModalUI(u);
       }
 
       modal.classList.add('active');
+    }
+
+    function updateUserGoogleModalUI(user) {
+      const googleBadge = document.getElementById('userGoogleStatusBadge');
+      const googleDesc = document.getElementById('userGoogleStatusDesc');
+      const btnInvite = document.getElementById('btnUserInviteGoogle');
+      const btnUnlink = document.getElementById('btnUserUnlinkGoogle');
+
+      if (!googleBadge || !googleDesc) return;
+
+      if (user.googleLinked) {
+        googleBadge.textContent = "✅ เชื่อมโยงแล้ว";
+        googleBadge.style.background = "rgba(16, 185, 129, 0.2)";
+        googleBadge.style.color = "#6ee7b7";
+        googleDesc.innerHTML = `บัญชี Google Workspace: <strong style="color: #fff;">${user.googleEmail || user.staffId + '@hospital.go.th'}</strong><br/>สามารถใช้ปุ่ม "ดำเนินการต่อด้วย Google" เพื่อล็อกอินเข้าสู่ระบบได้`;
+        if (btnInvite) btnInvite.style.display = "none";
+        if (btnUnlink) btnUnlink.style.display = "inline-flex";
+      } else {
+        googleBadge.textContent = "⚪ ยังไม่ได้เชื่อมโยง";
+        googleBadge.style.background = "rgba(245, 158, 11, 0.2)";
+        googleBadge.style.color = "#fcd34d";
+        googleDesc.textContent = "ผู้ใช้ยังไม่ได้ผูกบัญชี Google คุณสามารถส่งคำเชิญไปยังอีเมลของผู้ปฏิบัติงานเพื่อให้กดยืนยันการผูกบัญชีได้";
+        if (btnInvite) btnInvite.style.display = "inline-flex";
+        if (btnUnlink) btnUnlink.style.display = "none";
+      }
+    }
+
+    function inviteUserGoogle() {
+      const index = parseInt(document.getElementById('userEditIndex').value, 10);
+      if (index === -1) return;
+      const user = systemUsersData[index];
+      if (!user) return;
+
+      const email = prompt(`✉️ ส่งคำเชิญผูกบัญชี Google ให้ "${user.name}":\nระบุอีเมล Google Workspace ของผู้ปฏิบัติงาน:`, user.staffId.includes('@') ? user.staffId : `${user.staffId}@hospital.go.th`);
+      if (email !== null && email.trim() !== "") {
+        user.googleEmail = email.trim();
+        user.googleLinked = true; // จำลองว่าส่งคำเชิญและผูกสำเร็จ
+        updateUserGoogleModalUI(user);
+        renderSystemUsersList();
+        showToast(`📨 ส่งคำเชิญและเชื่อมโยง Google Account (${email.trim()}) ให้ ${user.name} เรียบร้อยแล้ว`);
+      }
+    }
+
+    function unlinkUserGoogle() {
+      const index = parseInt(document.getElementById('userEditIndex').value, 10);
+      if (index === -1) return;
+      const user = systemUsersData[index];
+      if (!user) return;
+
+      if (confirm(`🔓 ต้องการปลดการเชื่อมโยง Google Account ของ "${user.name}" หรือไม่?\n\n* ผู้ใช้จะไม่สามารถเข้าสู่ระบบผ่าน Google Sign-In ได้จนกว่าจะผูกใหม่`)) {
+        user.googleLinked = false;
+        user.googleEmail = "";
+        updateUserGoogleModalUI(user);
+        renderSystemUsersList();
+        showToast(`🔓 ปลดการเชื่อมโยง Google Account ของ "${user.name}" เรียบร้อยแล้ว`);
+      }
     }
 
     function closeUserModal() {
