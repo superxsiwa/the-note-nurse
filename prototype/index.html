@@ -1851,27 +1851,36 @@
           📂 หมวดหมู่เอกสารความรู้การพยาบาล (คลิกเพื่อเลือกหมวดหมู่)
         </div>
         
-        <!-- หมวดหมู่ 4 หมวดหลัก -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;" id="knowCategoryGrid">
-          <div class="card know-cat-card active" id="catCard-drugs" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1.5px solid var(--cyan); transition: all 0.2s;" onclick="selectKnowledgeCategory('drugs')">
-            <div style="font-size: 22px; margin-bottom: 4px;">💊</div>
-            <div style="font-weight: 600; font-size: 13px; color: #fff;">High Alert Drugs</div>
-            <div style="font-size: 11px; color: var(--muted);">14 รายการยาเสี่ยงสูง</div>
+        <!-- หมวดหมู่ 4 หมวดหลัก (ขนาดกะทัดรัดขึ้น พร้อมแสดงจำนวนเอกสารจริง) -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;" id="knowCategoryGrid">
+          <div class="card know-cat-card active" id="catCard-drugs" style="padding: 8px 6px; text-align: center; cursor: pointer; margin-bottom: 0; border: 1.5px solid var(--cyan); border-radius: 8px; transition: all 0.2s;" onclick="selectKnowledgeCategory('drugs')">
+            <div style="font-size: 18px; margin-bottom: 2px;">💊</div>
+            <div style="font-weight: 600; font-size: 11.5px; color: #fff; line-height: 1.2;">High Alert</div>
+            <div style="font-size: 10px; color: var(--cyan); margin-top: 2px; font-weight: 600;">(3 เอกสาร)</div>
           </div>
-          <div class="card know-cat-card" id="catCard-ekg" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); transition: all 0.2s;" onclick="selectKnowledgeCategory('ekg')">
-            <div style="font-size: 22px; margin-bottom: 4px;">📈</div>
-            <div style="font-weight: 600; font-size: 13px; color: #fff;">EKG & Arrhythmia</div>
-            <div style="font-size: 11px; color: var(--muted);">การแปลผล & เฝ้าระวัง</div>
+          <div class="card know-cat-card" id="catCard-ekg" style="padding: 8px 6px; text-align: center; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); border-radius: 8px; transition: all 0.2s;" onclick="selectKnowledgeCategory('ekg')">
+            <div style="font-size: 18px; margin-bottom: 2px;">📈</div>
+            <div style="font-weight: 600; font-size: 11.5px; color: #fff; line-height: 1.2;">EKG & Arrhy</div>
+            <div style="font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 600;">(2 เอกสาร)</div>
           </div>
-          <div class="card know-cat-card" id="catCard-devices" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); transition: all 0.2s;" onclick="selectKnowledgeCategory('devices')">
-            <div style="font-size: 22px; margin-bottom: 4px;">🫁</div>
-            <div style="font-weight: 600; font-size: 13px; color: #fff;">อุปกรณ์ช่วยชีวิต</div>
-            <div style="font-size: 11px; color: var(--muted);">IABP, Pacemaker, Vent</div>
+          <div class="card know-cat-card" id="catCard-devices" style="padding: 8px 6px; text-align: center; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); border-radius: 8px; transition: all 0.2s;" onclick="selectKnowledgeCategory('devices')">
+            <div style="font-size: 18px; margin-bottom: 2px;">🫁</div>
+            <div style="font-weight: 600; font-size: 11.5px; color: #fff; line-height: 1.2;">อุปกรณ์วิกฤต</div>
+            <div style="font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 600;">(2 เอกสาร)</div>
           </div>
-          <div class="card know-cat-card" id="catCard-labs" style="padding: 12px; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); transition: all 0.2s;" onclick="selectKnowledgeCategory('labs')">
-            <div style="font-size: 22px; margin-bottom: 4px;">🩸</div>
-            <div style="font-weight: 600; font-size: 13px; color: #fff;">Lab & วิกฤตฉุกเฉิน</div>
-            <div style="font-size: 11px; color: var(--muted);">Troponin, aPTT, ABG</div>
+          <div class="card know-cat-card" id="catCard-labs" style="padding: 8px 6px; text-align: center; cursor: pointer; margin-bottom: 0; border: 1px solid var(--border); border-radius: 8px; transition: all 0.2s;" onclick="selectKnowledgeCategory('labs')">
+            <div style="font-size: 18px; margin-bottom: 2px;">🩸</div>
+            <div style="font-weight: 600; font-size: 11.5px; color: #fff; line-height: 1.2;">Lab ฉุกเฉิน</div>
+            <div style="font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 600;">(2 เอกสาร)</div>
+          </div>
+        </div>
+
+        <!-- ช่องค้นหาเอกสารความรู้ (ต่อจากปุ่มหมวดเอกสาร) -->
+        <div class="form-group" style="margin-bottom: 12px;">
+          <div class="input-wrapper" style="position: relative;">
+            <span class="input-icon-left">🔍</span>
+            <input type="text" id="knowDocSearchInput" class="form-input" style="padding-left: 38px; padding-right: 32px; font-size: 12.5px; height: 38px;" placeholder="ค้นหาชื่อยา, อาการ, หัตถการ, หรือแนวปฏิบัติ..." oninput="handleKnowledgeSearch(this.value)">
+            <button type="button" id="btnClearKnowSearch" onclick="clearKnowledgeSearch()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; display: none;">✕</button>
           </div>
         </div>
 
@@ -1896,15 +1905,25 @@
             <span>⭐</span>
             <span>แนวปฏิบัติสำคัญประจำวอร์ด CCU (คลิกอ่านด่วน)</span>
           </div>
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <button type="button" class="btn-line" onclick="openDocViewer('protocol-pci')" style="justify-content: space-between; font-size: 12px; padding: 8px 10px; width: 100%;">
-              <span>📌 แนวปฏิบัติการเฝ้าระวังเลือดออกหลังแทงสายสวน PCI</span>
-              <span style="color: var(--cyan); font-size: 11px;">เปิดดู ➜</span>
-            </button>
-            <button type="button" class="btn-line" onclick="openDocViewer('protocol-shock')" style="justify-content: space-between; font-size: 12px; padding: 8px 10px; width: 100%;">
-              <span>📌 คู่มือการพยาบาลผู้ป่วยภาวะ Cardiogenic Shock</span>
-              <span style="color: var(--cyan); font-size: 11px;">เปิดดู ➜</span>
-            </button>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div style="min-width: 0;">
+                <div style="font-weight: 600; font-size: 12.5px; color: #fff;">📌 แนวปฏิบัติการเฝ้าระวังเลือดออกหลังแทงสายสวน PCI</div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Femoral vs Radial sheath • เฝ้าระวัง Retroperitoneal hematoma</div>
+              </div>
+              <button type="button" class="btn-sm-edit" onclick="openDocViewer('protocol-pci')" style="flex-shrink: 0; font-size: 11.5px; padding: 5px 10px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #6ee7b7; cursor: pointer;">
+                📖 เปิดดู
+              </button>
+            </div>
+            <div style="background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div style="min-width: 0;">
+                <div style="font-weight: 600; font-size: 12.5px; color: #fff;">📌 คู่มือการพยาบาลผู้ป่วยภาวะ Cardiogenic Shock</div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">MAP Target ≥ 65 mmHg • การให้ Inotropes/Vasopressors & IABP</div>
+              </div>
+              <button type="button" class="btn-sm-edit" onclick="openDocViewer('protocol-shock')" style="flex-shrink: 0; font-size: 11.5px; padding: 5px 10px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #6ee7b7; cursor: pointer;">
+                📖 เปิดดู
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -4134,16 +4153,37 @@
       }
     };
 
+    let knowledgeSearchQuery = "";
+
+    function handleKnowledgeSearch(query) {
+      knowledgeSearchQuery = (query || "").trim().toLowerCase();
+      const btnClear = document.getElementById('btnClearKnowSearch');
+      if (btnClear) {
+        btnClear.style.display = knowledgeSearchQuery ? 'block' : 'none';
+      }
+      renderKnowledgeDocList();
+    }
+
+    function clearKnowledgeSearch() {
+      const input = document.getElementById('knowDocSearchInput');
+      if (input) input.value = "";
+      handleKnowledgeSearch("");
+    }
+
     function selectKnowledgeCategory(catKey) {
       activeKnowledgeCategory = catKey;
       
       // อัปเดตสไตล์ของกริดการ์ด
       document.querySelectorAll('.know-cat-card').forEach(c => {
         c.style.border = '1px solid var(--border)';
+        const countTxt = c.querySelector('div:last-child');
+        if (countTxt) countTxt.style.color = 'var(--muted)';
       });
       const activeCard = document.getElementById(`catCard-${catKey}`);
       if (activeCard) {
         activeCard.style.border = '1.5px solid var(--cyan)';
+        const countTxt = activeCard.querySelector('div:last-child');
+        if (countTxt) countTxt.style.color = 'var(--cyan)';
       }
 
       renderKnowledgeDocList();
@@ -4158,28 +4198,57 @@
       if (!catData || !container) return;
 
       if (headerEl) {
-        headerEl.innerHTML = `<span>${catData.icon}</span> <span>รายการเอกสาร: ${catData.title}</span>`;
-      }
-      if (countEl) {
-        countEl.textContent = `${catData.docs.length} ฉบับ`;
+        if (knowledgeSearchQuery) {
+          headerEl.innerHTML = `<span>🔍</span> <span>ผลการค้นหา: "${knowledgeSearchQuery}" (หมวด ${catData.title.split(' ')[0]})</span>`;
+        } else {
+          headerEl.innerHTML = `<span>${catData.icon}</span> <span>รายการเอกสาร: ${catData.title}</span>`;
+        }
       }
 
-      container.innerHTML = catData.docs.map((doc, idx) => `
-        <div class="card" style="padding: 10px 12px; background: #0f172a; margin-bottom: 0; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s;" onclick="openDocViewer('${activeKnowledgeCategory}', ${idx})">
-          <div style="min-width: 0;">
-            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-              <span style="font-weight: 600; font-size: 13px; color: #fff;">${doc.title}</span>
-              <span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.3); padding: 1px 6px; border-radius: 4px;">${doc.badge}</span>
-            </div>
-            <div style="font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4;">
-              ${doc.sub}
-            </div>
+      // กรองเอกสารตามคำค้นหา
+      let filteredDocs = catData.docs;
+      if (knowledgeSearchQuery) {
+        filteredDocs = catData.docs.filter(d => 
+          d.title.toLowerCase().includes(knowledgeSearchQuery) ||
+          d.sub.toLowerCase().includes(knowledgeSearchQuery) ||
+          d.badge.toLowerCase().includes(knowledgeSearchQuery) ||
+          d.content.toLowerCase().includes(knowledgeSearchQuery)
+        );
+      }
+
+      if (countEl) {
+        countEl.textContent = `${filteredDocs.length} ฉบับ`;
+      }
+
+      if (filteredDocs.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 20px 10px; color: var(--muted); font-size: 12.5px;">
+            🔍 ไม่พบเอกสารที่ตรงกับคำค้นหา "${knowledgeSearchQuery}" ในหมวดนี้<br/>
+            <span style="font-size: 11.5px; color: var(--cyan); cursor: pointer; text-decoration: underline; margin-top: 6px; display: inline-block;" onclick="clearKnowledgeSearch()">ล้างคำค้นหา</span>
           </div>
-          <button type="button" class="btn-sm-edit" style="flex-shrink: 0; font-size: 11px; padding: 4px 8px;" onclick="event.stopPropagation(); openDocViewer('${activeKnowledgeCategory}', ${idx})">
-            📖 เปิดดู
-          </button>
-        </div>
-      `).join('');
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredDocs.map((doc) => {
+        const originalIndex = catData.docs.findIndex(d => d.id === doc.id);
+        return `
+          <div class="card" style="padding: 10px 12px; background: #0f172a; margin-bottom: 0; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s;" onclick="openDocViewer('${activeKnowledgeCategory}', ${originalIndex})">
+            <div style="min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-weight: 600; font-size: 13px; color: #fff;">${doc.title}</span>
+                <span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.3); padding: 1px 6px; border-radius: 4px;">${doc.badge}</span>
+              </div>
+              <div style="font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4;">
+                ${doc.sub}
+              </div>
+            </div>
+            <button type="button" class="btn-sm-edit" style="flex-shrink: 0; font-size: 11px; padding: 4px 8px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #6ee7b7;" onclick="event.stopPropagation(); openDocViewer('${activeKnowledgeCategory}', ${originalIndex})">
+              📖 เปิดดู
+            </button>
+          </div>
+        `;
+      }).join('');
     }
 
     let currentOpenDocTitle = "";
