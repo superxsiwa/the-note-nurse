@@ -2280,21 +2280,7 @@
         <span class="role-pill role-pill-admin">Admin</span>
       </button>
 
-      <!-- 3. ความรู้ (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
-      <button class="sys-menu-item" id="menuItemKnowledge" onclick="openSystemSubmenu('knowledge')">
-        <span class="item-icon">📖</span>
-        <span class="item-text">ความรู้</span>
-        <span class="role-pill role-pill-senior">รุ่นพี่</span>
-      </button>
-
-      <!-- 4. เกร็ดความรู้ (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
-      <button class="sys-menu-item" id="menuItemPearls" onclick="openSystemSubmenu('pearls')">
-        <span class="item-icon">💡</span>
-        <span class="item-text">เกร็ดความรู้</span>
-        <span class="role-pill role-pill-senior">รุ่นพี่</span>
-      </button>
-
-      <!-- 5. โจทย์ฝึกหัด (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
+      <!-- 3. โจทย์ฝึกหัด (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
       <button class="sys-menu-item" id="menuItemQuizGen" onclick="openSystemSubmenu('quizgen')">
         <span class="item-icon">🎯</span>
         <span class="item-text">โจทย์ฝึกหัด</span>
@@ -2811,18 +2797,6 @@
         userItem.style.display = isAdmin ? 'flex' : 'none';
       }
 
-      // เมนูความรู้ (สำหรับพยาบาลรุ่นพี่/Charge/Admin ที่เห็นและใช้ได้)
-      const knowItem = document.getElementById('menuItemKnowledge');
-      if (knowItem) {
-        knowItem.style.display = isSenior ? 'flex' : 'none';
-      }
-
-      // เมนูเกร็ดความรู้ (สำหรับพยาบาลรุ่นพี่/Charge/Admin ที่เห็นและใช้ได้)
-      const pearlsItem = document.getElementById('menuItemPearls');
-      if (pearlsItem) {
-        pearlsItem.style.display = isSenior ? 'flex' : 'none';
-      }
-
       // เมนูโจทย์ฝึกหัด (สำหรับพยาบาลรุ่นพี่/Charge/Admin ที่เห็นและใช้ได้)
       const quizItem = document.getElementById('menuItemQuizGen');
       if (quizItem) {
@@ -2842,7 +2816,7 @@
         return;
       }
 
-      if ((subKey === 'knowledge' || subKey === 'pearls' || subKey === 'quizgen') && !isSenior) {
+      if (subKey === 'quizgen' && !isSenior) {
         showToast("⛔ เมนูนี้สำหรับ พยาบาลรุ่นพี่/Preceptor/Charge ขึ้นไปเท่านั้น");
         return;
       }
