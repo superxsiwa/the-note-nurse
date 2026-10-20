@@ -775,15 +775,23 @@
     .btn-heart {
       background: rgba(251, 113, 133, 0.15);
       color: var(--rose);
-      border: 1px solid rgba(251, 113, 133, 0.3);
+      border: 1px solid rgba(251, 113, 133, 0.35);
       border-radius: 20px;
-      padding: 4px 12px;
+      padding: 4px 10px;
       font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 4px;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+    .btn-heart.liked {
+      background: rgba(244, 63, 94, 0.28);
+      border-color: rgba(244, 63, 94, 0.6);
+      color: #fda4af;
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.25);
     }
     .btn-heart:active {
       transform: scale(1.15);
@@ -1954,34 +1962,8 @@
 
       <!-- Tab 3: เกร็ดความรู้ (Pearls จากรุ่นพี่) -->
       <div id="tab-know-pearls" class="know-tab-content" style="display: none;">
-        <div class="card" style="background: linear-gradient(135deg, #152238, #182e50); border-color: rgba(56, 189, 248, 0.4); margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 12px; font-weight: 700; color: var(--amber);">💡 เกร็ดความรู้เด่นจากพี่ CCU</span>
-            <span style="font-size: 11px; color: var(--muted);">วันนี้ 10:30 น.</span>
-          </div>
-          <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;">"การสังเกต Retroperitoneal Bleed หลังทำ PCI"</div>
-          <div style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
-            ถ้าน้องเจอคนไข้แทงสายสวนที่ขาหนีบ แล้วอยู่ๆ บ่นปวดหลัง/สะโพก หรือความดันดรอปโดยไม่มีเลือดออกที่แผลภายนอก ให้รีบคลำหน้าท้องด้านล่าง และรายงานหมอทันทีนะจ๊ะ เลือดอาจออกในช่องท้องหลังเยื่อบุ!
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 12px; color: var(--cyan);">✍️ พว. วรรณา สว่างวงศ์ (Charge Nurse CCU)</span>
-            <button class="btn-heart" onclick="addHeart(this)">❤️ ขอบคุณพี่ <span class="heart-num">25</span></button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 12px; font-weight: 700; color: var(--cyan);">💡 ทริคประจำวอร์ด</span>
-            <span style="font-size: 11px; color: var(--muted);">เมื่อวาน</span>
-          </div>
-          <div style="font-size: 13.5px; font-weight: 600; color: #fff; margin-bottom: 4px;">"ก่อนปลด A-line ต้องตรวจอะไรบ้าง?"</div>
-          <div style="font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 8px;">
-            ตรวจ Allen's test หรือดู Ulnar artery flow ก่อนเสมอ และเตรียมผ้าก๊อซพร้อมกดแผลแน่นอย่างน้อย 10-15 นาที อย่าเพิ่งรีบปล่อยมือจ้า
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 11.5px; color: var(--muted);">✍️ พว. สมพร เจริญสุข (Preceptor)</span>
-            <button class="btn-heart" onclick="addHeart(this)">❤️ ขอบคุณพี่ <span class="heart-num">18</span></button>
-          </div>
+        <div id="pearlsListContainer" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Pearls rendered by JS -->
         </div>
       </div>
     </div>
@@ -2793,6 +2775,7 @@
         updateHeaderProfile();
         if (screenId === 'screen-knowledge') {
           renderKnowledgeDocList();
+          renderSeniorPearls();
         }
       }
 
@@ -4316,7 +4299,10 @@
         renderKnowledgeDocList();
       }
       else if (tabKey === 'ai') document.getElementById('tab-know-ai').style.display = 'block';
-      else if (tabKey === 'pearls') document.getElementById('tab-know-pearls').style.display = 'block';
+      else if (tabKey === 'pearls') {
+        document.getElementById('tab-know-pearls').style.display = 'block';
+        renderSeniorPearls();
+      }
     }
 
     function askQuickPrompt(promptText) {
@@ -4453,13 +4439,110 @@
       showToast("📋 คัดลอกสรุปทุกเตียงประจำเวรเรียบร้อย!");
     }
 
-    // Reaction
+    // ----------------------------------------------------
+    // เกร็ดความรู้ (Senior Pearls) Data & Logic
+    // ----------------------------------------------------
+    let seniorPearlsData = [
+      {
+        id: "pearl-1",
+        badge: "💡 เกร็ดความรู้เด่นจากพี่ CCU",
+        badgeColor: "var(--amber)",
+        title: "การสังเกต Retroperitoneal Bleed หลังทำ PCI",
+        content: "ถ้าน้องเจอคนไข้แทงสายสวนที่ขาหนีบ แล้วอยู่ๆ บ่นปวดหลัง/สะโพก หรือความดันดรอปโดยไม่มีเลือดออกที่แผลภายนอก ให้รีบคลำหน้าท้องด้านล่าง และรายงานหมอทันทีนะจ๊ะ เลือดอาจออกในช่องท้องหลังเยื่อบุ!",
+        author: "พว. วรรณา สว่างวงศ์ (Charge Nurse CCU)",
+        date: "วันนี้ 10:30 น.",
+        highlight: true,
+        likes: 25,
+        likedBy: []
+      },
+      {
+        id: "pearl-2",
+        badge: "💡 ทริคประจำวอร์ด",
+        badgeColor: "var(--cyan)",
+        title: "ก่อนปลด A-line ต้องตรวจอะไรบ้าง?",
+        content: "ตรวจ Allen's test หรือดู Ulnar artery flow ก่อนเสมอ และเตรียมผ้าก๊อซพร้อมกดแผลแน่นอย่างน้อย 10-15 นาที อย่าเพิ่งรีบปล่อยมือจ้า",
+        author: "พว. สมพร เจริญสุข (Preceptor)",
+        date: "เมื่อวาน",
+        highlight: false,
+        likes: 18,
+        likedBy: []
+      }
+    ];
+
+    function renderSeniorPearls() {
+      const container = document.getElementById('pearlsListContainer');
+      if (!container) return;
+
+      const currentUser = (typeof currentAuthUser !== 'undefined' && currentAuthUser) ? currentAuthUser : 'user';
+
+      container.innerHTML = seniorPearlsData.map(pearl => {
+        const isLiked = pearl.likedBy && pearl.likedBy.includes(currentUser);
+        const cardBg = pearl.highlight 
+          ? "background: linear-gradient(135deg, #152238, #182e50); border-color: rgba(56, 189, 248, 0.4);" 
+          : "";
+        const titleStyle = pearl.highlight
+          ? "font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;"
+          : "font-size: 13.5px; font-weight: 600; color: #fff; margin-bottom: 4px;";
+        const contentStyle = pearl.highlight
+          ? "font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;"
+          : "font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 8px;";
+        const authorStyle = pearl.highlight
+          ? "font-size: 12px; color: var(--cyan);"
+          : "font-size: 11.5px; color: var(--muted);";
+
+        return `
+          <div class="card" style="${cardBg}">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 12px; font-weight: 700; color: ${pearl.badgeColor};">${pearl.badge}</span>
+              <span style="font-size: 11px; color: var(--muted);">${pearl.date}</span>
+            </div>
+            <div style="${titleStyle}">"${pearl.title}"</div>
+            <div style="${contentStyle}">${pearl.content}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="${authorStyle}">✍️ ${pearl.author}</span>
+              <button class="btn-heart ${isLiked ? 'liked' : ''}" 
+                      onclick="togglePearlHeart('${pearl.id}')"
+                      title="${isLiked ? 'กดยกเลิกหัวใจ' : 'กดให้หัวใจ'}">
+                ❤️ <span class="heart-num">${pearl.likes}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function togglePearlHeart(pearlId) {
+      const pearl = seniorPearlsData.find(p => p.id === pearlId);
+      if (!pearl) return;
+
+      const currentUser = (typeof currentAuthUser !== 'undefined' && currentAuthUser) ? currentAuthUser : 'user';
+      if (!pearl.likedBy) pearl.likedBy = [];
+
+      const userIndex = pearl.likedBy.indexOf(currentUser);
+
+      if (userIndex > -1) {
+        // เคยกดแล้ว -> กดยกเลิก (กดคืน)
+        pearl.likedBy.splice(userIndex, 1);
+        pearl.likes = Math.max(0, pearl.likes - 1);
+        showToast("🤍 ยกเลิกการส่งหัวใจแล้ว");
+      } else {
+        // ยังไม่เคยกด -> กดให้ 1 คนต่อ 1 เกร็ด
+        pearl.likedBy.push(currentUser);
+        pearl.likes += 1;
+        showToast("❤️ ส่งหัวใจให้เกร็ดความรู้นี้แล้วค่ะ!");
+      }
+
+      renderSeniorPearls();
+    }
+
+    // Reaction (legacy fallback)
     function addHeart(btn) {
       const numSpan = btn.querySelector('.heart-num');
-      let count = parseInt(numSpan.textContent);
+      if (!numSpan) return;
+      let count = parseInt(numSpan.textContent) || 0;
       numSpan.textContent = count + 1;
-      btn.style.background = "rgba(251, 113, 133, 0.35)";
-      showToast("❤️ ส่งความขอบคุณให้พี่พยาบาลแล้วค่ะ!");
+      btn.classList.add('liked');
+      showToast("❤️ ส่งหัวใจแล้วค่ะ!");
     }
 
     // Tutor
