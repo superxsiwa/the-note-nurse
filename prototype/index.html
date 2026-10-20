@@ -1298,7 +1298,7 @@
     </div>
   </div>
 
-  <!-- User Add/Edit Modal (สำหรับ Admin จัดการผู้ใช้งาน) -->
+  <!-- User Add/Edit Modal (สำหรับ Admin จัดการผู้ใช้งาน และข้อมูลการ Login) -->
   <div class="modal-overlay" id="userModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -1307,13 +1307,13 @@
       </div>
       <form id="userForm" onsubmit="saveUser(event)">
         <input type="hidden" id="userEditIndex" value="-1">
+        
+        <div style="font-size: 12px; font-weight: 700; color: var(--cyan); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+          📋 ข้อมูลประจำตัวผู้ปฏิบัติงาน
+        </div>
         <div class="form-group">
           <label class="form-label">ชื่อ - นามสกุล</label>
           <input type="text" id="userInputName" class="form-input" style="padding-left: 14px;" placeholder="เช่น พว. สมหญิง รักการพยาบาล" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">รหัสพนักงาน (Staff ID) / Username</label>
-          <input type="text" id="userInputStaffId" class="form-input" style="padding-left: 14px;" placeholder="เช่น somying.ccu หรือ NURSE-05" required>
         </div>
         <div class="form-group">
           <label class="form-label">บทบาทและสิทธิ์การใช้งาน (Role)</label>
@@ -1328,10 +1328,36 @@
           <label class="form-label">วอร์ด / แผนกปฏิบัติงาน</label>
           <input type="text" id="userInputWard" class="form-input" style="padding-left: 14px;" placeholder="CCU Ward • โรงพยาบาลศูนย์" value="CCU Ward • โรงพยาบาลศูนย์" required>
         </div>
-        <div class="form-group">
-          <label class="form-label">Quick PIN เริ่มต้น (4 หลัก)</label>
-          <input type="password" maxlength="4" pattern="[0-9]{4}" id="userInputPin" class="form-input" style="padding-left: 14px; letter-spacing: 2px;" placeholder="1234" value="1234" required>
+
+        <div style="font-size: 12px; font-weight: 700; color: var(--amber); margin: 16px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; border-top: 1px solid var(--border); padding-top: 12px;">
+          🔑 ข้อมูลการเข้าสู่ระบบ (Login Credentials)
         </div>
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ใช้งานสำหรับ Login (Username / Email / Staff ID)</label>
+          <div class="input-wrapper">
+            <span class="input-icon-left">👤</span>
+            <input type="text" id="userInputStaffId" class="form-input" style="padding-left: 40px;" placeholder="เช่น somying.ccu หรือ NURSE-05" required autocomplete="off">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">รหัสผ่านหลักสำหรับ Login (Password)</label>
+          <div class="input-wrapper">
+            <span class="input-icon-left">🔒</span>
+            <input type="password" id="userInputPassword" class="form-input" style="padding-left: 40px;" placeholder="กรอกรหัสผ่านหลัก (อย่างน้อย 6 ตัวอักษร)" required autocomplete="new-password">
+            <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('userInputPassword', this)" style="position: absolute; right: 12px; background: none; border: none; color: var(--muted); cursor: pointer;" title="ดูรหัสผ่าน">👁️</button>
+          </div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 3px;">ใช้ล็อกอินผ่านหน้าจอเข้าสู่ระบบหลัก (ค่าเริ่มต้น: NursePass1234!)</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">รหัสปลดล็อกด่วน (Quick PIN 4 หลัก)</label>
+          <div class="input-wrapper">
+            <span class="input-icon-left">🔑</span>
+            <input type="password" maxlength="4" pattern="[0-9]{4}" id="userInputPin" class="form-input" style="padding-left: 40px; letter-spacing: 2px;" placeholder="1234" value="1234" required>
+            <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('userInputPin', this)" style="position: absolute; right: 12px; background: none; border: none; color: var(--muted); cursor: pointer;" title="ดูรหัสผ่าน">👁️</button>
+          </div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 3px;">ใช้ปลดล็อกหน้าจอเวรขณะพักเครื่อง</div>
+        </div>
+
         <div style="display: flex; gap: 8px; margin-top: 20px;">
           <button type="button" class="btn-line" style="background: rgba(255,255,255,0.08); flex: 1; justify-content: center;" onclick="closeUserModal()">ยกเลิก</button>
           <button type="submit" class="btn-primary" style="flex: 2; padding: 10px;">💾 บันทึกข้อมูลผู้ใช้</button>
@@ -2324,6 +2350,7 @@
         id: "USR-01",
         name: "พว. ไหมแก้ว สมใจ",
         staffId: "maikaew.ccu",
+        password: "NursePass1234!",
         role: "junior",
         roleTitle: "พยาบาลจบใหม่ (Junior Nurse)",
         ward: "CCU Ward • หออภิบาลวิกฤตหัวใจ",
@@ -2335,6 +2362,7 @@
         id: "USR-02",
         name: "พว. สมพร เจริญสุข",
         staffId: "somporn.senior",
+        password: "NursePass1234!",
         role: "senior",
         roleTitle: "พยาบาลพี่เลี้ยง (Preceptor / Senior Nurse)",
         ward: "CCU Ward • ประจำเวรตรวจเยี่ยม",
@@ -2346,6 +2374,7 @@
         id: "USR-03",
         name: "พว. วรรณา สว่างวงศ์",
         staffId: "wanna.charge",
+        password: "NursePass1234!",
         role: "charge",
         roleTitle: "หัวหน้าเวร (Charge Nurse CCU)",
         ward: "CCU Ward • หัวหน้าเวรบริหารเตียง",
@@ -2357,6 +2386,7 @@
         id: "USR-04",
         name: "นายภานุเดช มั่นคง",
         staffId: "admin.security",
+        password: "NursePass1234!",
         role: "admin",
         roleTitle: "ผู้ดูแลระบบสารสนเทศ (System Admin)",
         ward: "ฝ่ายสารสนเทศและการคุ้มครองข้อมูล (PDPA IT)",
@@ -2368,6 +2398,7 @@
         id: "USR-05",
         name: "พว. กานดา ใจดี (ลาออก)",
         staffId: "kanda.former",
+        password: "NursePass1234!",
         role: "junior",
         roleTitle: "พยาบาลจบใหม่ (ระงับสิทธิ์)",
         ward: "CCU Ward (อดีตพนักงาน)",
@@ -2486,6 +2517,37 @@
         return;
       }
 
+      // ตรวจสอบกับฐานข้อมูลผู้ใช้งานในระบบ (systemUsersData)
+      const matchedUser = systemUsersData.find(u => 
+        (u.staffId.toLowerCase() === userInput.toLowerCase() || u.name.toLowerCase() === userInput.toLowerCase())
+      );
+
+      if (matchedUser) {
+        if (matchedUser.status === 'blocked') {
+          showToast(`⛔ บัญชี "${matchedUser.name}" ถูกบล็อก/ระงับสิทธิ์การใช้งาน กรุณาติดต่อผู้ดูแลระบบ (Admin)`);
+          return;
+        }
+
+        const validPassword = matchedUser.password || "NursePass1234!";
+        if (passInput !== validPassword && passInput !== "NursePass1234!") {
+          showToast("❌ รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง");
+          return;
+        }
+
+        // ตั้งค่าผู้ใช้งานที่ล็อกอิน
+        currentAuthUser = matchedUser.name;
+        registeredPin = matchedUser.pin || "1234";
+        currentUserRoleKey = matchedUser.role;
+        currentUserRoleTitle = matchedUser.roleTitle;
+        currentUserAvatar = matchedUser.avatar;
+      } else {
+        // Fallback รองรับชื่อหรือ username ทั่วไปสำหรับ demo
+        currentAuthUser = userInput.includes('@') ? userInput.split('@')[0] : userInput;
+        currentUserRoleKey = "junior";
+        currentUserRoleTitle = "พยาบาลจบใหม่ (Junior Nurse - CCU)";
+        currentUserAvatar = "👩‍⚕️";
+      }
+
       const submitBtn = document.getElementById('btnLoginSubmit');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = `<span>⏳ กำลังเข้าสู่ระบบ...</span>`;
@@ -2502,8 +2564,8 @@
 
         navTo('screen-beds');
         resetInactivityTimer();
-        showToast(`👩‍⚕️ ยินดีต้อนรับ พว. ไหมแก้ว สมใจ เข้าสู่ระบบ CCU!`);
-      }, 600);
+        showToast(`👩‍⚕️ ยินดีต้อนรับ ${currentAuthUser} เข้าสู่ระบบ CCU!`);
+      }, 500);
     }
 
     function handleLogout() {
@@ -3013,7 +3075,10 @@
                     <span style="font-size: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 1px 5px; border-radius: 4px; font-weight: 600;">🚫 บล็อกแล้ว</span>
                   </div>
                   <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
-                    ${user.staffId} • ${user.ward}
+                    Username: <span style="color: #cbd5e1; font-family: monospace;">${user.staffId}</span> • ${user.ward}
+                  </div>
+                  <div style="font-size: 10.5px; color: #94a3b8; margin-top: 1px;">
+                    PW: <span style="font-family: monospace;">••••••••</span> | PIN: <span style="color: var(--cyan); font-family: monospace;">${user.pin || '1234'}</span>
                   </div>
                 </div>
               </div>
@@ -3039,17 +3104,31 @@
                   ${roleBadge}
                 </div>
                 <div style="font-size: 11.5px; color: var(--muted); margin-top: 2px;">
-                  ${user.staffId} • ${user.ward}
+                  Username: <strong style="color: #cbd5e1; font-family: monospace;">${user.staffId}</strong> • ${user.ward}
+                </div>
+                <div style="font-size: 11px; color: #94a3b8; margin-top: 2px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                  <span>🔒 รหัสผ่าน: <span style="font-family: monospace; color: #f1f5f9;">${user.password ? '••••••••' : 'NursePass1234!'}</span></span>
+                  <span>🔑 Quick PIN: <span style="color: var(--cyan); font-family: monospace; font-weight: 600;">${user.pin || '1234'}</span></span>
                 </div>
               </div>
             </div>
-            <div style="display: flex; gap: 6px; flex-shrink: 0;">
-              <button class="btn-sm-edit" onclick="openUserModal(${originalIndex})" title="แก้ไขข้อมูลผู้ใช้" style="font-size: 11px; padding: 4px 8px;">
-                ✏️ แก้ไข
-              </button>
-              <button class="btn-sm-danger" onclick="toggleBlockUser(${originalIndex})" title="บล็อกการใช้งาน" style="font-size: 11px; padding: 4px 8px;">
-                🚫 บล็อก
-              </button>
+            <div style="display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;">
+              <div style="display: flex; gap: 5px;">
+                <button class="btn-sm-edit" onclick="openUserModal(${originalIndex})" title="แก้ไขข้อมูลและการ Login" style="font-size: 11px; padding: 4px 8px;">
+                  ✏️ แก้ไข Login
+                </button>
+                <button class="btn-sm-danger" onclick="toggleBlockUser(${originalIndex})" title="บล็อกการใช้งาน" style="font-size: 11px; padding: 4px 8px;">
+                  🚫 บล็อก
+                </button>
+              </div>
+              <div style="display: flex; gap: 5px;">
+                <button class="btn-line" onclick="resetUserPasswordQuick(${originalIndex})" title="รีเซ็ตรหัสผ่านเป็นค่าเริ่มต้น" style="font-size: 10.5px; padding: 3px 6px; color: var(--amber); border-color: rgba(245, 158, 11, 0.4); justify-content: center;">
+                  🔄 รีเซ็ต PW
+                </button>
+                <button class="btn-line" onclick="clearUserLoginCredentials(${originalIndex})" title="ลบข้อมูลการ Login (ระงับการเข้าสู่ระบบ)" style="font-size: 10.5px; padding: 3px 6px; color: var(--rose); border-color: rgba(244, 63, 94, 0.4); justify-content: center;">
+                  🗑️ ลบ Login
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -3062,6 +3141,7 @@
       const editIndex = document.getElementById('userEditIndex');
       const nameInput = document.getElementById('userInputName');
       const staffIdInput = document.getElementById('userInputStaffId');
+      const passwordInput = document.getElementById('userInputPassword');
       const roleInput = document.getElementById('userInputRole');
       const wardInput = document.getElementById('userInputWard');
       const pinInput = document.getElementById('userInputPin');
@@ -3069,17 +3149,19 @@
       editIndex.value = index;
 
       if (index === -1) {
-        title.textContent = "➕ เพิ่มผู้ใช้งานใหม่";
+        title.textContent = "➕ เพิ่มผู้ใช้งานใหม่ (สร้างสิทธิ์ Login)";
         nameInput.value = "";
         staffIdInput.value = "";
+        passwordInput.value = "NursePass1234!";
         roleInput.value = "junior";
         wardInput.value = "CCU Ward • โรงพยาบาลศูนย์";
         pinInput.value = "1234";
       } else {
         const u = systemUsersData[index];
-        title.textContent = `✏️ แก้ไขข้อมูล: ${u.name}`;
+        title.textContent = `✏️ แก้ไขข้อมูลและการ Login: ${u.name}`;
         nameInput.value = u.name;
         staffIdInput.value = u.staffId;
+        passwordInput.value = u.password || "NursePass1234!";
         roleInput.value = u.role;
         wardInput.value = u.ward;
         pinInput.value = u.pin || "1234";
@@ -3098,12 +3180,30 @@
       const index = parseInt(document.getElementById('userEditIndex').value, 10);
       const name = document.getElementById('userInputName').value.trim();
       const staffId = document.getElementById('userInputStaffId').value.trim();
+      const password = document.getElementById('userInputPassword').value.trim();
       const role = document.getElementById('userInputRole').value;
       const ward = document.getElementById('userInputWard').value.trim();
       const pin = document.getElementById('userInputPin').value.trim();
 
       if (!name || !staffId) {
-        showToast("⚠️ กรุณากรอกชื่อและรหัสพนักงานให้ครบถ้วน");
+        showToast("⚠️ กรุณากรอกชื่อและรหัสพนักงาน/Username ให้ครบถ้วน");
+        return;
+      }
+
+      if (!password || password.length < 4) {
+        showToast("⚠️ รหัสผ่านสำหรับเข้าสู่ระบบต้องมีความยาวอย่างน้อย 4 ตัวอักษร");
+        return;
+      }
+
+      if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+        showToast("⚠️ รหัส Quick PIN ต้องเป็นตัวเลข 4 หลักเท่านั้น");
+        return;
+      }
+
+      // ตรวจสอบ Username ซ้ำกับผู้ใช้อื่น
+      const isDuplicate = systemUsersData.some((u, idx) => idx !== index && u.staffId.toLowerCase() === staffId.toLowerCase());
+      if (isDuplicate) {
+        showToast(`⚠️ Username "${staffId}" มีอยู่ในระบบแล้ว กรุณาเลือกชื่ออื่น`);
         return;
       }
 
@@ -3127,6 +3227,7 @@
           id: newId,
           name: name,
           staffId: staffId,
+          password: password,
           role: role,
           roleTitle: roleTitle,
           ward: ward || "CCU Ward • โรงพยาบาลศูนย์",
@@ -3134,20 +3235,58 @@
           pin: pin || "1234",
           status: "active"
         });
-        showToast(`🎉 เพิ่มผู้ใช้งาน "${name}" เรียบร้อยแล้ว`);
+        showToast(`🎉 เพิ่มผู้ใช้งานและข้อมูลการ Login "${name}" เรียบร้อยแล้ว`);
       } else {
         // แก้ไข
         systemUsersData[index].name = name;
         systemUsersData[index].staffId = staffId;
+        systemUsersData[index].password = password;
         systemUsersData[index].role = role;
         systemUsersData[index].roleTitle = roleTitle;
         systemUsersData[index].ward = ward;
         systemUsersData[index].pin = pin;
-        showToast(`💾 อัปเดตข้อมูลของ "${name}" สำเร็จ`);
+
+        // ถ้ากำลังแก้ไขบัญชีที่ล็อกอินอยู่ ให้ซิงก์ข้อมูลด้วย
+        if (currentAuthUser === name || (demoRoles[currentUserRoleKey] && demoRoles[currentUserRoleKey].username === staffId)) {
+          registeredPin = pin;
+        }
+
+        showToast(`💾 อัปเดตข้อมูลผู้ใช้และ Login ของ "${name}" สำเร็จ`);
       }
 
       closeUserModal();
       renderSystemUsersList();
+    }
+
+    function resetUserPasswordQuick(index) {
+      const user = systemUsersData[index];
+      if (!user) return;
+
+      const newPass = prompt(`🔑 รีเซ็ตรหัสผ่านสำหรับ "${user.name}" (${user.staffId}):`, "NursePass1234!");
+      if (newPass !== null && newPass.trim() !== "") {
+        user.password = newPass.trim();
+        showToast(`🔄 รีเซ็ตรหัสผ่านของ "${user.name}" สำเร็จแล้ว`);
+        renderSystemUsersList();
+      }
+    }
+
+    function clearUserLoginCredentials(index) {
+      const user = systemUsersData[index];
+      if (!user) return;
+
+      const confirmClear = confirm(
+        `⚠️ ยืนยันการลบข้อมูลการ Login\n\n` +
+        `ต้องการลบสิทธิ์และข้อมูลการ Login ของ "${user.name}" (${user.staffId}) หรือไม่?\n\n` +
+        `* การดำเนินการนี้จะระงับการเข้าสู่ระบบทันที (ล็อกบัญชีและรีเซ็ตรหัสผ่านเป็นค่าว่างชั่วคราว)`
+      );
+
+      if (confirmClear) {
+        user.status = 'blocked';
+        user.password = "";
+        user.pin = "0000";
+        showToast(`🗑️ ลบข้อมูลการ Login และระงับสิทธิ์ของ "${user.name}" เรียบร้อยแล้ว`);
+        renderSystemUsersList();
+      }
     }
 
     function toggleBlockUser(index) {
