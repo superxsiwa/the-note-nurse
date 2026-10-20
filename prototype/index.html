@@ -2279,13 +2279,6 @@
         <span class="item-text">ผู้ใช้งาน</span>
         <span class="role-pill role-pill-admin">Admin</span>
       </button>
-
-      <!-- 3. โจทย์ฝึกหัด (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
-      <button class="sys-menu-item" id="menuItemQuizGen" onclick="openSystemSubmenu('quizgen')">
-        <span class="item-icon">🎯</span>
-        <span class="item-text">โจทย์ฝึกหัด</span>
-        <span class="role-pill role-pill-senior">รุ่นพี่</span>
-      </button>
     </div>
 
     <!-- Bottom Navigation Bar (5 เมนูหลัก) -->
@@ -2789,18 +2782,11 @@
 
     function updateSystemMenuVisibility() {
       const isAdmin = isCurrentUserAdmin();
-      const isSenior = isCurrentUserSeniorOrAbove();
 
       // เมนูผู้ใช้งาน (Admin เท่านั้นที่เห็นและใช้ได้)
       const userItem = document.getElementById('menuItemUsers');
       if (userItem) {
         userItem.style.display = isAdmin ? 'flex' : 'none';
-      }
-
-      // เมนูโจทย์ฝึกหัด (สำหรับพยาบาลรุ่นพี่/Charge/Admin ที่เห็นและใช้ได้)
-      const quizItem = document.getElementById('menuItemQuizGen');
-      if (quizItem) {
-        quizItem.style.display = isSenior ? 'flex' : 'none';
       }
     }
 
@@ -2809,15 +2795,9 @@
 
       // ตรวจสอบสิทธิ์อีกชั้นหนึ่งเพื่อความปลอดภัย
       const isAdmin = isCurrentUserAdmin();
-      const isSenior = isCurrentUserSeniorOrAbove();
 
       if (subKey === 'users' && !isAdmin) {
         showToast("⛔ เมนูผู้ใช้งาน สำหรับผู้ดูแลระบบ (Admin) เท่านั้น");
-        return;
-      }
-
-      if (subKey === 'quizgen' && !isSenior) {
-        showToast("⛔ เมนูนี้สำหรับ พยาบาลรุ่นพี่/Preceptor/Charge ขึ้นไปเท่านั้น");
         return;
       }
 
