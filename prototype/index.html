@@ -50,10 +50,11 @@
 
     /* Header Bar */
     .header-bar {
-      padding: 16px 20px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       background: rgba(11, 19, 41, 0.95);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
@@ -65,13 +66,14 @@
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-shrink: 0;
     }
     .logo-icon {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       background: linear-gradient(135deg, #0284c7, #38bdf8);
-      border-radius: 10px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -79,12 +81,13 @@
     }
     .brand-title {
       font-weight: 700;
-      font-size: 17px;
+      font-size: 15px;
       letter-spacing: -0.3px;
       color: #fff;
+      line-height: 1.2;
     }
     .brand-sub {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--cyan);
       font-weight: 500;
     }
@@ -92,7 +95,63 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    .header-user-profile {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 18px;
+      padding: 3px 8px 3px 4px;
+      transition: all 0.2s;
+      min-width: 0;
+    }
+    .header-user-profile:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--cyan);
+    }
+    .header-user-avatar {
+      font-size: 15px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      flex-shrink: 0;
+    }
+    .header-user-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+      text-align: left;
+      min-width: 0;
+    }
+    .header-user-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      max-width: 85px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-user-role {
+      font-size: 9px;
+      color: var(--cyan);
+      font-weight: 600;
+      max-width: 85px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .pill-badge {
@@ -1019,6 +1078,131 @@
       font-weight: 600;
       margin-left: 6px;
     }
+
+    /* System Popup Menu */
+    .system-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 6, 23, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .system-popup-overlay.active {
+      display: block;
+    }
+    .system-popup-menu {
+      position: fixed;
+      bottom: 74px;
+      right: 16px;
+      width: 250px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.2);
+      z-index: 201;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      animation: popupSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popupSlideUp {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .system-popup-menu.active {
+      display: flex;
+    }
+    .sys-menu-header {
+      padding: 8px 10px 6px 10px;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sys-menu-header-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .sys-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: all 0.15s;
+    }
+    .sys-menu-item:hover {
+      background: rgba(56, 189, 248, 0.12);
+      color: #fff;
+    }
+    .sys-menu-item:active {
+      transform: scale(0.98);
+    }
+    .sys-menu-item .item-icon {
+      font-size: 17px;
+      width: 22px;
+      text-align: center;
+    }
+    .sys-menu-item .item-text {
+      flex: 1;
+    }
+    .sys-menu-item .role-pill {
+      font-size: 9.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .role-pill-admin {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+    .role-pill-senior {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .avatar-quick-pill {
+      background: #111d35;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .avatar-quick-pill:hover {
+      border-color: var(--cyan);
+      transform: scale(1.1);
+      background: rgba(56, 189, 248, 0.15);
+    }
+    .avatar-quick-pill.active {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan-glow);
+      background: rgba(56, 189, 248, 0.2);
+    }
   </style>
 
 </head>
@@ -1114,6 +1298,48 @@
     </div>
   </div>
 
+  <!-- User Add/Edit Modal (สำหรับ Admin จัดการผู้ใช้งาน) -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="userModalTitle" style="margin: 0; font-size: 16px; color: #fff;">➕ เพิ่มผู้ใช้งานใหม่</h3>
+        <button type="button" class="btn-close-modal" onclick="closeUserModal()">✕</button>
+      </div>
+      <form id="userForm" onsubmit="saveUser(event)">
+        <input type="hidden" id="userEditIndex" value="-1">
+        <div class="form-group">
+          <label class="form-label">ชื่อ - นามสกุล</label>
+          <input type="text" id="userInputName" class="form-input" style="padding-left: 14px;" placeholder="เช่น พว. สมหญิง รักการพยาบาล" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">รหัสพนักงาน (Staff ID) / Username</label>
+          <input type="text" id="userInputStaffId" class="form-input" style="padding-left: 14px;" placeholder="เช่น somying.ccu หรือ NURSE-05" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">บทบาทและสิทธิ์การใช้งาน (Role)</label>
+          <select id="userInputRole" class="form-input" style="padding-left: 14px;">
+            <option value="junior">พยาบาลรุ่นน้อง (Junior Nurse)</option>
+            <option value="senior">พยาบาลรุ่นพี่/พี่เลี้ยง (Senior Nurse / Preceptor)</option>
+            <option value="charge">หัวหน้าเวร/วอร์ด (Charge Nurse)</option>
+            <option value="admin">ผู้ดูแลระบบสารสนเทศ (System Admin)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">วอร์ด / แผนกปฏิบัติงาน</label>
+          <input type="text" id="userInputWard" class="form-input" style="padding-left: 14px;" placeholder="CCU Ward • โรงพยาบาลศูนย์" value="CCU Ward • โรงพยาบาลศูนย์" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quick PIN เริ่มต้น (4 หลัก)</label>
+          <input type="password" maxlength="4" pattern="[0-9]{4}" id="userInputPin" class="form-input" style="padding-left: 14px; letter-spacing: 2px;" placeholder="1234" value="1234" required>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 20px;">
+          <button type="button" class="btn-line" style="background: rgba(255,255,255,0.08); flex: 1; justify-content: center;" onclick="closeUserModal()">ยกเลิก</button>
+          <button type="submit" class="btn-primary" style="flex: 2; padding: 10px;">💾 บันทึกข้อมูลผู้ใช้</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="app-frame">
 
     <!-- Header -->
@@ -1126,6 +1352,15 @@
         </div>
       </div>
       <div class="header-right">
+        <!-- ข้อมูลโปรไฟล์ผู้ใช้งาน (อวตาร + ชื่อ + บทบาท) อยู่ด้านซ้ายติดปุ่ม logout -->
+        <div class="header-user-profile" id="headerUserProfile" onclick="openSystemSubmenu('profile')" title="คลิกเพื่อดูโปรไฟล์">
+          <div class="header-user-avatar" id="headerUserAvatar">👩‍⚕️</div>
+          <div class="header-user-info">
+            <span class="header-user-name" id="headerUserName">พว. ไหมแก้ว</span>
+            <span class="header-user-role" id="headerUserRole">Junior Nurse</span>
+          </div>
+        </div>
+
         <button id="headerLogoutBtn" onclick="handleLogout()" title="ออกจากระบบ" style="display: none; background: rgba(251, 113, 133, 0.15); border: 1px solid rgba(251, 113, 133, 0.3); color: var(--rose); border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">🚪 ออก</button>
       </div>
     </div>
@@ -1714,23 +1949,31 @@
     <!-- ระบบ (SYSTEM SETTINGS & ADMIN MANAGEMENT)      -->
     <!-- ============================================== -->
     <div id="screen-system" class="screen">
+      <!-- ส่วนหัวของหน้าจอ: เปลี่ยนชื่อหน้าจอแบบไดนามิกตามเมนูย่อยที่เปิดอยู่ -->
       <div style="margin-bottom: 14px;">
-        <h2 style="font-size: 18px; margin: 0 0 4px 0;">ระบบ (System Settings)</h2>
-        <div style="font-size: 13px; color: var(--muted);">จัดการโปรไฟล์, ผู้ใช้งาน, ความรู้ และคลังข้อสอบ</div>
-      </div>
-
-      <!-- System Submenu Pills -->
-      <div class="tab-pills" style="margin-bottom: 14px;">
-        <button class="tab-pill-btn active" onclick="switchSystemTab('profile', this)">👤 โปรไฟล์</button>
-        <button class="tab-pill-btn" onclick="switchSystemTab('users', this)" id="tabBtnUsers">👥 ผู้ใช้งาน <span class="admin-only-badge">Admin</span></button>
-        <button class="tab-pill-btn" onclick="switchSystemTab('knowledge', this)">📖 จัดการความรู้</button>
-        <button class="tab-pill-btn" onclick="switchSystemTab('quizgen', this)">🎯 สร้างโจทย์</button>
+        <h2 style="font-size: 18px; margin: 0 0 4px 0;" id="sysScreenTitle">โปรไฟล์ (Profile)</h2>
+        <div style="font-size: 13px; color: var(--muted);" id="sysScreenSubtitle">ข้อมูลส่วนตัว การตั้งค่าความปลอดภัย และแต้มประสบการณ์</div>
       </div>
 
       <!-- Submenu 1: โปรไฟล์ (Profile) -->
       <div id="sys-tab-profile" class="sys-tab-content">
         <div class="card" style="text-align: center; padding: 20px 16px; margin-bottom: 14px;">
-          <div class="user-avatar" id="profAvatar" style="font-size: 32px; width: 64px; height: 64px; margin-bottom: 10px;">👩‍⚕️</div>
+          <div style="position: relative; width: 68px; height: 68px; margin: 0 auto 10px auto;">
+            <div class="user-avatar" id="profAvatar" style="font-size: 32px; width: 68px; height: 68px; margin: 0; cursor: pointer; border: 2px solid var(--cyan);" onclick="triggerAvatarUpload()" title="คลิกเพื่อเปลี่ยนรูปอวตาร">👩‍⚕️</div>
+            <button type="button" onclick="triggerAvatarUpload()" style="position: absolute; bottom: -2px; right: -2px; width: 24px; height: 24px; border-radius: 50%; background: var(--cyan); border: 2px solid var(--bg); color: #020617; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold;" title="เปลี่ยนรูปอวตาร">📷</button>
+          </div>
+          <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarFileSelected(event)">
+
+          <!-- Quick Emoji Avatar Picker -->
+          <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+            <button type="button" class="avatar-quick-pill" onclick="selectQuickAvatar('👩‍⚕️')">👩‍⚕️</button>
+            <button type="button" class="avatar-quick-pill" onclick="selectQuickAvatar('👨‍⚕️')">👨‍⚕️</button>
+            <button type="button" class="avatar-quick-pill" onclick="selectQuickAvatar('🩺')">🩺</button>
+            <button type="button" class="avatar-quick-pill" onclick="selectQuickAvatar('💊')">💊</button>
+            <button type="button" class="avatar-quick-pill" onclick="selectQuickAvatar('🛡️')">🛡️</button>
+            <button type="button" class="avatar-quick-pill" onclick="triggerAvatarUpload()" style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; border: 1px dashed var(--cyan); background: rgba(56, 189, 248, 0.1); color: var(--cyan);">+ อัปโหลด</button>
+          </div>
+
           <h3 id="profName" style="margin: 0 0 4px 0; font-size: 17px; color: #fff;">พว. ไหมแก้ว สมใจ</h3>
           <div id="profRole" style="font-size: 13px; color: var(--cyan); font-weight: 600;">พยาบาลจบใหม่ (Junior Nurse)</div>
           <div id="profWard" style="font-size: 12px; color: var(--muted); margin-top: 2px;">CCU Ward • โรงพยาบาลศูนย์</div>
@@ -1751,6 +1994,54 @@
           </div>
         </div>
 
+        <!-- ฟอร์มแก้ไขข้อมูลส่วนตัวและความปลอดภัย (เจ้าของสามารถแก้ไขได้) -->
+        <div class="card" style="padding: 16px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-size: 13.5px; font-weight: 700; color: #fff;">⚙️ แก้ไขข้อมูลส่วนตัว & ความปลอดภัย</div>
+            <span style="font-size: 11px; color: var(--cyan); background: rgba(56, 189, 248, 0.15); padding: 2px 8px; border-radius: 6px;">เจ้าของบัญชี</span>
+          </div>
+
+          <form onsubmit="handleSaveProfileSettings(event)">
+            <!-- 1. แก้ไขชื่อ-นามสกุล -->
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" style="font-size: 12px; color: var(--muted);">ชื่อ - นามสกุล (Display Name)</label>
+              <div class="input-wrapper">
+                <span class="input-icon-left">👤</span>
+                <input type="text" id="editProfileFullName" class="form-input" style="padding-left: 40px; font-size: 13px;" required value="พว. ไหมแก้ว สมใจ">
+              </div>
+            </div>
+
+            <!-- 2. แก้ไข Quick PIN (4 หลัก) -->
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label" style="font-size: 12px; color: var(--muted);">รหัสปลดล็อกด่วน (Quick PIN 4 หลัก)</label>
+              <div class="input-wrapper">
+                <span class="input-icon-left">🔑</span>
+                <input type="password" id="editProfilePin" maxlength="4" pattern="[0-9]{4}" class="form-input" style="padding-left: 40px; font-size: 14px; letter-spacing: 2px;" placeholder="ตัวเลข 4 หลัก" required value="1234">
+                <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('editProfilePin', this)" style="position: absolute; right: 12px; background: none; border: none; color: var(--muted); cursor: pointer;">👁️</button>
+              </div>
+            </div>
+
+            <!-- 3. เลือกระยะเวลาล็อกหน้าจออัตโนมัติ (Inactivity Lock Timeout) -->
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-label" style="font-size: 12px; color: var(--muted);">เวลาล็อกหน้าจอเมื่อพักเครื่อง (Auto-lock Timeout)</label>
+              <div class="input-wrapper">
+                <span class="input-icon-left">⏱️</span>
+                <select id="editProfileLockTimeout" class="form-input" style="padding-left: 40px; font-size: 13px;">
+                  <option value="1">1 นาที (เข้มงวดสูงสุด)</option>
+                  <option value="3">3 นาที (มาตรฐานเตียงวิกฤต)</option>
+                  <option value="5" selected>5 นาที (ค่าเริ่มต้นที่แนะนำ)</option>
+                  <option value="10">10 นาที</option>
+                  <option value="15">15 นาที</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="padding: 11px; font-size: 13.5px;">
+              <span>💾 บันทึกการเปลี่ยนแปลง</span>
+            </button>
+          </form>
+        </div>
+
         <div class="card" style="padding: 14px; margin-bottom: 14px;">
           <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 10px;">🔒 ความปลอดภัยอุปกรณ์ส่วนตัว (BYOD)</div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -1759,11 +2050,8 @@
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span style="font-size: 12.5px; color: var(--muted);">ล็อกจอเมื่อพักเครื่อง</span>
-            <span style="font-size: 12px; color: var(--amber); font-weight: 600;">⏱️ 5 นาที (Quick PIN)</span>
+            <span style="font-size: 12px; color: var(--amber); font-weight: 600;" id="profLockTimeDisplay">⏱️ 5 นาที (Quick PIN)</span>
           </div>
-          <button class="btn-sm-edit" style="width: 100%; padding: 8px; margin-top: 6px;" onclick="promptChangePin()">
-            🔑 เปลี่ยนรหัส Quick PIN
-          </button>
         </div>
 
         <button class="btn-sm-danger" style="width: 100%; padding: 12px; font-size: 13px;" onclick="handleLogout()">
@@ -1776,74 +2064,37 @@
         <div id="adminNotice" class="card" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.35); padding: 12px; margin-bottom: 12px;">
           <div style="font-size: 12.5px; color: #fca5a5; font-weight: 600;">🛡️ เฉพาะผู้ดูแลระบบ (Admin Access Only)</div>
           <div style="font-size: 11.5px; color: var(--muted); margin-top: 2px;">
-            จัดการสิทธิ์, ตรวจสอบ Device Binding, รีเซ็ตรหัสผ่าน และระงับสิทธิ์บัญชีพยาบาล
+            จัดการสิทธิ์, เพิ่มผู้ใช้, แก้ไขบทบาท, บล็อก/ปลดบล็อก และลบผู้ใช้ถาวรตามนโยบาย PDPA
           </div>
         </div>
 
-        <div class="card" style="padding: 12px; margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 13px; font-weight: 600; color: #fff;">รายชื่อพยาบาลในระบบ (4 บัญชี)</span>
-            <button class="btn-sm-success" onclick="alert('เพิ่มผู้ใช้งานใหม่โดยผู้ดูแลระบบ')">➕ เพิ่มผู้ใช้</button>
+        <!-- แท็บสลับ: ผู้ใช้ปกติ vs ผู้ใช้ที่ถูกบล็อก -->
+        <div class="tab-pills" style="margin-bottom: 12px; background: #0a1020;">
+          <button class="tab-pill-btn active" id="btnTabUsersActive" onclick="switchUserListTab('active', this)">
+            👥 ผู้ใช้ปกติ (<span id="userCountActive">4</span>)
+          </button>
+          <button class="tab-pill-btn" id="btnTabUsersBlocked" onclick="switchUserListTab('blocked', this)">
+            🚫 ผู้ใช้ที่ถูกบล็อก (<span id="userCountBlocked">1</span>)
+          </button>
+        </div>
+
+        <div class="card" style="padding: 14px; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 13px; font-weight: 600; color: #fff;" id="userListSectionTitle">รายชื่อพยาบาลในระบบ</span>
+            <button class="btn-sm-success" onclick="openUserModal(-1)">➕ เพิ่มผู้ใช้ใหม่</button>
           </div>
 
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
-              <div>
-                <div style="font-size: 13px; font-weight: 600; color: #fff;">พว. ไหมแก้ว สมใจ</div>
-                <div style="font-size: 11px; color: var(--muted);">RN-680459 • Junior Nurse (CCU)</div>
-              </div>
-              <span class="role-card-tag tag-junior">Junior</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
-              <div>
-                <div style="font-size: 13px; font-weight: 600; color: #fff;">พว. สมพร เจริญสุข</div>
-                <div style="font-size: 11px; color: var(--muted);">RN-590123 • Senior Preceptor</div>
-              </div>
-              <span class="role-card-tag tag-senior">Senior</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
-              <div>
-                <div style="font-size: 13px; font-weight: 600; color: #fff;">พว. วรรณา สว่างวงศ์</div>
-                <div style="font-size: 11px; color: var(--muted);">RN-510008 • Charge Nurse</div>
-              </div>
-              <span class="role-card-tag tag-charge">Charge</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px; border-radius: 8px;">
-              <div>
-                <div style="font-size: 13px; font-weight: 600; color: #fff;">นายภานุเดช มั่นคง</div>
-                <div style="font-size: 11px; color: var(--muted);">IT-ADMIN • ฝ่ายสารสนเทศ</div>
-              </div>
-              <span class="role-card-tag tag-admin">Admin</span>
-            </div>
+          <!-- กล่องแสดงรายการผู้ใช้ (Render แบบ Dynamic) -->
+          <div id="usersListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Rendered by JS -->
           </div>
         </div>
       </div>
 
-      <!-- Submenu 3: จัดการความรู้ (แท็บ เอกสาร / FAQ / เกร็ดความรู้) -->
+      <!-- Submenu 3: จัดการความรู้ (แท็บ เอกสาร / FAQ) -->
       <div id="sys-tab-knowledge" class="sys-tab-content" style="display: none;">
-        <div class="tab-pills" style="margin-bottom: 12px; background: #0a1020;">
-          <button class="tab-pill-btn active" onclick="switchSysKnowTab('docs', this)">📄 เอกสาร</button>
-          <button class="tab-pill-btn" onclick="switchSysKnowTab('faq', this)">❓ FAQ & Vector Train</button>
-          <button class="tab-pill-btn" onclick="switchSysKnowTab('tips', this)">💡 เกร็ดความรู้พยาบาล</button>
-        </div>
-
-        <!-- แท็บย่อย: เอกสาร -->
-        <div id="sys-know-docs" class="sys-know-sub">
-          <div class="card" style="padding: 12px; margin-bottom: 12px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 13px; font-weight: 600; color: #fff;">คลังเอกสารแนวปฏิบัติ (Guidelines)</span>
-              <button class="btn-sm-success" onclick="alert('อัปโหลดไฟล์ PDF/DOCX เข้าสู่ระบบคลังเอกสาร')">📤 อัปโหลดเอกสาร</button>
-            </div>
-            <div style="font-size: 12.5px; color: var(--muted); line-height: 1.6;">
-              • Guideline_Acute_STEMI_2026.pdf (อนุมัติแล้ว)<br/>
-              • High_Alert_Drugs_Titrate_CCU.pdf (อนุมัติแล้ว)<br/>
-              • Post_PCI_Bleeding_Protocol_v2.pdf (ฉบับร่าง)
-            </div>
-          </div>
-        </div>
-
         <!-- แท็บย่อย: FAQ (ให้พยาบาลรุ่นพี่ Approve + สร้าง Vector Train AI ทุกครั้งที่เปลี่ยน) -->
-        <div id="sys-know-faq" class="sys-know-sub" style="display: none;">
+        <div id="sys-know-faq" class="sys-know-sub">
           <div class="card" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.35); padding: 12px; margin-bottom: 12px;">
             <div style="font-size: 13px; font-weight: 700; color: #6ee7b7;">
               ✅ ระบบตรวจสอบและอนุมัติ FAQ โดยพยาบาลรุ่นพี่
@@ -1887,19 +2138,54 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- แท็บย่อย: เกร็ดความรู้พยาบาล -->
-        <div id="sys-know-tips" class="sys-know-sub" style="display: none;">
+          <!-- เอกสารแนวปฏิบัติ -->
           <div class="card" style="padding: 12px; margin-bottom: 12px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 13px; font-weight: 600; color: #fff;">เกร็ดความรู้พยาบาล (Senior Pearls)</span>
-              <button class="btn-sm-success" onclick="addNewPearlModal()">➕ โพสต์เกร็ดความรู้</button>
+              <span style="font-size: 13px; font-weight: 600; color: #fff;">คลังเอกสารแนวปฏิบัติ (Guidelines)</span>
+              <button class="btn-sm-success" onclick="alert('อัปโหลดไฟล์ PDF/DOCX เข้าสู่ระบบคลังเอกสาร')">📤 อัปโหลดเอกสาร</button>
             </div>
             <div style="font-size: 12.5px; color: var(--muted); line-height: 1.6;">
-              • การสังเกต Retroperitoneal Bleed หลังทำ PCI (ยอดหัวใจ: 25 ❤️)<br/>
-              • ก่อนปลด A-line ต้องตรวจ Allen's test (ยอดหัวใจ: 18 ❤️)<br/>
-              • การ Titrate Levophed ให้สัมพันธ์กับ Urine Output (ฉบับร่าง)
+              • Guideline_Acute_STEMI_2026.pdf (อนุมัติแล้ว)<br/>
+              • High_Alert_Drugs_Titrate_CCU.pdf (อนุมัติแล้ว)<br/>
+              • Post_PCI_Bleeding_Protocol_v2.pdf (ฉบับร่าง)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submenu 3.2: เกร็ดความรู้ (Senior Pearls) -->
+      <div id="sys-tab-pearls" class="sys-tab-content" style="display: none;">
+        <div class="card" style="padding: 14px; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <div style="font-size: 13.5px; font-weight: 700; color: #fff;">💡 เกร็ดความรู้พยาบาล (Senior Pearls)</div>
+              <div style="font-size: 11.5px; color: var(--muted);">แบ่งปันทริคและข้อควรระวังในเคสจริง เพื่อให้น้องๆ เรียนรู้และกดขอบคุณ</div>
+            </div>
+            <button class="btn-sm-success" onclick="addNewPearlModal()">➕ โพสต์เกร็ดความรู้</button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="background: #0f172a; padding: 12px; border-radius: 10px; border-left: 3px solid var(--amber);">
+              <div style="font-size: 13px; font-weight: 600; color: #fff;">"การสังเกต Retroperitoneal Bleed หลังทำ PCI"</div>
+              <div style="font-size: 12px; color: #94a3b8; margin: 4px 0 6px 0; line-height: 1.4;">
+                ถ้าน้องเจอคนไข้แทงสายสวนที่ขาหนีบ แล้วบ่นปวดหลัง/สะโพก หรือ BP ดรอป รีบคลำหน้าท้องด้านล่างและรายงานหมอทันที!
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--muted);">
+                <span>ผู้เขียน: พว. วรรณา สว่างวงศ์ (Charge)</span>
+                <span style="color: var(--amber); font-weight: 600;">❤️ 25 ยอดหัวใจ</span>
+              </div>
+            </div>
+
+            <div style="background: #0f172a; padding: 12px; border-radius: 10px; border-left: 3px solid var(--cyan);">
+              <div style="font-size: 13px; font-weight: 600; color: #fff;">"ก่อนปลด A-line ต้องตรวจ Allen's test เสมอ"</div>
+              <div style="font-size: 12px; color: #94a3b8; margin: 4px 0 6px 0; line-height: 1.4;">
+                ดู Ulnar artery flow และกดแผลแน่น 10-15 นาที อย่าเพิ่งรีบปล่อยมือ
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--muted);">
+                <span>ผู้เขียน: พว. สมพร เจริญสุข (Preceptor)</span>
+                <span style="color: var(--cyan); font-weight: 600;">❤️ 18 ยอดหัวใจ</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1957,6 +2243,49 @@
       </div>
     </div>
 
+    <!-- Popup Menu: ระบบ (System Menu Popup) -->
+    <div class="system-popup-overlay" id="systemPopupOverlay" onclick="toggleSystemPopup(false)"></div>
+    <div class="system-popup-menu" id="systemPopupMenu">
+      <div class="sys-menu-header">
+        <span class="sys-menu-header-title">⚙️ เมนูระบบ (System)</span>
+        <button onclick="toggleSystemPopup(false)" style="background:none; border:none; color:var(--muted); font-size:16px; cursor:pointer;">✕</button>
+      </div>
+
+      <!-- 1. โปรไฟล์ (ทุกคนเข้าถึงได้) -->
+      <button class="sys-menu-item" onclick="openSystemSubmenu('profile')">
+        <span class="item-icon">👤</span>
+        <span class="item-text">โปรไฟล์</span>
+      </button>
+
+      <!-- 2. ผู้ใช้งาน (สำหรับ Admin เท่านั้น) -->
+      <button class="sys-menu-item" id="menuItemUsers" onclick="openSystemSubmenu('users')">
+        <span class="item-icon">👥</span>
+        <span class="item-text">ผู้ใช้งาน</span>
+        <span class="role-pill role-pill-admin">Admin</span>
+      </button>
+
+      <!-- 3. ความรู้ (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
+      <button class="sys-menu-item" id="menuItemKnowledge" onclick="openSystemSubmenu('knowledge')">
+        <span class="item-icon">📖</span>
+        <span class="item-text">ความรู้</span>
+        <span class="role-pill role-pill-senior">รุ่นพี่</span>
+      </button>
+
+      <!-- 4. เกร็ดความรู้ (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
+      <button class="sys-menu-item" id="menuItemPearls" onclick="openSystemSubmenu('pearls')">
+        <span class="item-icon">💡</span>
+        <span class="item-text">เกร็ดความรู้</span>
+        <span class="role-pill role-pill-senior">รุ่นพี่</span>
+      </button>
+
+      <!-- 5. โจทย์ฝึกหัด (สำหรับ พยาบาลรุ่นพี่/Charge/Admin) -->
+      <button class="sys-menu-item" id="menuItemQuizGen" onclick="openSystemSubmenu('quizgen')">
+        <span class="item-icon">🎯</span>
+        <span class="item-text">โจทย์ฝึกหัด</span>
+        <span class="role-pill role-pill-senior">รุ่นพี่</span>
+      </button>
+    </div>
+
     <!-- Bottom Navigation Bar (5 เมนูหลัก) -->
     <div class="bottom-nav" id="appBottomNav" style="display: none;">
       <button class="nav-item active" onclick="navTo('screen-beds', this)">
@@ -1975,7 +2304,7 @@
         <span class="nav-icon">🎮</span>
         <span>ฝึกหัด</span>
       </button>
-      <button class="nav-item" onclick="navTo('screen-system', this)">
+      <button class="nav-item" id="navItemSystem" onclick="handleSystemNavClick(this)">
         <span class="nav-icon">⚙️</span>
         <span>ระบบ</span>
       </button>
@@ -1983,6 +2312,71 @@
   </div>
 
   <script>
+    // State สำหรับ Avatar ของผู้ใช้งานปัจจุบัน
+    let currentUserAvatar = "👩‍⚕️";
+    let currentUserRoleKey = "junior";
+    let currentUserRoleTitle = "พยาบาลจบใหม่ (Junior Nurse - CCU)";
+
+    // รายชื่อผู้ใช้งานในระบบ (System Users State สำหรับ Admin)
+    let systemUsersTab = 'active'; // 'active' | 'blocked'
+    let systemUsersData = [
+      {
+        id: "USR-01",
+        name: "พว. ไหมแก้ว สมใจ",
+        staffId: "maikaew.ccu",
+        role: "junior",
+        roleTitle: "พยาบาลจบใหม่ (Junior Nurse)",
+        ward: "CCU Ward • หออภิบาลวิกฤตหัวใจ",
+        avatar: "👩‍⚕️",
+        pin: "1234",
+        status: "active"
+      },
+      {
+        id: "USR-02",
+        name: "พว. สมพร เจริญสุข",
+        staffId: "somporn.senior",
+        role: "senior",
+        roleTitle: "พยาบาลพี่เลี้ยง (Preceptor / Senior Nurse)",
+        ward: "CCU Ward • ประจำเวรตรวจเยี่ยม",
+        avatar: "👩‍⚕️",
+        pin: "2345",
+        status: "active"
+      },
+      {
+        id: "USR-03",
+        name: "พว. วรรณา สว่างวงศ์",
+        staffId: "wanna.charge",
+        role: "charge",
+        roleTitle: "หัวหน้าเวร (Charge Nurse CCU)",
+        ward: "CCU Ward • หัวหน้าเวรบริหารเตียง",
+        avatar: "🩺",
+        pin: "3456",
+        status: "active"
+      },
+      {
+        id: "USR-04",
+        name: "นายภานุเดช มั่นคง",
+        staffId: "admin.security",
+        role: "admin",
+        roleTitle: "ผู้ดูแลระบบสารสนเทศ (System Admin)",
+        ward: "ฝ่ายสารสนเทศและการคุ้มครองข้อมูล (PDPA IT)",
+        avatar: "🛡️",
+        pin: "9999",
+        status: "active"
+      },
+      {
+        id: "USR-05",
+        name: "พว. กานดา ใจดี (ลาออก)",
+        staffId: "kanda.former",
+        role: "junior",
+        roleTitle: "พยาบาลจบใหม่ (ระงับสิทธิ์)",
+        ward: "CCU Ward (อดีตพนักงาน)",
+        avatar: "👩‍⚕️",
+        pin: "0000",
+        status: "blocked"
+      }
+    ];
+
     // Role Definitions for Demo Login
     const demoRoles = {
       junior: {
@@ -2034,8 +2428,12 @@
       // Set active role state
       currentAuthUser = role.name;
       registeredPin = role.pin;
+      currentUserRoleKey = roleKey;
+      currentUserRoleTitle = role.title;
+      currentUserAvatar = role.avatar;
 
-      // Update lock modal profile
+      // อัปเดตข้อมูลบน Header และหน้าจอล็อก
+      updateHeaderProfile();
       document.getElementById('lockUserName').textContent = role.name;
       document.getElementById('lockUserAvatar').textContent = role.avatar;
       document.getElementById('lockUserWard').textContent = role.ward;
@@ -2100,6 +2498,7 @@
         // Show app views & update header
         document.getElementById('appBottomNav').style.display = 'flex';
         document.getElementById('headerLogoutBtn').style.display = 'inline-block';
+        updateHeaderProfile();
 
         navTo('screen-beds');
         resetInactivityTimer();
@@ -2111,6 +2510,8 @@
       if (confirm("ต้องการออกจากระบบหรือไม่?")) {
         document.getElementById('appBottomNav').style.display = 'none';
         document.getElementById('headerLogoutBtn').style.display = 'none';
+        const headerProfile = document.getElementById('headerUserProfile');
+        if (headerProfile) headerProfile.style.display = 'none';
         navTo('screen-login');
         showToast("🔒 ออกจากระบบเรียบร้อยแล้ว");
       }
@@ -2120,7 +2521,7 @@
     let registeredPin = "1234"; // Default Quick PIN
     let inactivityTimer = null;
     let lockEnteredPin = "";
-    const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+    let inactivityTimeoutMinutes = 5; // Default 5 minutes
 
     function resetInactivityTimer() {
       if (inactivityTimer) clearTimeout(inactivityTimer);
@@ -2131,9 +2532,10 @@
       const isLoggedOut = loginScreen.classList.contains('active') || registerScreen.classList.contains('active');
       
       if (!isLoggedOut) {
+        const timeoutMs = (inactivityTimeoutMinutes || 5) * 60 * 1000;
         inactivityTimer = setTimeout(() => {
           triggerAutoLock(false);
-        }, INACTIVITY_TIMEOUT_MS);
+        }, timeoutMs);
       }
     }
 
@@ -2267,6 +2669,7 @@
 
     // Navigation
     function navTo(screenId, navEl) {
+      toggleSystemPopup(false);
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const target = document.getElementById(screenId);
       if (target) target.classList.add('active');
@@ -2274,16 +2677,510 @@
       if (screenId === 'screen-login' || screenId === 'screen-register') {
         document.getElementById('appBottomNav').style.display = 'none';
         document.getElementById('headerLogoutBtn').style.display = 'none';
+        const headerProfile = document.getElementById('headerUserProfile');
+        if (headerProfile) headerProfile.style.display = 'none';
         // shift badge removed from header
       } else {
         document.getElementById('appBottomNav').style.display = 'flex';
         document.getElementById('headerLogoutBtn').style.display = 'inline-block';
-        // shift badge removed from header
+        const headerProfile = document.getElementById('headerUserProfile');
+        if (headerProfile) headerProfile.style.display = 'flex';
+        updateHeaderProfile();
       }
 
       if (navEl) {
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         navEl.classList.add('active');
+      }
+    }
+
+    // Role-based Access Control Helpers
+    function isCurrentUserAdmin() {
+      return currentAuthUser.includes("มั่นคง") || currentAuthUser.toLowerCase().includes("admin");
+    }
+
+    function isCurrentUserSeniorOrAbove() {
+      // Senior (สมพร), Charge (วรรณา), หรือ Admin (มั่นคง)
+      return isCurrentUserAdmin() ||
+        currentAuthUser.includes("สมพร") ||
+        currentAuthUser.includes("วรรณา") ||
+        currentAuthUser.toLowerCase().includes("senior") ||
+        currentAuthUser.toLowerCase().includes("charge") ||
+        currentAuthUser.toLowerCase().includes("preceptor");
+    }
+
+    // System Popup Menu Controls
+    let isSystemPopupOpen = false;
+
+    function handleSystemNavClick(navEl) {
+      updateSystemMenuVisibility();
+      toggleSystemPopup(!isSystemPopupOpen);
+    }
+
+    function toggleSystemPopup(show) {
+      isSystemPopupOpen = (typeof show === 'boolean') ? show : !isSystemPopupOpen;
+      const overlay = document.getElementById('systemPopupOverlay');
+      const menu = document.getElementById('systemPopupMenu');
+      const navItem = document.getElementById('navItemSystem');
+
+      if (isSystemPopupOpen) {
+        updateSystemMenuVisibility();
+        if (overlay) overlay.classList.add('active');
+        if (menu) menu.classList.add('active');
+        if (navItem) navItem.classList.add('active');
+      } else {
+        if (overlay) overlay.classList.remove('active');
+        if (menu) menu.classList.remove('active');
+        // keep active nav item consistent with current screen
+        const currentScreen = document.querySelector('.screen.active');
+        if (currentScreen && currentScreen.id !== 'screen-system' && navItem) {
+          navItem.classList.remove('active');
+        }
+      }
+    }
+
+    function updateSystemMenuVisibility() {
+      const isAdmin = isCurrentUserAdmin();
+      const isSenior = isCurrentUserSeniorOrAbove();
+
+      // เมนูผู้ใช้งาน (Admin เท่านั้นที่เห็นและใช้ได้)
+      const userItem = document.getElementById('menuItemUsers');
+      if (userItem) {
+        userItem.style.display = isAdmin ? 'flex' : 'none';
+      }
+
+      // เมนูความรู้ (สำหรับพยาบาลรุ่นพี่/Charge/Admin ที่เห็นและใช้ได้)
+      const knowItem = document.getElementById('menuItemKnowledge');
+      if (knowItem) {
+        knowItem.style.display = isSenior ? 'flex' : 'none';
+      }
+
+      // เมนูเกร็ดความรู้ (สำหรับพยาบาลรุ่นพี่/Charge/Admin ที่เห็นและใช้ได้)
+      const pearlsItem = document.getElementById('menuItemPearls');
+      if (pearlsItem) {
+        pearlsItem.style.display = isSenior ? 'flex' : 'none';
+      }
+
+      // เมนูโจทย์ฝึกหัด (สำหรับพยาบาลรุ่นพี่/Charge/Admin ที่เห็นและใช้ได้)
+      const quizItem = document.getElementById('menuItemQuizGen');
+      if (quizItem) {
+        quizItem.style.display = isSenior ? 'flex' : 'none';
+      }
+    }
+
+    function openSystemSubmenu(subKey) {
+      toggleSystemPopup(false);
+
+      // ตรวจสอบสิทธิ์อีกชั้นหนึ่งเพื่อความปลอดภัย
+      const isAdmin = isCurrentUserAdmin();
+      const isSenior = isCurrentUserSeniorOrAbove();
+
+      if (subKey === 'users' && !isAdmin) {
+        showToast("⛔ เมนูผู้ใช้งาน สำหรับผู้ดูแลระบบ (Admin) เท่านั้น");
+        return;
+      }
+
+      if ((subKey === 'knowledge' || subKey === 'pearls' || subKey === 'quizgen') && !isSenior) {
+        showToast("⛔ เมนูนี้สำหรับ พยาบาลรุ่นพี่/Preceptor/Charge ขึ้นไปเท่านั้น");
+        return;
+      }
+
+      // นำทางไปยังหน้าจอระบบ
+      navTo('screen-system', document.getElementById('navItemSystem'));
+
+      // สลับหน้าจอและอัปเดตชื่อหน้าจอให้ตรงกับเมนูย่อย
+      switchSystemSubView(subKey);
+    }
+
+    function switchSystemSubView(subKey) {
+      // ซ่อนทุกแท็บย่อยของระบบ
+      document.querySelectorAll('.sys-tab-content').forEach(c => c.style.display = 'none');
+
+      const titleEl = document.getElementById('sysScreenTitle');
+      const subtitleEl = document.getElementById('sysScreenSubtitle');
+
+      if (subKey === 'profile') {
+        document.getElementById('sys-tab-profile').style.display = 'block';
+        if (titleEl) titleEl.textContent = '👤 โปรไฟล์';
+        if (subtitleEl) subtitleEl.textContent = 'ข้อมูลส่วนตัว การตั้งค่าความปลอดภัย และแต้มประสบการณ์';
+        // ซิงก์ค่าลงในฟอร์มแก้ไข
+        syncProfileFormInputs();
+      } else if (subKey === 'users') {
+        document.getElementById('sys-tab-users').style.display = 'block';
+        if (titleEl) titleEl.textContent = '👥 ผู้ใช้งาน (Admin)';
+        if (subtitleEl) subtitleEl.textContent = 'จัดการสิทธิ์ผู้ใช้งาน ตรวจสอบอุปกรณ์ และรีเซ็ตรหัสผ่าน';
+        const isAdmin = isCurrentUserAdmin();
+        if (!isAdmin) {
+          showToast("⚠️ ท่านกำลังเข้าดูในโหมดจำลองสิทธิ์ (Admin Preview)");
+        }
+        renderSystemUsersList();
+      } else if (subKey === 'knowledge') {
+        document.getElementById('sys-tab-knowledge').style.display = 'block';
+        if (titleEl) titleEl.textContent = '📖 ความรู้';
+        if (subtitleEl) subtitleEl.textContent = 'ตรวจสอบ อนุมัติคำถาม FAQ พยาบาล และซิงก์ Vector Train AI';
+      } else if (subKey === 'pearls') {
+        document.getElementById('sys-tab-pearls').style.display = 'block';
+        if (titleEl) titleEl.textContent = '💡 เกร็ดความรู้';
+        if (subtitleEl) subtitleEl.textContent = 'คลังเกร็ดความรู้และทริคสำคัญจากพยาบาลรุ่นพี่ประจำวอร์ด';
+      } else if (subKey === 'quizgen') {
+        document.getElementById('sys-tab-quizgen').style.display = 'block';
+        if (titleEl) titleEl.textContent = '🎯 โจทย์ฝึกหัด';
+        if (subtitleEl) subtitleEl.textContent = 'สร้างโจทย์ข้อสอบจำลองสถานการณ์เพื่อกระจายให้พยาบาลทุกคนฝึกทำ';
+      }
+    }
+
+    // ซิงก์ข้อมูลเจ้าของบัญชีลงฟอร์มแก้ไขในหน้าโปรไฟล์
+    function syncProfileFormInputs() {
+      const nameInput = document.getElementById('editProfileFullName');
+      const pinInput = document.getElementById('editProfilePin');
+      const timeoutInput = document.getElementById('editProfileLockTimeout');
+      const lockDisplay = document.getElementById('profLockTimeDisplay');
+
+      if (nameInput) nameInput.value = currentAuthUser;
+      if (pinInput) pinInput.value = registeredPin;
+      if (timeoutInput) timeoutInput.value = String(inactivityTimeoutMinutes);
+      if (lockDisplay) lockDisplay.textContent = `⏱️ ${inactivityTimeoutMinutes} นาที (Quick PIN)`;
+    }
+
+    function handleSaveProfileSettings(e) {
+      if (e) e.preventDefault();
+      const newName = document.getElementById('editProfileFullName').value.trim();
+      const newPin = document.getElementById('editProfilePin').value.trim();
+      const newTimeout = parseInt(document.getElementById('editProfileLockTimeout').value, 10);
+
+      if (!newName) {
+        showToast("⚠️ กรุณาระบุชื่อ-นามสกุล");
+        return;
+      }
+
+      if (!newPin || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+        showToast("⚠️ รหัส Quick PIN ต้องเป็นตัวเลข 4 หลักเท่านั้น");
+        return;
+      }
+
+      // บันทึกค่า
+      currentAuthUser = newName;
+      registeredPin = newPin;
+      inactivityTimeoutMinutes = newTimeout || 5;
+
+      // อัปเดตแสดงผลในหน้าโปรไฟล์
+      const profNameEl = document.getElementById('profName');
+      if (profNameEl) profNameEl.textContent = newName;
+      const profPinEl = document.getElementById('profPin');
+      if (profPinEl) profPinEl.textContent = '••••';
+      const lockDisplay = document.getElementById('profLockTimeDisplay');
+      if (lockDisplay) lockDisplay.textContent = `⏱️ ${inactivityTimeoutMinutes} นาที (Quick PIN)`;
+
+      // อัปเดตไปยังหน้าจอล็อกด้วย
+      const lockUserEl = document.getElementById('lockUserName');
+      if (lockUserEl) lockUserEl.textContent = newName;
+
+      // รีเซ็ตตัวจับเวลาใหม่ตามที่เลือก
+      resetInactivityTimer();
+
+      // ซิงก์ Header Profile
+      updateHeaderProfile();
+
+      showToast(`✅ บันทึกข้อมูลสำเร็จ! ชื่อ: ${newName}, PIN ใหม่: [${newPin}], ล็อกจอ: ${inactivityTimeoutMinutes} นาที`);
+    }
+
+    // ==========================================
+    // 👤 AVATAR & HEADER PROFILE FUNCTIONS
+    // ==========================================
+    function updateHeaderProfile() {
+      const headerName = document.getElementById('headerUserName');
+      const headerRole = document.getElementById('headerUserRole');
+      const headerAvatar = document.getElementById('headerUserAvatar');
+      const profAvatar = document.getElementById('profAvatar');
+      const profName = document.getElementById('profName');
+      const profRole = document.getElementById('profRole');
+      const lockUserName = document.getElementById('lockUserName');
+      const lockUserAvatar = document.getElementById('lockUserAvatar');
+
+      if (headerName) headerName.textContent = currentAuthUser || "พว. ไหมแก้ว";
+      if (headerRole) headerRole.textContent = currentUserRoleTitle.split('(')[0].trim() || "Junior Nurse";
+
+      // Render Avatar (Emoji หรือ Image DataURL)
+      const renderAvatarHtml = (el) => {
+        if (!el) return;
+        if (currentUserAvatar && currentUserAvatar.startsWith('data:image')) {
+          el.innerHTML = `<img src="${currentUserAvatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        } else {
+          el.innerHTML = currentUserAvatar || "👩‍⚕️";
+        }
+      };
+
+      renderAvatarHtml(headerAvatar);
+      renderAvatarHtml(profAvatar);
+      renderAvatarHtml(lockUserAvatar);
+
+      if (profName) profName.textContent = currentAuthUser;
+      if (profRole) profRole.textContent = currentUserRoleTitle;
+      if (lockUserName) lockUserName.textContent = currentAuthUser;
+    }
+
+    function selectQuickAvatar(emoji) {
+      currentUserAvatar = emoji;
+      updateHeaderProfile();
+      showToast(`✨ เปลี่ยนรูปอวตารเป็น ${emoji} เรียบร้อยแล้ว`);
+    }
+
+    function triggerAvatarUpload() {
+      const input = document.getElementById('avatarFileInput');
+      if (input) input.click();
+    }
+
+    function handleAvatarFileSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast("⚠️ กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG, WebP)");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentUserAvatar = e.target.result;
+        updateHeaderProfile();
+        showToast("📷 อัปโหลดรูปโปรไฟล์อวตารใหม่สำเร็จแล้ว!");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ==========================================
+    // 👥 SYSTEM USERS MANAGEMENT (ADMIN ONLY)
+    // ==========================================
+    function switchUserListTab(tabKey, btn) {
+      systemUsersTab = tabKey;
+      document.querySelectorAll('#sys-tab-users .tab-pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderSystemUsersList();
+    }
+
+    function renderSystemUsersList() {
+      const container = document.getElementById('usersListContainer');
+      const titleEl = document.getElementById('userListSectionTitle');
+      const countActiveEl = document.getElementById('userCountActive');
+      const countBlockedEl = document.getElementById('userCountBlocked');
+
+      const activeUsers = systemUsersData.filter(u => u.status === 'active');
+      const blockedUsers = systemUsersData.filter(u => u.status === 'blocked');
+
+      if (countActiveEl) countActiveEl.textContent = activeUsers.length;
+      if (countBlockedEl) countBlockedEl.textContent = blockedUsers.length;
+
+      if (!container) return;
+
+      const isViewingBlocked = systemUsersTab === 'blocked';
+      if (titleEl) {
+        titleEl.textContent = isViewingBlocked 
+          ? `รายชื่อผู้ใช้ที่ถูกบล็อก / ระงับสิทธิ์ (${blockedUsers.length})`
+          : `รายชื่อพยาบาลในระบบ CCU (${activeUsers.length})`;
+      }
+
+      const listToRender = isViewingBlocked ? blockedUsers : activeUsers;
+
+      if (listToRender.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 24px 10px; color: var(--muted); font-size: 13px;">
+            ${isViewingBlocked ? '🎉 ไม่มีผู้ใช้ที่ถูกบล็อกในระบบ' : 'ไม่พบข้อมูลผู้ใช้งาน'}
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = listToRender.map(user => {
+        const originalIndex = systemUsersData.findIndex(u => u.id === user.id);
+        const roleBadge = user.role === 'admin'
+          ? `<span class="role-pill role-pill-admin" style="font-size: 10px; padding: 2px 6px;">Admin</span>`
+          : user.role === 'senior' || user.role === 'charge'
+          ? `<span class="role-pill role-pill-senior" style="font-size: 10px; padding: 2px 6px;">${user.role === 'charge' ? 'Charge' : 'รุ่นพี่'}</span>`
+          : `<span style="font-size: 10px; background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 6px; border-radius: 4px; font-weight: 600;">Junior</span>`;
+
+        const avatarDisplay = user.avatar && user.avatar.startsWith('data:image')
+          ? `<img src="${user.avatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">`
+          : `<div style="width: 36px; height: 36px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 18px;">${user.avatar || '👩‍⚕️'}</div>`;
+
+        if (isViewingBlocked) {
+          return `
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                ${avatarDisplay}
+                <div style="min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="font-weight: 600; font-size: 13px; color: #fca5a5; text-decoration: line-through;">${user.name}</span>
+                    <span style="font-size: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171; padding: 1px 5px; border-radius: 4px; font-weight: 600;">🚫 บล็อกแล้ว</span>
+                  </div>
+                  <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                    ${user.staffId} • ${user.ward}
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button class="btn-sm-edit" onclick="toggleBlockUser(${originalIndex})" title="ปลดบล็อกผู้ใช้" style="font-size: 11px; padding: 4px 8px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7;">
+                  🔓 ปลดบล็อก
+                </button>
+                <button class="btn-sm-danger" onclick="deleteUserPermanently(${originalIndex})" title="ลบถาวรตาม PDPA" style="font-size: 11px; padding: 4px 8px;">
+                  🗑️ ลบถาวร
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div style="background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+              ${avatarDisplay}
+              <div style="min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <span style="font-weight: 600; font-size: 13px; color: #fff;">${user.name}</span>
+                  ${roleBadge}
+                </div>
+                <div style="font-size: 11.5px; color: var(--muted); margin-top: 2px;">
+                  ${user.staffId} • ${user.ward}
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px; flex-shrink: 0;">
+              <button class="btn-sm-edit" onclick="openUserModal(${originalIndex})" title="แก้ไขข้อมูลผู้ใช้" style="font-size: 11px; padding: 4px 8px;">
+                ✏️ แก้ไข
+              </button>
+              <button class="btn-sm-danger" onclick="toggleBlockUser(${originalIndex})" title="บล็อกการใช้งาน" style="font-size: 11px; padding: 4px 8px;">
+                🚫 บล็อก
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openUserModal(index) {
+      const modal = document.getElementById('userModal');
+      const title = document.getElementById('userModalTitle');
+      const editIndex = document.getElementById('userEditIndex');
+      const nameInput = document.getElementById('userInputName');
+      const staffIdInput = document.getElementById('userInputStaffId');
+      const roleInput = document.getElementById('userInputRole');
+      const wardInput = document.getElementById('userInputWard');
+      const pinInput = document.getElementById('userInputPin');
+
+      editIndex.value = index;
+
+      if (index === -1) {
+        title.textContent = "➕ เพิ่มผู้ใช้งานใหม่";
+        nameInput.value = "";
+        staffIdInput.value = "";
+        roleInput.value = "junior";
+        wardInput.value = "CCU Ward • โรงพยาบาลศูนย์";
+        pinInput.value = "1234";
+      } else {
+        const u = systemUsersData[index];
+        title.textContent = `✏️ แก้ไขข้อมูล: ${u.name}`;
+        nameInput.value = u.name;
+        staffIdInput.value = u.staffId;
+        roleInput.value = u.role;
+        wardInput.value = u.ward;
+        pinInput.value = u.pin || "1234";
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeUserModal() {
+      const modal = document.getElementById('userModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function saveUser(e) {
+      if (e) e.preventDefault();
+      const index = parseInt(document.getElementById('userEditIndex').value, 10);
+      const name = document.getElementById('userInputName').value.trim();
+      const staffId = document.getElementById('userInputStaffId').value.trim();
+      const role = document.getElementById('userInputRole').value;
+      const ward = document.getElementById('userInputWard').value.trim();
+      const pin = document.getElementById('userInputPin').value.trim();
+
+      if (!name || !staffId) {
+        showToast("⚠️ กรุณากรอกชื่อและรหัสพนักงานให้ครบถ้วน");
+        return;
+      }
+
+      let roleTitle = "พยาบาลจบใหม่ (Junior Nurse)";
+      let avatar = "👩‍⚕️";
+      if (role === 'senior') {
+        roleTitle = "พยาบาลพี่เลี้ยง (Preceptor / Senior Nurse)";
+        avatar = "👩‍⚕️";
+      } else if (role === 'charge') {
+        roleTitle = "หัวหน้าเวร (Charge Nurse CCU)";
+        avatar = "🩺";
+      } else if (role === 'admin') {
+        roleTitle = "ผู้ดูแลระบบสารสนเทศ (System Admin)";
+        avatar = "🛡️";
+      }
+
+      if (index === -1) {
+        // เพิ่มใหม่
+        const newId = `USR-0${systemUsersData.length + 1}`;
+        systemUsersData.push({
+          id: newId,
+          name: name,
+          staffId: staffId,
+          role: role,
+          roleTitle: roleTitle,
+          ward: ward || "CCU Ward • โรงพยาบาลศูนย์",
+          avatar: avatar,
+          pin: pin || "1234",
+          status: "active"
+        });
+        showToast(`🎉 เพิ่มผู้ใช้งาน "${name}" เรียบร้อยแล้ว`);
+      } else {
+        // แก้ไข
+        systemUsersData[index].name = name;
+        systemUsersData[index].staffId = staffId;
+        systemUsersData[index].role = role;
+        systemUsersData[index].roleTitle = roleTitle;
+        systemUsersData[index].ward = ward;
+        systemUsersData[index].pin = pin;
+        showToast(`💾 อัปเดตข้อมูลของ "${name}" สำเร็จ`);
+      }
+
+      closeUserModal();
+      renderSystemUsersList();
+    }
+
+    function toggleBlockUser(index) {
+      const user = systemUsersData[index];
+      if (!user) return;
+
+      if (user.status === 'active') {
+        if (confirm(`ต้องการบล็อกการเข้าถึงระบบของ "${user.name}" หรือไม่?\nผู้ใช้จะไม่สามารถเข้าสู่ระบบหรือเข้าถึงข้อมูลผู้ป่วยได้`)) {
+          user.status = 'blocked';
+          showToast(`🚫 บล็อกผู้ใช้ "${user.name}" เรียบร้อยแล้ว`);
+          renderSystemUsersList();
+        }
+      } else {
+        user.status = 'active';
+        showToast(`🔓 ปลดบล็อก "${user.name}" กลับสู่สถานะปกติแล้ว`);
+        renderSystemUsersList();
+      }
+    }
+
+    function deleteUserPermanently(index) {
+      const user = systemUsersData[index];
+      if (!user) return;
+
+      const confirmDelete = confirm(
+        `⚠️ ยืนยันการลบผู้ใช้ถาวร (Permanent Delete)\n\n` +
+        `ท่านต้องการลบ "${user.name}" (${user.staffId}) ออกจากฐานข้อมูลระบบอย่างถาวรหรือไม่?\n\n` +
+        `* หมายเหตุ: การกระทำนี้ไม่สามารถย้อนกลับได้ตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล (PDPA)`
+      );
+
+      if (confirmDelete) {
+        systemUsersData.splice(index, 1);
+        showToast(`🗑️ ลบผู้ใช้ "${user.name}" ออกจากระบบอย่างถาวรเรียบร้อยแล้ว`);
+        renderSystemUsersList();
       }
     }
 
@@ -2889,8 +3786,8 @@
       setTimeout(() => {
         showToast("🎉 บันทึกโจทย์สำเร็จ! เผยแพร่ข้อสอบให้พยาบาลทุกคนฝึกทำเรียบร้อย");
         document.getElementById('quizGenQuestion').value = "";
-        // Switch to Quiz view to show success
-        switchSystemTab('profile', document.querySelectorAll('#screen-system .tab-pill-btn')[0]);
+        // Switch to Profile view to show success
+        switchSystemSubView('profile');
       }, 800);
     }
 
